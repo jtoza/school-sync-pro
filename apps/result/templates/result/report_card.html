@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
+<div class="card reportcard">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <div>
+      <h5 class="mb-0">Report Card</h5>
+      <small>{{ student }} — {{ current_class }} | {{ term }} {{ session }}</small>
+    </div>
+    <div class="btn-group btn-group-sm">
+      <a href="{% url 'report-card-pdf' student.id %}" class="btn btn-primary"><i class="fas fa-file-pdf mr-1"></i>Download PDF</a>
+      <button onclick="window.print()" class="btn btn-secondary"><i class="fas fa-print mr-1"></i>Print</button>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-sm mb-0">
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>CA (40)</th>
+          <th>Exam (60)</th>
+          <th>Total</th>
+          <th>Grade</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in results %}
+        <tr>
+          <td>{{ r.subject }}</td>
+          <td>{{ r.test_score }}</td>
+          <td>{{ r.exam_score }}</td>
+          <td>{{ r.total_score }}</td>
+          <td>{{ r.grade }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center p-3">No results found.</td></tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="3" class="text-right">Average</th>
+          <th>{{ average_total|floatformat:2 }}</th>
+          <th></th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  <div class="card-footer">
+    <div class="row">
+      <div class="col-md-6">
+        <h6>Attendance Summary</h6>
+        <p class="mb-1">Present: <strong>{{ attendance.present }}</strong></p>
+        <p class="mb-1">Absent: <strong>{{ attendance.absent }}</strong></p>
+        <p class="mb-1">Late: <strong>{{ attendance.late }}</strong></p>
+        <p class="mb-1">Attendance: <strong>{{ attendance.percent|default:0 }}%</strong></p>
+      </div>
+      <div class="col-md-6">
+        <h6>Comments & Fees</h6>
+        <p class="mb-1"><strong>Teacher:</strong> {{ teacher_comment|default:'—' }}</p>
+        <p class="mb-1"><strong>Headteacher:</strong> {{ headteacher_comment|default:'—' }}</p>
+        <p class="mb-0"><strong>Outstanding Balance:</strong> {{ fee_balance|floatformat:2 }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  .reportcard { max-width: 900px; margin: 0 auto; border-radius: 10px; }
+  .reportcard .card-header { padding: 1rem 1.25rem; border-bottom: 2px solid #e9ecef; }
+  .reportcard .card-body { padding: 0; }
+  .reportcard table { table-layout: fixed; }
+  .reportcard thead th { background: #f8f9fc; font-weight: 600; font-size: 0.92rem; }
+  .reportcard tbody td, .reportcard thead th { padding: .65rem .75rem; }
+  .reportcard tbody tr:nth-child(odd) { background: #fcfdff; }
+  .reportcard tfoot th, .reportcard tfoot td { background: #f8f9fc; }
+  .reportcard .card-footer { background: #fff; padding: 1rem 1.25rem; }
+  .reportcard h6 { font-weight: 600; }
+
+  @media print {
+    .main-header,.main-sidebar,.card-header .btn,.control-sidebar,.nav-sidebar { display:none !important; }
+    .content-wrapper { margin:0 !important; padding:0 !important; }
+    .reportcard { box-shadow:none !important; border: none !important; max-width: 100%; }
+    .reportcard .card-header { padding-bottom: .5rem; border-bottom: 2px solid #000; }
+    .reportcard tbody td, .reportcard thead th { padding: .5rem .6rem; font-size: 11pt; }
+    .reportcard thead th { background: #f0f0f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .reportcard .card-footer { padding-top: .75rem; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+{% endblock %}

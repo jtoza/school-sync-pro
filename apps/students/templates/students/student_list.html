@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}Students Management{% endblock title %}
+
+{% block breadcrumb %}
+<div class="d-flex flex-wrap gap-2">
+  <a class="btn btn-success btn-sm" href="{% url 'student-create' %}">
+    <i class="fas fa-user-plus mr-1"></i> New Student
+  </a>
+  <a class="btn btn-info btn-sm" href="{% url 'student-upload' %}">
+    <i class="fas fa-upload mr-1"></i> Upload
+  </a>
+</div>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header bg-primary text-white">
+    <h5 class="card-title mb-0">
+      <i class="fas fa-user-graduate mr-2"></i>
+      Students
+    </h5>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table id="studenttable" class="table table-sm table-hover mb-0" data-page-length='25'>
+        <thead class="thead-dark">
+          <tr>
+            <th>#</th>
+            <th>Student</th>
+            <th class="d-none d-md-table-cell">Reg No.</th>
+            <th class="d-none d-sm-table-cell">Class</th>
+            <th class="d-none d-lg-table-cell">Gender</th>
+            <th class="d-none d-xl-table-cell">Mobile</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for student in object_list %}
+          <tr class='clickable-row' data-href="{% url 'student-detail' student.id %}">
+            <td class="text-center">{{ forloop.counter}}</td>
+            <td>
+              <div class="d-flex align-items-center">
+                {% if student.passport %}
+                  <img src="{{ student.passport.url }}" class="rounded-circle student-avatar-sm mr-2" alt="{{ student.surname }}">
+                {% else %}
+                  <div class="rounded-circle student-avatar-sm bg-secondary mr-2 d-flex align-items-center justify-content-center">
+                    <i class="fas fa-user text-white" style="font-size: 0.8rem;"></i>
+                  </div>
+                {% endif %}
+                <div class="student-info-mobile">
+                  <div class="font-weight-bold">{{ student.surname }} {{ student.firstname|first }}.</div>
+                  <small class="text-muted d-block d-md-none">{{ student.registration_number }}</small>
+                  <small class="text-muted d-block d-sm-none">{{ student.current_class }}</small>
+                </div>
+              </div>
+            </td>
+            <td class="d-none d-md-table-cell">
+              <small class="text-muted">{{ student.registration_number}}</small>
+            </td>
+            <td class="d-none d-sm-table-cell">
+              <span class="badge badge-info badge-sm">{{ student.current_class}}</span>
+            </td>
+            <td class="d-none d-lg-table-cell">
+              <small>{{ student.get_gender_display}}</small>
+            </td>
+            <td class="d-none d-xl-table-cell">
+              <small>{{ student.parent_mobile_number|default:"-" }}</small>
+            </td>
+            <td>
+              {% if student.current_status == 'active' %}
+                <span class="badge badge-success badge-sm">
+                  <i class="fas fa-check"></i>
+                </span>
+              {% else %}
+                <span class="badge badge-secondary badge-sm">
+                  <i class="fas fa-times"></i>
+                </span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center py-4">
+              <i class="fas fa-user-graduate fa-2x text-muted mb-2 d-block"></i>
+              <span class="text-muted">No students found</span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<style>
+.student-avatar-sm {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.student-info-mobile {
+  min-width: 0; /* Allows text truncation */
+}
+
+.badge-sm {
+  font-size: 0.7rem;
+  padding: 0.25em 0.4em;
+}
+
+/* Mobile-first table styles */
+@media (max-width: 576px) {
+  .table-responsive {
+    font-size: 0.8rem;
+  }
+  
+  .card-header h5 {
+    font-size: 1.1rem;
+  }
+  
+  .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Ensure table is scrollable on mobile */
+.table-responsive {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Better touch targets */
+.clickable-row {
+  min-height: 50px;
+}
+
+.clickable-row:active {
+  background-color: rgba(0, 123, 255, 0.1);
+}
+</style>
+
+{% block morejs %}
+<script>
+$(document).ready(function() {
+  $('#studenttable').DataTable({
+    "responsive": true,
+    "pageLength": 25,
+    "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+    "language": {
+      "search": "Search:",
+      "lengthMenu": "Show _MENU_ students",
+      "info": "Showing _START_ to _END_ of _TOTAL_",
+      "infoEmpty": "No students",
+      "emptyTable": "No students found"
+    },
+    "dom": '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
+  });
+});
+</script>
+{% endblock morejs %}
+{% endblock content %}

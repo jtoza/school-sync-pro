@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Student Performance Trend</h5>
+  </div>
+  <div class="card-body">
+    <form method="get" class="form-inline mb-3">
+      <input type="text" name="reg" class="form-control mr-2" placeholder="Registration Number" value="{{ request.GET.reg }}">
+      <button class="btn btn-primary" type="submit">Load</button>
+    </form>
+
+    {% if student %}
+    <h6 class="mb-3">{{ student }} — {{ student.current_class }}</h6>
+    <div style="height:300px"><canvas id="perfChart"></canvas></div>
+    <script type="application/json" id="perf-labels">{{ labels|json_script:"perf-labels" }}</script>
+    <script type="application/json" id="perf-totals">{{ totals|json_script:"perf-totals" }}</script>
+    {% else %}
+    <p>Enter a student's registration number to view performance by term.</p>
+    {% endif %}
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+(function(){
+  // Use JSON script tags to avoid template injecting invalid JS
+  const labelsEl = document.getElementById('perf-labels');
+  const totalsEl = document.getElementById('perf-totals');
+  if (!labelsEl || !totalsEl) return;
+  const labels = JSON.parse(labelsEl.textContent || '[]');
+  const totals = JSON.parse(totalsEl.textContent || '[]');
+  if (!Array.isArray(labels) || !labels.length) return;
+  const ctx = document.getElementById('perfChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Average Total (%)',
+        data: totals,
+        borderColor: 'rgba(54, 162, 235, 1)',
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        tension: 0.25,
+        fill: true,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { beginAtZero: true, max: 100 }
+      }
+    }
+  });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  {% if object %}Update Student{% else %}Add Student{% endif %}
+{% endblock title %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header bg-primary text-white">
+    <h5 class="card-title mb-0">
+      <i class="fas fa-user-graduate mr-2"></i>
+      {% if object %}
+        Update Student
+      {% else %}
+        Add New Student
+      {% endif %}
+    </h5>
+  </div>
+
+  <form action="" method="POST" enctype="multipart/form-data" id="student-form">
+    {% csrf_token %}
+    
+    <div class="card-body">
+      <!-- Basic Information -->
+      <div class="form-section mb-4">
+        <h6 class="section-title text-primary mb-3">
+          <i class="fas fa-user mr-2"></i>
+          Basic Information
+        </h6>
+        {% include 'corecode/form_snippet.html' %}
+      </div>
+
+      <!-- Guardian & Contacts -->
+      <div class="card mb-3">
+        <div class="card-header bg-info text-white py-2">
+          <h6 class="card-title mb-0">
+            <i class="fas fa-users mr-2"></i>
+            Guardian & Contacts
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="row g-2">
+            <div class="col-12 col-md-4">
+              <label class="form-label small fw-bold">{{ form.guardian_name.label }}</label>
+              {{ form.guardian_name }}
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label small fw-bold">{{ form.relationship.label }}</label>
+              {{ form.relationship }}
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label small fw-bold">{{ form.guardian_phone.label }}</label>
+              {{ form.guardian_phone }}
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label small fw-bold">{{ form.guardian_email.label }}</label>
+              {{ form.guardian_email }}
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label small fw-bold">{{ form.emergency_contact.label }}</label>
+              {{ form.emergency_contact }}
+            </div>
+            <div class="col-12">
+              <div class="form-check mt-2">
+                {{ form.pickup_authorized }}
+                <label class="form-check-label small fw-bold" for="{{ form.pickup_authorized.id_for_label }}">
+                  {{ form.pickup_authorized.label }}
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Medical Information -->
+      <div class="card mb-3">
+        <div class="card-header bg-warning text-dark py-2">
+          <h6 class="card-title mb-0">
+            <i class="fas fa-heartbeat mr-2"></i>
+            Medical Information
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="row g-2">
+            <div class="col-12">
+              <label class="form-label small fw-bold">{{ form.medical_notes.label }}</label>
+              {{ form.medical_notes }}
+              <div class="form-text">Any important medical information</div>
+            </div>
+            <div class="col-12">
+              <label class="form-label small fw-bold">{{ form.allergies.label }}</label>
+              {{ form.allergies }}
+              <div class="form-text">List any known allergies</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- House & Services -->
+      <div class="card mb-3">
+        <div class="card-header bg-success text-white py-2">
+          <h6 class="card-title mb-0">
+            <i class="fas fa-home mr-2"></i>
+            House & Services
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-12 col-md-4">
+              <label class="form-label small fw-bold">{{ form.house.label }}</label>
+              {{ form.house }}
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="form-check form-switch mt-3">
+                {{ form.transport_opt_in }}
+                <label class="form-check-label small fw-bold" for="{{ form.transport_opt_in.id_for_label }}">
+                  {{ form.transport_opt_in.label }}
+                </label>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="form-check form-switch mt-3">
+                {{ form.lunch_opt_in }}
+                <label class="form-check-label small fw-bold" for="{{ form.lunch_opt_in.id_for_label }}">
+                  {{ form.lunch_opt_in.label }}
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-footer bg-light">
+      <div class="d-flex flex-column flex-sm-row gap-2">
+        <a href="{% if object %}{% url 'student-detail' object.id %}{% else %}{% url 'student-list' %}{% endif %}" 
+           class="btn btn-outline-secondary flex-fill">
+          <i class="fas fa-times mr-1"></i> Cancel
+        </a>
+        <button type="submit" class="btn btn-success flex-fill" id="submit-btn">
+          <i class="fas fa-save mr-1"></i>
+          {% if object %}
+            Update
+          {% else %}
+            Save Student
+          {% endif %}
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<style>
+/* Mobile-first form styling */
+.form-control, .form-select {
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.1);
+}
+
+.form-label {
+  margin-bottom: 0.25rem;
+}
+
+.form-text {
+  font-size: 0.75rem;
+}
+
+.section-title {
+  font-size: 0.9rem;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 0.5rem;
+}
+
+/* Better form spacing for mobile */
+.row.g-2 > [class*="col-"] {
+  margin-bottom: 0.5rem;
+}
+
+/* Switch styling for better mobile interaction */
+.form-switch .form-check-input {
+  width: 2.5em;
+  height: 1.25em;
+}
+
+/* Card header sizing for mobile */
+.card-header h6 {
+  font-size: 0.9rem;
+}
+
+/* Button sizing for mobile */
+.btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+/* Ensure form elements are touch-friendly */
+.form-control, .form-select, .btn {
+  min-height: 44px; /* Minimum touch target */
+}
+
+/* Stack form elements on very small screens */
+@media (max-width: 576px) {
+  .card-body {
+    padding: 1rem;
+  }
+  
+  .form-section {
+    margin-bottom: 1.5rem;
+  }
+  
+  .card {
+    margin-bottom: 1rem;
+  }
+  
+  .flex-fill {
+    min-width: 120px;
+  }
+}
+
+/* Better spacing on larger screens */
+@media (min-width: 768px) {
+  .row.g-2 > [class*="col-"] {
+    margin-bottom: 0;
+  }
+}
+</style>
+
+<script>
+document.getElementById('student-form').addEventListener('submit', function() {
+    const submitBtn = document.getElementById('submit-btn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Saving...';
+});
+
+// Enhance form usability on mobile
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-focus first field
+    const firstInput = document.querySelector('form input:not([type="hidden"])');
+    if (firstInput) {
+        firstInput.focus();
+    }
+    
+    // Better select handling on mobile
+    const selects = document.querySelectorAll('select');
+    selects.forEach(select => {
+        select.classList.add('form-select');
+    });
+});
+</script>
+{% endblock content %}

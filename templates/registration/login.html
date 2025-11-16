@@ -1,0 +1,292 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>{{ school_name | default:"MySchool" }} - Login</title>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/toastr/toastr.min.css' %}">
+    <!-- overlayScrollbars -->
+    <link rel="stylesheet" href="{% static 'plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css' %}">
+    <!-- Login Page CSS -->
+    <link rel="stylesheet" href="{% static 'dist/css/login-page.css' %}">
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    
+    <style>
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        .login-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            min-height: 500px;
+        }
+        .login-image {
+            flex: 1;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+        .login-image img {
+            max-width: 100%;
+            height: auto;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+        }
+        .login-form {
+            flex: 1;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .login-title {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #333;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        .form-control {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+        .form-control:focus {
+            border-color: #007bff;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+            outline: none;
+        }
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,123,255,0.3);
+        }
+        .login-links {
+            text-align: center;
+            margin-top: 25px;
+        }
+        .login-links a {
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .login-links a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .info-message {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #bee5eb;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .school-brand {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #007bff;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .welcome-text {
+            text-align: center;
+            color: #6c757d;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        /* CSRF Token Styling */
+        .csrf-token {
+            display: none; /* Hide the CSRF token input */
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .login-card {
+                flex-direction: column;
+                max-width: 400px;
+            }
+            .login-image {
+                padding: 30px;
+                min-height: 200px;
+            }
+            .login-form {
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-image">
+            <img src="{% static 'dist/img/login.png' %}" alt="Login Illustration">
+        </div>
+        
+        <div class="login-form">
+            <div class="school-brand">
+                {{ school_name | default:"MySchool" }}
+            </div>
+            <div class="welcome-text">
+                Welcome back! Please login to your account.
+            </div>
+            
+            {% if form.errors %}
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i> 
+                Your username and password didn't match. Please try again.
+            </div>
+            {% endif %}
+
+            {% if next %}
+                {% if user.is_authenticated %}
+                <div class="error-message">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Your account doesn't have access to this page. To proceed, please login with an account that has access.
+                </div>
+                {% else %}
+                <div class="info-message">
+                    <i class="fas fa-info-circle"></i>
+                    Please login to see this page.
+                </div>
+                {% endif %}
+            {% endif %}
+
+            <form method="post" action="{% url 'login' %}">
+                {% csrf_token %}  <!-- ADD THIS LINE - CRITICAL -->
+                
+                <div class="form-group">
+                    <input class="form-control" id="id_username" name="username" 
+                           type="text" placeholder="Username" required>
+                    <div class="input-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <input class="form-control" type="password" id="id_password" name="password" 
+                           placeholder="Password" required>
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                </div>
+                
+                <button class="btn-login" type="submit">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                <input type="hidden" name="next" value="{{ next }}">
+            </form>
+
+            <div class="login-links">
+                <div style="margin-bottom: 15px;">
+                    <a href="#">
+                        <i class="fas fa-question-circle"></i> Forgot Username / Password?
+                    </a>
+                </div>
+                <div>
+                    <span style="color: #6c757d;">Don't have an account?</span>
+                    <a href="{% url 'signup' %}" style="margin-left: 5px;">
+                        <i class="fas fa-user-plus"></i> Sign Up
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- REQUIRED SCRIPTS -->
+<script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'plugins/toastr/toastr.min.js' %}"></script>
+<script src="{% static 'plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js' %}"></script>
+<script src="{% static 'dist/js/adminlte.js' %}"></script>
+
+{% if messages %}
+{% for message in messages %}
+<script type=text/javascript>
+    toastr.options = {
+        progressBar: true,
+        closeButton: true,
+        timeOut: 5000,
+        positionClass: "toast-top-right"
+    };
+    toastr.{{ message.tags }}('{{ message }}');
+</script>
+{% endfor %}
+{% endif %}
+
+<script>
+    // Add focus effects to form inputs
+    $(document).ready(function() {
+        $('.form-control').on('focus', function() {
+            $(this).parent().find('.input-icon').css('color', '#007bff');
+        }).on('blur', function() {
+            $(this).parent().find('.input-icon').css('color', '#6c757d');
+        });
+        
+        // Ensure CSRF token is present
+        console.log('CSRF token present:', $('input[name="csrfmiddlewaretoken"]').length > 0);
+    });
+</script>
+</body>
+</html>

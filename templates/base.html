@@ -1,0 +1,1240 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+  <title>{{ school_name | default:"MySchool" }}</title>
+
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#007bff"/>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="{{ school_name|default:'MySchool' }}">
+  <meta name="description" content="School Management System - Students, Attendance, Results">
+  <meta name="keywords" content="school, management, students, attendance, results">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="{% static 'dist/img/favicon.ico' %}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'dist/img/apple-touch-icon.png' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'dist/img/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'dist/img/favicon-16x16.png' %}">
+
+  <!-- PWA Icons for Apple devices -->
+  <link rel="apple-touch-icon" href="{% static 'dist/img/apple-touch-icon.png' %}">
+  <link rel="apple-touch-startup-image" href="{% static 'dist/img/apple-touch-icon.png' %}">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/toastr/toastr.min.css' %}">
+  <!-- overlayScrollbars -->
+  <link rel="stylesheet" href="{% static 'plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/Datatables/datatables.min.css' %}" />
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css' %}">
+  <!-- Google Font: Source Sans Pro -->
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+  
+  <!-- Performance Hints -->
+  <link rel="dns-prefetch" href="//fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <style>
+    /* ===== PWA INSTALL BUTTON STYLES ===== */
+    #pwaInstallContainer {
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    #pwaInstallBtn {
+      background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+      border: none;
+      color: white;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+    }
+    
+    #pwaInstallBtn:hover {
+      background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+    }
+    
+    #pwaInstallBtn:active {
+      transform: translateY(0);
+    }
+    
+    #pwaInstallBtn i {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+    }
+    
+    /* ===== ENHANCED RESPONSIVE STYLES ===== */
+    
+    /* Mobile-First Breakpoints */
+    @media (max-width: 576px) {
+      .navbar-nav .nav-link {
+        padding: 0.6rem 0.4rem;
+        font-size: 0.85rem;
+      }
+      
+      .dropdown-menu {
+        font-size: 0.9rem;
+        min-width: 200px;
+      }
+      
+      .card-body {
+        padding: 1rem;
+      }
+      
+      .content-wrapper {
+        padding: 0.5rem;
+      }
+      
+      /* Mobile-specific navbar fixes */
+      .mobile-academic-info {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        padding: 0.4rem 0.8rem;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        text-align: center;
+        margin: 0.2rem 0;
+        display: block;
+        line-height: 1.2;
+      }
+      
+      .navbar-mobile-compact {
+        flex-wrap: wrap;
+        min-height: auto;
+      }
+      
+      .navbar-mobile-compact .navbar-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      
+      .mobile-user-info {
+        font-size: 0.8rem;
+        background: rgba(255,255,255,0.1);
+        padding: 0.3rem 0.6rem;
+        border-radius: 12px;
+        margin: 0.2rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .navbar-nav .nav-item.d-none.d-sm-inline-block {
+        display: inline-block !important;
+      }
+      
+      .main-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+        box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+      }
+      
+      .sidebar-open .main-sidebar {
+        transform: translateX(0);
+      }
+      
+      .brand-link {
+        text-align: center;
+        font-size: 1.1rem;
+        padding: 0.8rem 0.5rem;
+      }
+      
+      .nav-sidebar > .nav-item > .nav-link {
+        padding: 0.8rem 0.6rem;
+        font-size: 0.9rem;
+        border-left: 3px solid transparent;
+      }
+      
+      .content-header h1 {
+        font-size: 1.4rem;
+        margin-bottom: 0.5rem;
+      }
+      
+      .breadcrumb {
+        font-size: 0.8rem;
+      }
+      
+      .mobile-nav-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 1038;
+      }
+      
+      .sidebar-open .mobile-nav-overlay {
+        display: block;
+      }
+      
+      /* Tablet navbar adjustments */
+      .navbar-tablet .session-info {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.6rem;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 992px) {
+      .brand-link {
+        font-size: 1.1rem;
+      }
+      
+      .nav-sidebar > .nav-item > .nav-link {
+        font-size: 0.9rem;
+        padding: 0.7rem 0.8rem;
+      }
+    }
+
+    /* ===== ENHANCED STYLING ===== */
+    
+    /* Brand Styling */
+    .brand-link {
+      font-weight: 700;
+      font-size: 1.3rem;
+      text-align: center;
+      padding: 0.9rem 0.5rem;
+      border-bottom: 2px solid #4b545c;
+      background: linear-gradient(135deg, #343a40 0%, #495057 100%);
+      transition: all 0.3s ease;
+    }
+
+    .brand-link:hover {
+      color: #fff !important;
+      text-decoration: none;
+      background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+    }
+
+    .brand-icon {
+      color: #007bff;
+      font-size: 1.4rem;
+    }
+
+    /* Enhanced Navbar Styling */
+    .navbar-white {
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+      border-bottom: 1px solid #dee2e6;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      backdrop-filter: blur(10px);
+      min-height: 57px;
+    }
+
+    .navbar-nav .nav-link {
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border-radius: 6px;
+      margin: 0 0.1rem;
+    }
+
+    .navbar-nav .nav-link:hover {
+      color: #007bff !important;
+      background: rgba(0,123,255,0.1);
+    }
+
+    /* Session and Term Info Styling */
+    .session-info {
+      background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+      color: white;
+      padding: 0.4rem 0.9rem;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      margin: 0 0.2rem;
+      box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+      border: 1px solid rgba(255,255,255,0.2);
+      white-space: nowrap;
+    }
+
+    /* Enhanced Sidebar Styling */
+    .sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active {
+      background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+      border-left: 4px solid #fff;
+      box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+    }
+
+    .nav-sidebar > .nav-item > .nav-link {
+      margin-bottom: 2px;
+      border-radius: 0;
+      transition: all 0.3s ease;
+      border-left: 3px solid transparent;
+    }
+
+    .nav-sidebar > .nav-item > .nav-link:hover {
+      background-color: #4b545c;
+      padding-left: 1.3rem;
+      border-left-color: #007bff;
+    }
+
+    .nav-header {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 1.2rem;
+      padding: 0.6rem 1rem;
+      color: #8fa0af;
+      border-bottom: 1px solid #4b545c;
+      background: rgba(0,0,0,0.1);
+    }
+
+    /* Card Enhancements */
+    .card {
+      box-shadow: 0 0.3rem 0.8rem rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 0.75rem;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 0.5rem 1.2rem rgba(0, 0, 0, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-bottom: 1px solid #dee2e6;
+      font-weight: 600;
+      border-radius: 0.75rem 0.75rem 0 0 !important;
+    }
+
+    /* Content Header Styling */
+    .content-header h1 {
+      color: #2c3e50;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #2c3e50, #3498db);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .breadcrumb {
+      background: transparent;
+      padding: 0;
+      font-size: 0.9rem;
+    }
+
+    .breadcrumb-item a {
+      color: #6c757d;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .breadcrumb-item a:hover {
+      color: #007bff;
+    }
+
+    /* Mobile Menu Toggle Enhancement */
+    .navbar-toggler {
+      border: none;
+      padding: 0.4rem 0.6rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-toggler:hover {
+      background: rgba(0,123,255,0.1);
+    }
+
+    .navbar-toggler:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+    }
+
+    /* Dropdown Menu Enhancement */
+    .dropdown-menu {
+      border: none;
+      box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15);
+      border-radius: 0.75rem;
+      margin-top: 0.5rem;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .dropdown-item {
+      padding: 0.7rem 1.2rem;
+      transition: all 0.3s ease;
+      border-radius: 0.5rem;
+      margin: 0.1rem 0.5rem;
+      width: auto;
+    }
+
+    .dropdown-item:hover {
+      background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+      color: white;
+      transform: translateX(5px);
+    }
+
+    .dropdown-header {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      font-weight: 600;
+      color: #495057;
+    }
+
+    /* Loading State */
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+      position: relative;
+    }
+
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255,255,255,0.8);
+      z-index: 1000;
+    }
+
+    /* Enhanced User Dropdown */
+    .user-dropdown .nav-link {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border-radius: 25px;
+      padding: 0.4rem 0.8rem;
+      border: 1px solid #dee2e6;
+    }
+
+    .user-dropdown .nav-link:hover {
+      background: linear-gradient(135deg, #007bff, #0056b3);
+      color: white !important;
+    }
+
+    /* Print Styles */
+    @media print {
+      .navbar, .main-sidebar, .content-header, .breadcrumb,
+      .control-sidebar, .card-header .btn-tool {
+        display: none !important;
+      }
+      .content-wrapper {
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        border-radius: 0 !important;
+      }
+      .card-header {
+        background: #f8f9fa !important;
+        color: #000 !important;
+      }
+    }
+
+    /* Smooth Scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Enhanced Focus States */
+    .nav-link:focus,
+    .btn:focus,
+    .form-control:focus,
+    .dropdown-item:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+    }
+
+    /* Better Table Responsiveness */
+    .table-responsive {
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+
+    /* Mobile-specific improvements */
+    .mobile-optimized-nav {
+      flex-wrap: wrap;
+      padding: 0.3rem 0.5rem;
+    }
+
+    .mobile-optimized-nav .navbar-nav {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .mobile-academic-compact {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      margin: 0.2rem 0;
+    }
+
+    /* PWA Standalone Mode Styles */
+    .pwa-standalone .navbar {
+      padding-top: env(safe-area-inset-top);
+    }
+    .pwa-standalone .content-wrapper {
+      padding-top: env(safe-area-inset-top);
+    }
+  </style>
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
+  <div class="wrapper">
+    <!-- Mobile Navigation Overlay -->
+    <div class="mobile-nav-overlay"></div>
+
+    <!-- Navbar - Mobile Optimized -->
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light mobile-optimized-nav">
+      <!-- Left navbar links -->
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" data-widget="pushmenu" href="#" role="button">
+            <i class="fas fa-bars"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'home' %}" class="nav-link">
+            <i class="fa fa-home"></i>
+            <span class="d-none d-sm-inline">Home</span>
+          </a>
+        </li>
+      </ul>
+
+      <!-- Academic Info - Different layouts for different screens -->
+      <div class="d-none d-md-flex mx-auto">
+        <span class="session-info">
+          <i class="fas fa-calendar-alt"></i> Session: {{ current_session }}
+        </span>
+        <span class="session-info ml-2">
+          <i class="fas fa-clock"></i> Term: {{ current_term }}
+        </span>
+      </div>
+
+      <!-- Mobile Academic Info -->
+      <div class="d-md-none mobile-academic-compact">
+        <span class="mobile-academic-info">
+          <i class="fas fa-calendar-alt"></i> {{ current_session }}
+        </span>
+        <span class="mobile-academic-info">
+          <i class="fas fa-clock"></i> {{ current_term }}
+        </span>
+      </div>
+
+      <!-- Right navbar links -->
+      <ul class="navbar-nav ml-auto align-items-center">
+        <!-- Quick Search -->
+        {% if user.is_authenticated %}
+        <li class="nav-item mr-2 d-none d-md-block" style="min-width:200px; max-width:280px; position: relative;">
+          <div class="input-group input-group-sm">
+            <input id="globalSearchInput" type="search" class="form-control" placeholder="Search students, staff, invoices..." aria-label="Search" autocomplete="off">
+            <div class="input-group-append">
+              <span class="input-group-text"><i class="fas fa-search"></i></span>
+            </div>
+          </div>
+          <div id="globalSearchResults" class="dropdown-menu dropdown-menu-right shadow" style="max-height:320px; overflow:auto; width: 320px; position: absolute; right: 0; z-index: 1061;"></div>
+        </li>
+
+        <!-- Notifications -->
+        <li class="nav-item dropdown mr-2">
+          <a class="nav-link" data-toggle="dropdown" href="#" id="notifBell">
+            <i class="far fa-bell"></i>
+            <span class="badge badge-danger navbar-badge" id="notifCount" style="display:none;">0</span>
+          </a>
+          <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" id="notifMenu">
+            <span class="dropdown-item dropdown-header">Notifications</span>
+            <div class="dropdown-divider"></div>
+            <div id="notifItems"></div>
+            <div class="dropdown-divider"></div>
+            <a href="/finance/invoice/list/" class="dropdown-item dropdown-footer">View Finance</a>
+          </div>
+        </li>
+
+        <!-- Dark Mode Toggle -->
+        <li class="nav-item mr-2">
+          <button id="themeToggle" class="btn btn-sm btn-outline-secondary" title="Toggle dark mode"><i class="fas fa-moon"></i></button>
+        </li>
+
+        <!-- PWA Install Button -->
+        <li class="nav-item mr-2" id="pwaInstallContainer" style="display: none;">
+          <button id="pwaInstallBtn" class="btn btn-sm btn-primary" title="Install App">
+            <i class="fas fa-download"></i>
+            <span class="d-none d-sm-inline ml-1">Install</span>
+          </button>
+        </li>
+
+        <!-- User Authentication -->
+        <li class="nav-item dropdown user-dropdown">
+          <a class="nav-link" data-toggle="dropdown" href="#">
+            <i class="far fa-user-circle"></i>
+            <span class="d-none d-sm-inline">{{ user.username }}</span>
+            <i class="fas fa-caret-down ml-1 d-none d-sm-inline"></i>
+          </a>
+          <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+            <span class="dropdown-item dropdown-header">
+              <i class="fas fa-user-circle mr-2"></i>Welcome, {{ user.username }}
+            </span>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item">
+              <i class="fas fa-user mr-2"></i> Profile
+            </a>
+            <a href="#" class="dropdown-item">
+              <i class="fas fa-cog mr-2"></i> Settings
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="{% url 'logout' %}" class="dropdown-item">
+              <i class="fas fa-sign-out-alt mr-2"></i> Sign out
+            </a>
+          </div>
+        </li>
+        {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'login' %}">
+            <i class="fas fa-sign-in-alt"></i>
+            <span class="d-none d-sm-inline">Login</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'signup' %}">
+            <i class="fas fa-user-plus"></i>
+            <span class="d-none d-sm-inline">Sign Up</span>
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+      <!-- Brand Logo -->
+      <a href="{% url 'home' %}" class="brand-link text-center">
+        <i class="fas fa-graduation-cap brand-icon mx-2"></i>
+        <span class="brand-text font-weight-bold">{{ school_name | default:"MySchool" }}</span>
+      </a>
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+          <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            <!-- Main Navigation -->
+            <li class="nav-item">
+              <a href="{% url 'student-list' %}" class="nav-link">
+                <i class="nav-icon fas fa-graduation-cap"></i>
+                <p>Students</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'staff-list' %}" class="nav-link">
+                <i class="nav-icon fas fa-users"></i>
+                <p>Staff Members</p>
+              </a>
+            </li>
+
+            <!-- Teacher Classes Section -->
+            <li class="nav-item">
+              <a href="{% url 'teacher-class-list' %}" class="nav-link">
+                <i class="nav-icon fas fa-chalkboard-teacher"></i>
+                <p>My Classes</p>
+              </a>
+            </li>
+
+            <!-- Finance Section -->
+            <li class="nav-header">Finance</li>
+            <li class="nav-item">
+              <a href="{% url 'invoice-list' %}" class="nav-link">
+                <i class="nav-icon fas fa-file-invoice-dollar"></i>
+                <p>Invoices</p>
+              </a>
+            </li>
+
+            <!-- Results Section -->
+            <li class="nav-header">Results & Reports</li>
+            <li class="nav-item">
+              <a href="{% url 'create-result' %}" class="nav-link">
+                <i class="nav-icon fas fa-plus-circle"></i>
+                <p>Create Results</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'edit-results' %}" class="nav-link">
+                <i class="nav-icon fas fa-edit"></i>
+                <p>Update Results</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'view-results' %}" class="nav-link">
+                <i class="nav-icon fas fa-eye"></i>
+                <p>View Results</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'student-performance' %}" class="nav-link">
+                <i class="nav-icon fas fa-chart-line"></i>
+                <p>Performance Trend</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link" onclick="reportCardPrompt(event)">
+                <i class="nav-icon fas fa-file-pdf"></i>
+                <p>Report Card</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link" onclick="classSheetPrompt(event)">
+                <i class="nav-icon fas fa-print"></i>
+                <p>Class Report Sheet</p>
+              </a>
+            </li>
+
+            <!-- Management Section -->
+            <li class="nav-header">Management</li>
+            <li class="nav-item has-treeview">
+              <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-cogs"></i>
+                <p>
+                  System Settings
+                  <i class="fas fa-angle-left right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="{% url 'sessions' %}" class="nav-link">
+                    <i class="nav-icon fas fa-calendar-alt"></i>
+                    <p>Sessions</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'terms' %}" class="nav-link">
+                    <i class="nav-icon fas fa-clock"></i>
+                    <p>Terms</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'subjects' %}" class="nav-link">
+                    <i class="nav-icon fas fa-book"></i>
+                    <p>Subjects</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'classes' %}" class="nav-link">
+                    <i class="nav-icon fas fa-chalkboard"></i>
+                    <p>Classes</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <!-- Authentication Section -->
+            <li class="nav-header">Account</li>
+            {% if not user.is_authenticated %}
+            <li class="nav-item">
+              <a href="{% url 'login' %}" class="nav-link">
+                <i class="nav-icon fas fa-sign-in-alt"></i>
+                <p>Login</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'signup' %}" class="nav-link">
+                <i class="nav-icon fas fa-user-plus"></i>
+                <p>Sign Up</p>
+              </a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a href="{% url 'logout' %}" class="nav-link">
+                <i class="nav-icon fas fa-sign-out-alt"></i>
+                <p>Logout</p>
+              </a>
+            </li>
+            {% endif %}
+
+            <!-- Settings -->
+            <li class="nav-item">
+              <a href="{% url 'configs' %}" class="nav-link">
+                <i class="nav-icon fas fa-cog"></i>
+                <p>System Settings</p>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+      </div>
+      <!-- /.sidebar -->
+    </aside>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-8">
+              <h1 class="page-title">{% block title %}{% endblock title %}</h1>
+            </div>
+            <div class="col-sm-4">
+              <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item">{% block breadcrumb %}{% endblock breadcrumb %}</li>
+              </ol>
+            </div>
+          </div>
+        </div><!-- /.container-fluid -->
+      </section>
+
+      <!-- Main content -->
+      <section class="content">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-12">
+              {% block fullcard %}
+              <div class="card">
+                {% block content-header %}{% endblock content-header %}
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      {% block content %}{% endblock content %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endblock fullcard %}
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+      <!-- Control sidebar content goes here -->
+      <div class="p-3">
+        <h5>Quick Settings</h5>
+        <p>Control sidebar content</p>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- REQUIRED SCRIPTS -->
+  <script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+  <script src="{% static 'dist/js/jquery.formset.js' %}"></script>
+  <script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'plugins/toastr/toastr.min.js' %}"></script>
+  <script src="{% static 'plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js' %}"></script>
+  <script src="{% static 'dist/js/adminlte.js' %}"></script>
+  <script src="{% static 'dist/js/demo.js' %}"></script>
+  <script src="{% static 'plugins/Datatables/datatables.min.js' %}"></script>
+
+  <!-- PWA Service Worker Registration + Update UX -->
+  <script>
+    // Register service worker and handle updates
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(function(reg) {
+            console.log('✅ SW registered:', reg.scope);
+
+            // Listen for waiting service worker
+            function listenForWaiting(registration) {
+              if (!registration) return;
+              if (registration.waiting) {
+                window.dispatchEvent(new CustomEvent('sw-update-available'));
+                return;
+              }
+              registration.addEventListener('updatefound', () => {
+                const newSW = registration.installing;
+                if (!newSW) return;
+                newSW.addEventListener('statechange', () => {
+                  if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+                    window.dispatchEvent(new CustomEvent('sw-update-available'));
+                  }
+                });
+              });
+            }
+
+            listenForWaiting(reg);
+
+            // Check on page focus
+            window.addEventListener('focus', () => reg.update());
+          })
+          .catch(function(err) { console.log('❌ SW registration failed:', err); });
+      });
+
+      // Support triggering skipWaiting from UI
+      window.addEventListener('sw-skip-waiting', () => {
+        if (navigator.serviceWorker?.controller) {
+          navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
+          setTimeout(() => window.location.reload(), 400);
+        }
+      });
+    }
+
+    // Detect if app is running in standalone mode
+    function isRunningStandalone() {
+      return (window.matchMedia('(display-mode: standalone)').matches) || 
+             (window.navigator.standalone) || 
+             (document.referrer.includes('android-app://'));
+    }
+
+    if (isRunningStandalone()) {
+      document.body.classList.add('pwa-standalone');
+    }
+
+    // PWA Install Button Handler
+    let deferredPrompt;
+    const installContainer = document.getElementById('pwaInstallContainer');
+    const installBtn = document.getElementById('pwaInstallBtn');
+
+    // Check if already installed
+    if (isRunningStandalone()) {
+      // Hide install button if already installed
+      if (installContainer) installContainer.style.display = 'none';
+    } else {
+      // Listen for the beforeinstallprompt event
+      window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent the mini-infobar from appearing on mobile
+        e.preventDefault();
+        // Stash the event so it can be triggered later
+        deferredPrompt = e;
+        // Show the install button
+        if (installContainer) {
+          installContainer.style.display = 'block';
+        }
+      });
+
+      // Handle install button click
+      if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+          if (!deferredPrompt) {
+            // Fallback: try to show browser's install prompt
+            if (window.matchMedia('(display-mode: browser)').matches) {
+              toastr.info('Please use your browser menu to install this app', 'Install App', {
+                timeOut: 3000
+              });
+            }
+            return;
+          }
+
+          // Show the install prompt
+          deferredPrompt.prompt();
+          
+          // Wait for the user to respond to the prompt
+          const { outcome } = await deferredPrompt.userChoice;
+          
+          if (outcome === 'accepted') {
+            console.log('✅ User accepted the install prompt');
+            toastr.success('App is being installed...', 'Installation Started', {
+              timeOut: 3000
+            });
+          } else {
+            console.log('❌ User dismissed the install prompt');
+          }
+          
+          // Clear the deferredPrompt variable
+          deferredPrompt = null;
+          
+          // Hide the install button
+          if (installContainer) {
+            installContainer.style.display = 'none';
+          }
+        });
+      }
+
+      // Hide install button after successful installation
+      window.addEventListener('appinstalled', () => {
+        console.log('✅ PWA was installed');
+        deferredPrompt = null;
+        if (installContainer) {
+          installContainer.style.display = 'none';
+        }
+        toastr.success('App installed successfully!', 'Installation Complete', {
+          timeOut: 3000
+        });
+      });
+    }
+  </script>
+
+  <!-- Online/Offline & SW Update Banners -->
+  <style>
+    .net-banner, .sw-banner {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 1060;
+      display: none; padding: .75rem 1rem; text-align: center; color: #fff;
+    }
+    .net-banner.offline { background: #dc3545; }
+    .net-banner.online { background: #28a745; }
+    .sw-banner { background: #007bff; }
+    .banner-btn { margin-left: .75rem; }
+  </style>
+  <div id="netBanner" class="net-banner" role="status"></div>
+  <div id="swBanner" class="sw-banner" role="status">
+    A new version is available.
+    <button id="swRefresh" class="btn btn-sm btn-light banner-btn">Update</button>
+  </div>
+  <script>
+    (function(){
+      const netBanner = document.getElementById('netBanner');
+      const swBanner = document.getElementById('swBanner');
+      const swRefresh = document.getElementById('swRefresh');
+
+      function showNet(status) {
+        if (!netBanner) return;
+        if (status === 'offline') {
+          netBanner.textContent = 'You are offline. Changes will sync when back online.';
+          netBanner.className = 'net-banner offline';
+          netBanner.style.display = 'block';
+        } else {
+          netBanner.textContent = 'You are back online.';
+          netBanner.className = 'net-banner online';
+          netBanner.style.display = 'block';
+          setTimeout(() => netBanner.style.display = 'none', 2500);
+        }
+      }
+
+      window.addEventListener('offline', () => showNet('offline'));
+      window.addEventListener('online', () => showNet('online'));
+
+      window.addEventListener('sw-update-available', () => {
+        if (swBanner) swBanner.style.display = 'block';
+      });
+      swRefresh?.addEventListener('click', () => {
+        window.dispatchEvent(new CustomEvent('sw-skip-waiting'));
+      });
+    })();
+  </script>
+
+  {% if messages %}
+  {% for message in messages %}
+  <script type=text/javascript>
+    toastr.options = {
+      progressBar: true,
+      closeButton: true,
+      timeOut: 5000,
+      positionClass: "toast-top-right"
+    };
+    toastr.{{ message.tags }}('{{ message }}');
+  </script>
+  {% endfor %}
+  {% endif %}
+
+  <script>
+    // Enhanced clickable rows
+    (function ($) {
+      $('.clickable-row').css('cursor', 'pointer');
+      $(".clickable-row").click(function () {
+        window.location = $(this).data("href");
+      });
+    })(jQuery);
+
+    // Enhanced mobile menu handling
+    $(document).ready(function() {
+      // Toggle sidebar on mobile
+      $('[data-widget="pushmenu"]').click(function() {
+        $('body').toggleClass('sidebar-open');
+      });
+
+      // Close sidebar when clicking overlay on mobile
+      $('.mobile-nav-overlay').click(function() {
+        $('body').removeClass('sidebar-open');
+      });
+
+      // Close sidebar when clicking outside on mobile
+      $(document).click(function(event) {
+        if ($(window).width() < 768) {
+          if (!$(event.target).closest('.main-sidebar').length && 
+              !$(event.target).closest('[data-widget="pushmenu"]').length &&
+              !$(event.target).closest('.mobile-nav-overlay').length) {
+            $('body').removeClass('sidebar-open');
+          }
+        }
+      });
+
+      // Handle window resize
+      $(window).resize(function() {
+        if ($(window).width() >= 768) {
+          $('body').removeClass('sidebar-open');
+        }
+      });
+    });
+
+    function reportCardPrompt(e){
+      e.preventDefault();
+      var id = prompt('Enter Student ID (numeric)');
+      if(!id) return;
+      if(isNaN(id)) {
+        toastr.error('Please enter a valid numeric Student ID');
+        return;
+      }
+      window.location.href = '/result/report-card/' + id + '/';
+    }
+
+    function classSheetPrompt(e){
+      e.preventDefault();
+      var id = prompt('Enter Class ID (numeric)');
+      if(!id) return;
+      if(isNaN(id)) {
+        toastr.error('Please enter a valid numeric Class ID');
+        return;
+      }
+      window.location.href = '/result/class-sheet/' + id + '/';
+    }
+
+    // Enhanced loading state for forms
+    $(document).on('submit', 'form', function() {
+      var $form = $(this);
+      var $submitBtn = $form.find('button[type="submit"]');
+      
+      // Only show loading if form is valid
+      if ($form[0].checkValidity()) {
+        $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Saving...');
+        
+        // Add loading class to form
+        $form.addClass('loading');
+      }
+    });
+
+    // Enhanced touch interactions for mobile
+    document.addEventListener('touchstart', function() {}, { passive: true });
+  </script>
+
+  {% block morejs %}{% endblock morejs %}
+
+  <!-- Navbar UX Scripts: Quick Search, Notifications, Dark Mode, FAB -->
+  <script>
+    (function(){
+      // Dark mode
+      const THEME_KEY = 'edusync-theme';
+      const root = document.documentElement;
+      function applyTheme(theme){
+        if (theme === 'dark') {
+          document.body.classList.add('dark-mode');
+          root.classList.add('dark-mode');
+        } else {
+          document.body.classList.remove('dark-mode');
+          root.classList.remove('dark-mode');
+        }
+      }
+      const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
+      applyTheme(savedTheme);
+      const toggleBtn = document.getElementById('themeToggle');
+      if (toggleBtn) toggleBtn.addEventListener('click', function(){
+        const cur = localStorage.getItem(THEME_KEY) || 'light';
+        const next = cur === 'light' ? 'dark' : 'light';
+        localStorage.setItem(THEME_KEY, next);
+        applyTheme(next);
+      });
+
+      // Quick search
+      const qInput = document.getElementById('globalSearchInput');
+      const qMenu = document.getElementById('globalSearchResults');
+      let qTimer = null; let items = []; let idx = -1;
+      function renderItems(data){
+        const sections = [];
+        function section(title, arr){
+          if (!arr || !arr.length) return '';
+          return `<div class="dropdown-header">${title}</div>` + arr.map((it,i)=>`<a href="${it.url}" class="dropdown-item result-item" data-index="${items.length + i}"><i class="fas fa-angle-right mr-2"></i>${it.label}</a>`).join('') + '<div class="dropdown-divider"></div>';
+        }
+        items = [].concat(data.students||[], data.staffs||[], data.invoices||[], data.classes||[]);
+        const html = [
+          section('Students', data.students),
+          section('Staff', data.staffs),
+          section('Invoices', data.invoices),
+          section('Classes', data.classes)
+        ].join('');
+        qMenu.innerHTML = html || '<span class="dropdown-item text-muted">No results</span>';
+        if (qInput.value.trim()) { qMenu.classList.add('show'); qMenu.style.display='block'; }
+      }
+      function searchNow(){
+        const q = qInput.value.trim();
+        if (!q){ qMenu.classList.remove('show'); qMenu.style.display='none'; return; }
+        fetch(`/search/?q=${encodeURIComponent(q)}`, { credentials:'same-origin' })
+          .then(r=>r.json()).then(renderItems).catch(()=>{});
+      }
+      if (qInput) {
+        qInput.addEventListener('input', function(){ clearTimeout(qTimer); qTimer = setTimeout(searchNow, 220); });
+        qInput.addEventListener('keydown', function(e){
+          const links = qMenu.querySelectorAll('.result-item');
+          if (e.key === 'ArrowDown'){ idx = Math.min(idx+1, links.length-1); links[idx]?.focus(); e.preventDefault(); }
+          if (e.key === 'ArrowUp'){ idx = Math.max(idx-1, 0); links[idx]?.focus(); e.preventDefault(); }
+          if (e.key === 'Enter'){ if (links.length){ window.location = links[0].getAttribute('href'); } }
+          if (e.key === 'Escape'){ qMenu.classList.remove('show'); qMenu.style.display='none'; }
+        });
+        document.addEventListener('click', function(ev){ if (!qMenu.contains(ev.target) && ev.target !== qInput){ qMenu.classList.remove('show'); qMenu.style.display='none'; }});
+      }
+
+      // Notifications
+      const notifCount = document.getElementById('notifCount');
+      const notifItems = document.getElementById('notifItems');
+      function loadNotifs(){
+        fetch('/notifications/', { credentials:'same-origin' })
+          .then(r=>r.json())
+          .then(data=>{
+            const items = data.items || [];
+            notifItems.innerHTML = items.map(it=>`<a href="${it.url}" class="dropdown-item"><span class="badge badge-${it.type} mr-2">&nbsp;</span>${it.text}</a>`).join('') || '<span class="dropdown-item text-muted">No notifications</span>';
+            if (items.length){ notifCount.textContent = items.length; notifCount.style.display = 'inline-block'; } else { notifCount.style.display='none'; }
+          }).catch(()=>{});
+      }
+      if (notifItems) { loadNotifs(); setInterval(loadNotifs, 60000); }
+
+      // Floating Action Button
+      const fab = document.createElement('div');
+      fab.innerHTML = `
+        <div id="fab" style="position:fixed; right:16px; bottom:16px; z-index:1061;">
+          <div class="btn-group dropup">
+            <button class="btn btn-primary btn-lg dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Quick actions">
+              <i class="fas fa-plus"></i>
+            </button>
+            <div class="dropdown-menu dropdown-menu-right shadow">
+              <a class="dropdown-item" href="/students/create/"><i class="fas fa-user-plus mr-2"></i>Add Student</a>
+              <a class="dropdown-item" href="{% url 'invoice-create' %}"><i class="fas fa-file-invoice-dollar mr-2"></i>Create Invoice</a>
+              <a class="dropdown-item" href="{% url 'attendance:register_create' %}"><i class="fas fa-check-square mr-2"></i>Take Attendance</a>
+            </div>
+          </div>
+        </div>`;
+      document.body.appendChild(fab.firstElementChild);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}
+Update Results
+{% endblock title %}
+
+
+{% block content %}
+<form method="POST">
+  {% csrf_token %}
+  {{ formset.management_form}}
+
+  <table id="studenttable" class="table table-sm">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Name</th>
+        <th>Subject</th>
+        <th>CA (max 40)</th>
+        <th>Exam (max 60)</th>
+        <th>Total</th>
+        <th>Grade</th>
+        <th>Teacher Comment</th>
+        <th>Headteacher Comment</th>
+        <th>Delete</th>
+        <th>Class</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for form in formset %}
+      {{ form.id}}
+        <tr>
+          <td>{{forloop.counter }}</td>
+          <td>{{form.instance.student }}</td>
+          <td>{{form.instance.subject}}</td>
+          <td style="width: 10%;">{{form.test_score | add_class:"form-control form-control-sm"}}</td>
+          <td style="width: 10%;">{{form.exam_score | add_class:"form-control form-control-sm"}}</td>
+          <td class="total-cell">{{form.instance.total_score}}</td>
+          <td class="grade-cell">{{form.instance.grade}}</td>
+          <td style="width: 18%;">{{form.teacher_comment | add_class:"form-control form-control-sm"}}</td>
+          <td style="width: 18%;">{{form.headteacher_comment | add_class:"form-control form-control-sm"}}</td>
+          <td>{{form.DELETE}}</td>
+          <td>{{form.instance.current_class}}</td>
+
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <input type="submit" class="btn btn-success" value="Save">
+  </form>
+
+<script>
+(function(){
+  // Live compute total and grade on input
+  const table = document.getElementById('studenttable');
+  if (!table) return;
+  const grade = (t)=>{
+    const s = parseFloat(t)||0;
+    if (s>=80) return 'Exceeding';
+    if (s>=70) return 'EE';
+    if (s>=60) return 'ME';
+    if (s>=50) return 'AE';
+    return 'BE';
+  };
+  table.addEventListener('input', function(e){
+    if (!e.target.name || (!e.target.name.endsWith('-test_score') && !e.target.name.endsWith('-exam_score'))) return;
+    const tr = e.target.closest('tr');
+    if (!tr) return;
+    const testInput = tr.querySelector('input[name$="-test_score"]');
+    const examInput = tr.querySelector('input[name$="-exam_score"]');
+    const totalCell = tr.querySelector('.total-cell');
+    const gradeCell = tr.querySelector('.grade-cell');
+    const test = Math.min(Math.max(parseFloat(testInput.value)||0, 0), 40);
+    const exam = Math.min(Math.max(parseFloat(examInput.value)||0, 0), 60);
+    if (testInput) testInput.value = test;
+    if (examInput) examInput.value = exam;
+    const total = test + exam;
+    if (totalCell) totalCell.textContent = total.toString();
+    if (gradeCell) gradeCell.textContent = grade(total);
+  });
+})();
+</script>
+
+{% endblock content %}

@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<form method="post">{% csrf_token %}
+  <div class="alert alert-danger">
+    Confirm delete this attendance register?
+  </div>
+  <button type="submit" class="btn btn-danger">Delete</button>
+  <a href="{% url 'attendance:register_list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

@@ -1,0 +1,863 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Take Attendance - {{ register.student_class }} • {{ register.date }}{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'attendance:register_list' %}">Attendance</a></li>
+<li class="breadcrumb-item"><a href="{% url 'attendance:register_detail' register.pk %}">{{ register.student_class }}</a></li>
+<li class="breadcrumb-item active">Take Attendance</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Header Card -->
+        <div class="card attendance-header-card">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="attendance-icon-wrapper">
+                                <i class="fas fa-clipboard-check"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h2 class="mb-1">Take Attendance</h2>
+                                <p class="text-muted mb-0">Record daily attendance for your class</p>
+                            </div>
+                        </div>
+                        
+                        <div class="class-info-grid">
+                            <div class="info-item">
+                                <div class="info-label">Class</div>
+                                <div class="info-value badge badge-primary">
+                                    <i class="fas fa-users mr-1"></i>
+                                    {{ register.student_class }}
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Date</div>
+                                <div class="info-value badge badge-info">
+                                    <i class="fas fa-calendar-day mr-1"></i>
+                                    {{ register.date }}
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Session</div>
+                                <div class="info-value badge badge-secondary">
+                                    <i class="fas fa-graduation-cap mr-1"></i>
+                                    {{ register.term }} • {{ register.session }}
+                                </div>
+                            </div>
+                            {% if register.taken_by %}
+                            <div class="info-item">
+                                <div class="info-label">Taken By</div>
+                                <div class="info-value badge badge-light">
+                                    <i class="fas fa-user mr-1"></i>
+                                    {{ register.taken_by.get_full_name|default:register.taken_by.username }}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-md-right">
+                        <div class="quick-stats-card">
+                            <div class="stat-item">
+                                <div class="stat-number" id="total-count">{{ students|length }}</div>
+                                <div class="stat-label">Total Students</div>
+                            </div>
+                            <div class="stat-divider"></div>
+                            <div class="stat-item">
+                                <div class="stat-number text-success" id="present-count">0</div>
+                                <div class="stat-label">Present</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number text-danger" id="absent-count">0</div>
+                                <div class="stat-label">Absent</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number text-warning" id="late-count">0</div>
+                                <div class="stat-label">Late</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Form Card -->
+        <div class="card attendance-form-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-list-check mr-2"></i>
+                    Student Attendance
+                </h5>
+                <div class="quick-actions">
+                    <button type="button" class="btn btn-outline-success btn-sm" id="mark-all-present" data-toggle="tooltip" title="Mark all students as Present">
+                        <i class="fas fa-check-circle mr-1"></i>All Present
+                    </button>
+                    <button type="button" class="btn btn-outline-danger btn-sm" id="mark-all-absent" data-toggle="tooltip" title="Mark all students as Absent">
+                        <i class="fas fa-times-circle mr-1"></i>All Absent
+                    </button>
+                    <button type="button" class="btn btn-outline-info btn-sm" id="clear-all-remarks" data-toggle="tooltip" title="Clear all remarks">
+                        <i class="fas fa-eraser mr-1"></i>Clear Remarks
+                    </button>
+                </div>
+            </div>
+
+            <form method="post" id="attendance-form">
+                {% csrf_token %}
+                
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover attendance-table">
+                            <thead class="attendance-thead">
+                                <tr>
+                                    <th width="4%" class="text-center">#</th>
+                                    <th width="25%">Student Information</th>
+                                    <th width="15%">Status</th>
+                                    <th width="18%">Time In</th>
+                                    <th width="18%">Time Out</th>
+                                    <th width="20%">Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in students %}
+                                {% with entry=entries|get_item:student.id %}
+                                <tr class="student-row" data-student-id="{{ student.id }}">
+                                    <td class="text-center serial-number">
+                                        <span class="serial">{{ forloop.counter }}</span>
+                                    </td>
+                                    <td class="student-info">
+                                        <div class="student-avatar">
+                                            {% if student.gender == 'M' %}
+                                            <i class="fas fa-male"></i>
+                                            {% elif student.gender == 'F' %}
+                                            <i class="fas fa-female"></i>
+                                            {% else %}
+                                            <i class="fas fa-user"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div class="student-details">
+                                            <div class="student-name">{{ student.surname }}, {{ student.firstname }}</div>
+                                            <div class="student-admission">ID: {{ student.admission_number }}</div>
+                                        </div>
+                                    </td>
+                                    <td class="status-cell">
+                                        <select name="status_{{ student.id }}" class="form-control status-select custom-select" data-student="{{ student.id }}">
+                                            {% for value, label in status_choices %}
+                                            <option value="{{ value }}" 
+                                                {% if entry and entry.status == value %}selected
+                                                {% elif not entry and value == 'P' %}selected{% endif %}
+                                                data-status="{{ value }}"
+                                                class="status-option status-{{ value|lower }}">
+                                                {{ label }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td class="time-cell">
+                                        <input type="time" class="form-control time-input" 
+                                               name="time_in_{{ student.id }}" 
+                                               value="{% if entry and entry.time_in %}{{ entry.time_in|time:'H:i' }}{% endif %}"
+                                               data-student="{{ student.id }}">
+                                    </td>
+                                    <td class="time-cell">
+                                        <input type="time" class="form-control time-input" 
+                                               name="time_out_{{ student.id }}" 
+                                               value="{% if entry and entry.time_out %}{{ entry.time_out|time:'H:i' }}{% endif %}"
+                                               data-student="{{ student.id }}">
+                                    </td>
+                                    <td class="remarks-cell">
+                                        <input type="text" class="form-control remarks-input" 
+                                               name="remarks_{{ student.id }}" 
+                                               placeholder="Add remarks..."
+                                               value="{% if entry %}{{ entry.remarks }}{% endif %}"
+                                               data-student="{{ student.id }}"
+                                               maxlength="255">
+                                    </td>
+                                </tr>
+                                {% endwith %}
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-5 empty-state">
+                                        <div class="empty-state-icon">
+                                            <i class="fas fa-users-slash"></i>
+                                        </div>
+                                        <h5>No Students Found</h5>
+                                        <p class="text-muted">There are no active students in this class.</p>
+                                        
+                                            <i class="fas fa-plus mr-1"></i>Add Students
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="attendance-summary">
+                                <div class="summary-item">
+                                    <span class="summary-dot present-dot"></span>
+                                    <span id="summary-present">0</span> Present
+                                </div>
+                                <div class="summary-item">
+                                    <span class="summary-dot absent-dot"></span>
+                                    <span id="summary-absent">0</span> Absent
+                                </div>
+                                <div class="summary-item">
+                                    <span class="summary-dot late-dot"></span>
+                                    <span id="summary-late">0</span> Late
+                                </div>
+                                <div class="summary-item">
+                                    <span class="summary-dot excused-dot"></span>
+                                    <span id="summary-excused">0</span> Excused
+                                </div>
+                                <div class="summary-item">
+                                    <span class="summary-dot halfday-dot"></span>
+                                    <span id="summary-halfday">0</span> Half Day
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <a href="{% url 'attendance:register_detail' register.pk %}" class="btn btn-outline-secondary mr-2">
+                                <i class="fas fa-arrow-left mr-1"></i> Back
+                            </a>
+                            <button type="submit" class="btn btn-success btn-save-attendance" id="save-attendance">
+                                <i class="fas fa-save mr-1"></i> Save Attendance
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Quick Help Card -->
+        <div class="card quick-help-card">
+            <div class="card-body">
+                <h6><i class="fas fa-lightbulb mr-2"></i>Quick Tips</h6>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="tip-item">
+                            <strong>Keyboard Shortcuts:</strong>
+                            <ul class="list-unstyled mt-1">
+                                <li><kbd>Alt + P</kbd> - Mark Present</li>
+                                <li><kbd>Alt + A</kbd> - Mark Absent</li>
+                                <li><kbd>Alt + L</kbd> - Mark Late</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="tip-item">
+                            <strong>Status Colors:</strong>
+                            <ul class="list-unstyled mt-1">
+                                <li><span class="status-indicator present"></span> Present</li>
+                                <li><span class="status-indicator absent"></span> Absent</li>
+                                <li><span class="status-indicator late"></span> Late</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="tip-item">
+                            <strong>Quick Actions:</strong>
+                            <ul class="list-unstyled mt-1">
+                                <li>Use "All Present" to mark everyone</li>
+                                <li>Click status field for dropdown</li>
+                                <li>Tab to navigate quickly</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block morejs %}
+<script>
+$(document).ready(function() {
+    // Initialize tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+
+    // Update attendance summary
+    function updateSummary() {
+        let present = 0, absent = 0, late = 0, excused = 0, halfday = 0;
+        
+        $('.status-select').each(function() {
+            const status = $(this).val();
+            if (status === 'P') present++;
+            else if (status === 'A') absent++;
+            else if (status === 'L') late++;
+            else if (status === 'E') excused++;
+            else if (status === 'H') halfday++;
+        });
+        
+        $('#present-count').text(present);
+        $('#absent-count').text(absent);
+        $('#late-count').text(late);
+        
+        $('#summary-present').text(present);
+        $('#summary-absent').text(absent);
+        $('#summary-late').text(late);
+        $('#summary-excused').text(excused);
+        $('#summary-halfday').text(halfday);
+
+        // Update progress (you can add a progress bar if needed)
+        const total = present + absent + late + excused + halfday;
+        if (total > 0) {
+            const completionRate = Math.round((present + late + excused + halfday) / total * 100);
+            // You can update a progress bar here
+        }
+    }
+
+    // Update row styling based on status
+    function updateRowStyling() {
+        $('.student-row').each(function() {
+            const row = $(this);
+            const select = row.find('.status-select');
+            const status = select.val();
+            
+            // Remove all status classes
+            row.removeClass('row-present row-absent row-late row-excused row-halfday');
+            
+            // Add current status class
+            if (status === 'P') row.addClass('row-present');
+            else if (status === 'A') row.addClass('row-absent');
+            else if (status === 'L') row.addClass('row-late');
+            else if (status === 'E') row.addClass('row-excused');
+            else if (status === 'H') row.addClass('row-halfday');
+        });
+    }
+
+    // Initialize summary and styling
+    updateSummary();
+    updateRowStyling();
+
+    // Update when status changes
+    $('.status-select').change(function() {
+        updateSummary();
+        updateRowStyling();
+    });
+
+    // Mark all present
+    $('#mark-all-present').click(function() {
+        $('.status-select').val('P').trigger('change');
+        $('.time-input').val('');
+        $('.remarks-input').val('');
+    });
+
+    // Mark all absent
+    $('#mark-all-absent').click(function() {
+        $('.status-select').val('A').trigger('change');
+        $('.time-input').val('');
+        $('.remarks-input').val('');
+    });
+
+    // Clear all remarks
+    $('#clear-all-remarks').click(function() {
+        $('.remarks-input').val('');
+    });
+
+    // Form submission handling
+    $('#attendance-form').on('submit', function() {
+        const submitBtn = $('#save-attendance');
+        submitBtn.prop('disabled', true)
+                .html('<i class="fas fa-spinner fa-spin mr-1"></i> Saving...');
+        
+        // Show loading state
+        $('.attendance-table').addClass('table-loading');
+        $('.student-row').addClass('row-loading');
+    });
+
+    // Keyboard shortcuts
+    $(document).on('keydown', function(e) {
+        if (e.altKey) {
+            const focused = $(':focus');
+            if (focused.hasClass('status-select')) {
+                switch(e.key.toLowerCase()) {
+                    case 'p': 
+                        focused.val('P').trigger('change');
+                        e.preventDefault();
+                        break;
+                    case 'a': 
+                        focused.val('A').trigger('change');
+                        e.preventDefault();
+                        break;
+                    case 'l': 
+                        focused.val('L').trigger('change');
+                        e.preventDefault();
+                        break;
+                    case 'e': 
+                        focused.val('E').trigger('change');
+                        e.preventDefault();
+                        break;
+                    case 'h': 
+                        focused.val('H').trigger('change');
+                        e.preventDefault();
+                        break;
+                }
+            }
+        }
+    });
+
+    // Auto-advance to next field on Enter key in remarks
+    $('.remarks-input').on('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const currentRow = $(this).closest('.student-row');
+            const nextRow = currentRow.next('.student-row');
+            if (nextRow.length) {
+                nextRow.find('.status-select').focus();
+            }
+        }
+    });
+
+    // Focus first empty status field on page load
+    $('.status-select').first().focus();
+
+    // Real-time validation
+    $('.time-input').on('change', function() {
+        const timeIn = $(this).closest('.student-row').find('input[name*="time_in"]').val();
+        const timeOut = $(this).closest('.student-row').find('input[name*="time_out"]').val();
+        
+        if (timeIn && timeOut && timeIn > timeOut) {
+            $(this).addClass('is-invalid');
+            // You can show a tooltip or message here
+        } else {
+            $(this).removeClass('is-invalid');
+        }
+    });
+
+    // Add smooth animations
+    $('.student-row').hover(
+        function() {
+            $(this).addClass('row-hover');
+        },
+        function() {
+            $(this).removeClass('row-hover');
+        }
+    );
+});
+</script>
+
+<style>
+/* Modern Card Styles */
+.attendance-header-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.attendance-header-card .card-body {
+    padding: 2rem;
+}
+
+.attendance-icon-wrapper {
+    width: 70px;
+    height: 70px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.attendance-form-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+.attendance-form-card .card-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1.5rem 2rem;
+}
+
+.quick-help-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+    background: #f8f9fa;
+}
+
+/* Class Info Grid */
+.class-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.info-item .info-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+    opacity: 0.9;
+}
+
+.info-item .info-value {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* Quick Stats */
+.quick-stats-card {
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    backdrop-filter: blur(10px);
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    opacity: 0.9;
+    margin-top: 0.25rem;
+}
+
+.stat-divider {
+    width: 1px;
+    height: 40px;
+    background: rgba(255,255,255,0.3);
+}
+
+/* Table Styles */
+.attendance-table {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.attendance-thead {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.attendance-thead th {
+    border: none;
+    padding: 1.25rem 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    color: #495057;
+}
+
+.student-row {
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.student-row:hover {
+    background-color: #f8f9fa;
+    transform: translateX(5px);
+    border-left-color: #007bff;
+}
+
+.student-row.row-hover {
+    background-color: #f1f3f4;
+}
+
+/* Status-based row coloring */
+.row-present { border-left-color: #28a745; background-color: rgba(40, 167, 69, 0.02); }
+.row-absent { border-left-color: #dc3545; background-color: rgba(220, 53, 69, 0.02); }
+.row-late { border-left-color: #ffc107; background-color: rgba(255, 193, 7, 0.02); }
+.row-excused { border-left-color: #6f42c1; background-color: rgba(111, 66, 193, 0.02); }
+.row-halfday { border-left-color: #fd7e14; background-color: rgba(253, 126, 20, 0.02); }
+
+/* Student Information */
+.student-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.student-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.student-details {
+    flex: 1;
+}
+
+.student-name {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+}
+
+.student-admission {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+/* Form Controls */
+.status-select.custom-select {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 0.5rem 0.75rem;
+    height: auto;
+}
+
+.status-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+.status-option.status-p { color: #28a745; font-weight: 500; }
+.status-option.status-a { color: #dc3545; font-weight: 500; }
+.status-option.status-l { color: #ffc107; font-weight: 500; }
+.status-option.status-e { color: #6f42c1; font-weight: 500; }
+.status-option.status-h { color: #fd7e14; font-weight: 500; }
+
+.time-input, .remarks-input {
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    padding: 0.5rem 0.75rem;
+}
+
+.time-input:focus, .remarks-input:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40,167,69,0.25);
+}
+
+.remarks-input:focus {
+    border-color: #17a2b8;
+    box-shadow: 0 0 0 0.2rem rgba(23,162,184,0.25);
+}
+
+/* Serial Number */
+.serial-number {
+    position: relative;
+}
+
+.serial {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background: #f8f9fa;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 30px;
+    font-weight: 600;
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+/* Summary Styles */
+.attendance-summary {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.summary-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.present-dot { background: #28a745; }
+.absent-dot { background: #dc3545; }
+.late-dot { background: #ffc107; }
+.excused-dot { background: #6f42c1; }
+.halfday-dot { background: #fd7e14; }
+
+/* Status Indicators */
+.status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 0.5rem;
+}
+
+.status-indicator.present { background: #28a745; }
+.status-indicator.absent { background: #dc3545; }
+.status-indicator.late { background: #ffc107; }
+
+/* Empty State */
+.empty-state {
+    padding: 3rem 1rem;
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    color: #dee2e6;
+    margin-bottom: 1rem;
+}
+
+.empty-state h5 {
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+/* Quick Actions */
+.quick-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Loading States */
+.table-loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.row-loading {
+    position: relative;
+}
+
+.row-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255,255,255,0.8);
+    z-index: 1;
+}
+
+/* Quick Tips */
+.tip-item {
+    padding: 0.5rem 0;
+}
+
+.tip-item ul li {
+    padding: 0.1rem 0;
+    font-size: 0.85rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .attendance-header-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .class-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .quick-stats-card {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .stat-divider {
+        display: none;
+    }
+    
+    .attendance-form-card .card-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .quick-actions {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+    
+    .student-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .attendance-summary {
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+    
+    .card-footer .text-right {
+        text-align: center !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .attendance-table {
+        font-size: 0.8rem;
+    }
+    
+    .attendance-thead th {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.7rem;
+    }
+    
+    .student-row td {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .serial {
+        width: 25px;
+        height: 25px;
+        line-height: 25px;
+        font-size: 0.7rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .btn, .quick-actions, .quick-help-card, .card-footer .btn-outline-secondary {
+        display: none !important;
+    }
+    
+    .attendance-header-card {
+        background: white !important;
+        color: black !important;
+    }
+    
+    .student-row {
+        break-inside: avoid;
+    }
+}
+</style>
+{% endblock %}

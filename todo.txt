@@ -1,0 +1,17 @@
+⭐ Parent Fee Portal with Real-Time Statements
+
+A portal where parents log in and see:
+
+Fees due
+
+Past payments
+
+Balance
+
+Download receipts
+
+Pay via Mpesa
+
+Request payment plan
+
+Real-time statements like a bank account
