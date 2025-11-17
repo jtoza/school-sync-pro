@@ -37,10 +37,10 @@ Classes
   </div>
 
 
-  <div class="modal fade" id="modal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal fade" id="modal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">
       <div class="modal-content">
-        <form action="{% url 'class-create' %}" method="POST">
+        <form action="{% url 'class-create' %}" method="POST" id="classForm">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Add new class</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -68,6 +68,26 @@ Classes
       </div>
     </div>
   </div>
+
+  <script>
+    $(document).ready(function() {
+      // Prevent modal from auto-opening on page load
+      $('#modal1').modal({show: false});
+      
+      // Reset form when modal is closed
+      $('#modal1').on('hidden.bs.modal', function () {
+        $('#classForm')[0].reset();
+        $('#classForm').find('.is-invalid').removeClass('is-invalid');
+        $('#classForm').find('.invalid-feedback').remove();
+      });
+      
+      // Prevent form submission from causing page reload issues
+      $('#classForm').on('submit', function(e) {
+        // Let the form submit normally, but close modal first
+        $('#modal1').modal('hide');
+      });
+    });
+  </script>
 
 {% endblock content %}
 
