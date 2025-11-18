@@ -175,12 +175,44 @@ class ClassListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
         return context
 
 
+# In your views.py file, replace the existing ClassCreateView with this:
+
 class ClassCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = StudentClass
     form_class = StudentClassForm
     template_name = "corecode/mgt_form.html"
     success_url = reverse_lazy("classes")
     success_message = "New class successfully added"
+
+    def form_valid(self, form):
+        """Handle AJAX requests differently"""
+        response = super().form_valid(form)
+        
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'message': str(self.success_message)
+            })
+        else:
+            messages.success(self.request, self.success_message)
+            return response
+
+    def form_invalid(self, form):
+        """Handle AJAX form errors"""
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': False,
+                'errors': form.errors.get_json_data()
+            })
+        else:
+            return super().form_invalid(form)
+
+    def get_context_data(self, **kwargs):
+        """Ensure we can still access the form in regular requests"""
+        context = super().get_context_data(**kwargs)
+        if not self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            context['title'] = "Add new class"
+        return context
 
 
 class ClassUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
