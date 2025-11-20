@@ -756,7 +756,11 @@
               </a>
             </li>
             <li class="nav-item">
-              <a href="{% url 'staff-list' %}" class="nav-link">
+              <!-- Use the namespace: -->
+<a href="{% url 'staffs:staff-list' %}" class="nav-link">
+  <i class="nav-icon fas fa-chalkboard-teacher"></i>
+  <p>Staff</p>
+</a>
                 <i class="nav-icon fas fa-users"></i>
                 <p>Staff Members</p>
               </a>

@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bulk Generate Teacher ID Cards{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card baby-card">
+                <div class="card-header baby-header text-white">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-chalkboard-teacher me-2"></i>Bulk Generate Teacher ID Cards
+                        <span class="baby-badge">👨‍🏫 Staff Edition!</span>
+                    </h4>
+                </div>
+                <div class="card-body baby-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="alert baby-info">
+                                <h5><i class="fas fa-info-circle me-2"></i>About Teacher ID Generation</h5>
+                                <p class="mb-0">
+                                    This will generate professional ID cards for all active teachers and staff members.
+                                    Teacher IDs include staff-specific information and access privileges.
+                                </p>
+                            </div>
+
+                            <div class="card baby-option-card mb-4">
+                                <div class="card-header baby-option-header">
+                                    <h5 class="card-title mb-0">🎯 Teacher ID Options</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold baby-label">Generation Scope:</label>
+                                            <p class="text-muted">All active teachers will receive ID cards</p>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold baby-label">🎨 Output Format:</label>
+                                            <div class="form-check baby-checkbox">
+                                                <input class="form-check-input" type="checkbox" name="generate_pdf" id="generate_pdf" checked>
+                                                <label class="form-check-label" for="generate_pdf">
+                                                    📄 Generate PDF files for printing
+                                                </label>
+                                            </div>
+                                            <div class="form-check baby-checkbox">
+                                                <input class="form-check-input" type="checkbox" name="include_qr" id="include_qr" checked>
+                                                <label class="form-check-label" for="include_qr">
+                                                    🔐 Include QR codes for access control
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-grid gap-2 d-md-flex justify-content-md-end baby-buttons">
+                                            <a href="{% url 'idcards:idcard-dashboard' %}" class="btn btn-secondary me-md-2 baby-btn">
+                                                <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+                                            </a>
+                                            <button type="submit" class="btn btn-success baby-btn-primary">
+                                                <i class="fas fa-play me-1"></i> Generate Teacher IDs 🚀
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card baby-stats-card">
+                                <div class="card-header baby-stats-header text-white">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-chart-bar me-2"></i>Teacher Stats 📊
+                                    </h5>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="baby-stat-main mb-4">
+                                        <i class="fas fa-chalkboard-teacher baby-stat-icon"></i>
+                                        <h2 class="baby-stat-number">{{ total_teachers }}</h2>
+                                        <p class="baby-stat-label">Active Teachers</p>
+                                    </div>
+                                    
+                                    <div class="row baby-mini-stats">
+                                        <div class="col-6 mb-3">
+                                            <div class="baby-mini-stat success">
+                                                <small class="baby-mini-label">ID Cards Generated</small>
+                                                <div class="baby-mini-number">{{ generated_count }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <div class="baby-mini-stat warning">
+                                                <small class="baby-mini-label">Pending Generation</small>
+                                                <div class="baby-mini-number">{{ pending_count }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="baby-progress-container">
+                                        <div class="baby-progress" style="height: 25px;">
+                                            <div class="baby-progress-bar" role="progressbar" 
+                                                 style="width: {{ coverage_percentage }}%;" 
+                                                 aria-valuenow="{{ coverage_percentage }}" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100">
+                                                <span class="baby-progress-text">{{ coverage_percentage }}%</span>
+                                            </div>
+                                        </div>
+                                        <small class="baby-progress-label">Staff Coverage 🎯</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card baby-tips-card mt-4">
+                                <div class="card-header baby-tips-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-lightbulb me-2"></i>Teacher ID Features 💡
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled baby-tips-list">
+                                        <li class="baby-tip-item">
+                                            <i class="fas fa-check baby-tip-icon"></i>
+                                            Professional design for staff members
+                                        </li>
+                                        <li class="baby-tip-item">
+                                            <i class="fas fa-check baby-tip-icon"></i>
+                                            QR codes for building access
+                                        </li>
+                                        <li class="baby-tip-item">
+                                            <i class="fas fa-check baby-tip-icon"></i>
+                                            Staff-specific information display
+                                        </li>
+                                        <li class="baby-tip-item">
+                                            <i class="fas fa-check baby-tip-icon"></i>
+                                            Department and position details
+                                        </li>
+                                        <li class="baby-tip-item">
+                                            <i class="fas fa-check baby-tip-icon"></i>
+                                            Library and resource access codes
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

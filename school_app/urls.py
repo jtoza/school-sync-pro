@@ -37,7 +37,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('apps.corecode.urls')),
     path('students/', include('apps.students.urls', namespace='students')),  # ADDED NAMESPACE
-    path('staffs/', include('apps.staffs.urls')),
+    path('staffs/', include('apps.staffs.urls', namespace='staffs')),
     path('finance/', include('apps.finance.urls')),
     path('result/', include('apps.result.urls')),
     path('attendance/', include('attendance.urls', namespace='attendance')),

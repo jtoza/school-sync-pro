@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load staff_extras %}
+
+{% block title %}Mark Teacher Attendance{% endblock title %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-gradient-success text-white">
+                <div class="card-body py-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="card-title mb-1">
+                                <i class="fas fa-edit me-3"></i>Mark Teacher Attendance
+                            </h2>
+                            <p class="card-text opacity-75 mb-0">Record attendance for teaching staff</p>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-light text-success fs-6 p-2">Date: {{ selected_date }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Selector -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <form method="get" class="row g-3 align-items-center">
+                        <div class="col-md-4">
+                            <label for="date" class="form-label"><strong>Select Date:</strong></label>
+                            <input type="date" name="date" id="date" class="form-control" 
+                                   value="{{ selected_date|date:'Y-m-d' }}" 
+                                   max="{{ today|date:'Y-m-d' }}">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-success mt-4">
+                                <i class="fas fa-search me-2"></i>Load
+                            </button>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <a href="{% url 'staffs:attendance-dashboard' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendance Form -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0 text-success">
+                        <i class="fas fa-users me-2"></i>Teacher List ({{ teachers.count }} teachers)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="attendanceForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="attendance_date" value="{{ selected_date|date:'Y-m-d' }}">
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="attendanceTable">
+                                <thead class="table-success">
+                                    <tr>
+                                        <th>Teacher Name</th>
+                                        <th>Status</th>
+                                        <th>Time In</th>
+                                        <th>Time Out</th>
+                                        <th>Notes</th>
+                                        <th>Last Record</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for teacher in teachers %}
+                                    {% with attendance=attendance_dict|get_item:teacher.id %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ teacher.firstname }} {{ teacher.surname }}</strong>
+                                            {% if teacher.other_name %}
+                                            <br><small class="text-muted">{{ teacher.other_name }}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <select name="status_{{ teacher.id }}" class="form-select status-select" 
+                                                    data-teacher="{{ teacher.id }}">
+                                                <option value="present" {% if attendance.status == 'present' %}selected{% endif %}>Present</option>
+                                                <option value="absent" {% if attendance.status == 'absent' %}selected{% endif %}>Absent</option>
+                                                <option value="late" {% if attendance.status == 'late' %}selected{% endif %}>Late</option>
+                                                <option value="half_day" {% if attendance.status == 'half_day' %}selected{% endif %}>Half Day</option>
+                                                <option value="leave" {% if attendance.status == 'leave' %}selected{% endif %}>On Leave</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="time" name="time_in_{{ teacher.id }}" 
+                                                   class="form-control time-input" 
+                                                   value="{{ attendance.time_in|default:'' }}"
+                                                   {% if attendance and attendance.status == 'absent' %}disabled{% endif %}>
+                                        </td>
+                                        <td>
+                                            <input type="time" name="time_out_{{ teacher.id }}" 
+                                                   class="form-control time-input" 
+                                                   value="{{ attendance.time_out|default:'' }}"
+                                                   {% if attendance and attendance.status == 'absent' %}disabled{% endif %}>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="notes_{{ teacher.id }}" 
+                                                   class="form-control" 
+                                                   value="{{ attendance.notes|default:'' }}"
+                                                   placeholder="Optional notes">
+                                        </td>
+                                        <td>
+                                            {% if attendance %}
+                                            <small class="text-muted">
+                                                {{ attendance.get_status_display }}<br>
+                                                {% if attendance.time_in %}
+                                                {{ attendance.time_in }} - {{ attendance.time_out|default:"--:--" }}
+                                                {% endif %}
+                                            </small>
+                                            {% else %}
+                                            <span class="badge bg-secondary">No record</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endwith %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-4 text-center">
+                            <button type="submit" class="btn btn-success btn-lg px-5">
+                                <i class="fas fa-save me-2"></i>Save Attendance
+                            </button>
+                            <button type="reset" class="btn btn-outline-secondary btn-lg px-5 ms-2">
+                                <i class="fas fa-undo me-2"></i>Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.table th {
+    border-top: none;
+    font-weight: 600;
+}
+
+.status-select {
+    min-width: 120px;
+}
+
+.time-input {
+    min-width: 100px;
+}
+
+.form-select, .form-control {
+    border-radius: 0.5rem;
+}
+
+/* Highlight present teachers */
+tr:has(option[value="present"]:checked) {
+    background-color: #f8fff9;
+}
+
+/* Highlight absent teachers */
+tr:has(option[value="absent"]:checked) {
+    background-color: #fff5f5;
+}
+
+/* Highlight late teachers */
+tr:has(option[value="late"]:checked) {
+    background-color: #fffbf0;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Enable/disable time inputs based on status
+    document.querySelectorAll('.status-select').forEach(select => {
+        select.addEventListener('change', function() {
+            const teacherId = this.dataset.teacher;
+            const timeIn = document.querySelector(`input[name="time_in_${teacherId}"]`);
+            const timeOut = document.querySelector(`input[name="time_out_${teacherId}"]`);
+            
+            if (this.value === 'absent') {
+                timeIn.disabled = true;
+                timeOut.disabled = true;
+                timeIn.value = '';
+                timeOut.value = '';
+            } else {
+                timeIn.disabled = false;
+                timeOut.disabled = false;
+            }
+            
+            // Update row highlighting
+            const row = this.closest('tr');
+            document.querySelectorAll('tr').forEach(r => r.style.backgroundColor = '');
+            if (this.value === 'present') row.style.backgroundColor = '#f8fff9';
+            else if (this.value === 'absent') row.style.backgroundColor = '#fff5f5';
+            else if (this.value === 'late') row.style.backgroundColor = '#fffbf0';
+        });
+    });
+    
+    // Initialize table sorting
+    $('#attendanceTable').DataTable({
+        pageLength: 25,
+        responsive: true
+    });
+});
+</script>
+
+{% endblock %}

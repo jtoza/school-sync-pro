@@ -1,5 +1,7 @@
 from django.db import models
 from apps.students.models import Student
+from django.utils import timezone
+from apps.staffs.models import Staff 
 
 class StudentIDCard(models.Model):
     student = models.OneToOneField(Student, on_delete=models.CASCADE)
@@ -32,3 +34,22 @@ class IDCardTemplate(models.Model):
     
     def __str__(self):
         return self.name
+    
+class TeacherIDCard(models.Model):
+    teacher = models.OneToOneField('staffs.Staff', on_delete=models.CASCADE)
+    id_number = models.CharField(max_length=20, unique=True)
+    issue_date = models.DateField(auto_now_add=True)
+    expiry_date = models.DateField()
+    template_used = models.CharField(max_length=50, default='default')
+    is_active = models.BooleanField(default=True)
+    qr_code = models.ImageField(upload_to='teacher_qrcodes/', blank=True, null=True)
+    
+    class Meta:
+        verbose_name = "Teacher ID Card"
+        verbose_name_plural = "Teacher ID Cards"
+    
+    def __str__(self):
+        return f"Teacher ID - {self.teacher.firstname} {self.teacher.surname}"
+    
+    def is_expired(self):
+        return timezone.now().date() > self.expiry_date

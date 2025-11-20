@@ -8,7 +8,8 @@ from datetime import timedelta
 import os
 from apps.students.models import Student
 from apps.corecode.models import StudentClass
-from .models import StudentIDCard, IDCardTemplate
+from apps.staffs.models import Staff 
+from .models import StudentIDCard, IDCardTemplate, TeacherIDCard
 from .utils import generate_student_id, generate_barcode
 from django.views.generic import View
 
@@ -242,3 +243,139 @@ class IDCardSearchView(View):
         except Student.DoesNotExist:
             messages.error(request, f'Student with registration number "{registration_number}" not found')
             return render(request, 'idcards/idcard_search.html')
+
+@login_required
+def generate_teacher_id_card(request, teacher_id):
+    """Generate ID card for individual teacher"""
+    teacher = get_object_or_404(Staff, id=teacher_id)
+    
+    # Create or get existing ID card
+    id_card, created = TeacherIDCard.objects.get_or_create(
+        teacher=teacher,
+        defaults={
+            'id_number': f"TEA{generate_student_id()[3:]}",  # Teacher ID prefix
+            'expiry_date': timezone.now().date() + timedelta(days=365),
+            'template_used': 'default'
+        }
+    )
+    
+    if created:
+        messages.success(request, f'ID card created for Teacher {teacher.firstname} {teacher.surname}')
+    
+    context = {
+        'teacher': teacher,
+        'id_card': id_card,
+        'school_name': 'GREEN BELLS ACADEMY',
+        'school_motto': 'IN PURSUIT OF EXCELLENCE',
+        'today': timezone.now().date(),
+    }
+    return render(request, 'idcards/teacher_id_card_preview.html', context)
+
+@login_required
+def bulk_generate_teacher_id_cards(request):
+    """Bulk generate ID cards for all teachers"""
+    if request.method == 'POST':
+        scope = request.POST.get('scope', 'all')
+        
+        # Get active teachers - FIXED: Use current_status instead of is_active
+        teachers = Staff.objects.filter(current_status='active')
+        
+        generated_count = 0
+        for teacher in teachers:
+            # Check if teacher already has an ID card
+            if not TeacherIDCard.objects.filter(teacher=teacher).exists():
+                id_card, created = TeacherIDCard.objects.get_or_create(
+                    teacher=teacher,
+                    defaults={
+                        'id_number': f"TEA{generate_student_id()[3:]}",
+                        'expiry_date': timezone.now().date() + timedelta(days=365),
+                        'template_used': 'default'
+                    }
+                )
+                if created:
+                    generated_count += 1
+        
+        if generated_count > 0:
+            messages.success(request, f'Successfully generated {generated_count} new teacher ID cards')
+        else:
+            messages.info(request, 'No new teacher ID cards were generated. All teachers already have ID cards.')
+        
+        return redirect('idcards:teacher-idcard-list')
+    
+    # GET request - show statistics
+    # FIXED: Use current_status instead of is_active
+    total_teachers = Staff.objects.filter(current_status='active').count()
+    generated_count = TeacherIDCard.objects.count()
+    pending_count = total_teachers - generated_count
+    coverage_percentage = (generated_count / total_teachers * 100) if total_teachers > 0 else 0
+    
+    context = {
+        'total_teachers': total_teachers,
+        'generated_count': generated_count,
+        'pending_count': pending_count,
+        'coverage_percentage': round(coverage_percentage, 1),
+    }
+    return render(request, 'idcards/bulk_generate_teachers.html', context)
+
+@login_required
+def teacher_idcard_list(request):
+    """List all teacher ID cards"""
+    idcards_list = TeacherIDCard.objects.select_related('teacher').all()
+    
+    # Pagination
+    paginator = Paginator(idcards_list, 12)
+    page_number = request.GET.get('page')
+    idcards = paginator.get_page(page_number)
+    
+    context = {
+        'idcards': idcards,
+        'today': timezone.now().date(),
+    }
+    return render(request, 'idcards/teacher_idcard_list.html', context) 
+
+@login_required
+def download_teacher_id_card_pdf(request, teacher_id):
+    """Download individual teacher ID card as PDF"""
+    try:
+        from apps.result.views import render_to_pdf
+    except ImportError:
+        messages.error(request, 'PDF generation is not available')
+        return redirect('idcards:generate-teacher-idcard', teacher_id=teacher_id)
+    
+    teacher = get_object_or_404(Staff, id=teacher_id)
+    id_card = get_object_or_404(TeacherIDCard, teacher=teacher)
+    
+    # Get the base URL for absolute image paths
+    base_url = request.build_absolute_uri('/')[:-1]  # Remove trailing slash
+    
+    context = {
+        'teacher': teacher,
+        'id_card': id_card,
+        'school_name': 'GREEN BELLS ACADEMY',
+        'school_motto': 'IN PURSUIT OF EXCELLENCE',
+        'today': timezone.now().date(),
+        'base_url': base_url,  # Add base URL for absolute image paths
+    }
+    
+    response = render_to_pdf(request, 'idcards/teacher_id_card_pdf.html', context)
+    if response:
+        filename = f"teacher_id_card_{teacher.id}.pdf"
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+    else:
+        messages.error(request, 'Failed to generate PDF')
+        return redirect('idcards:generate-teacher-idcard', teacher_id=teacher_id) 
+
+@login_required
+def renew_teacher_id_card(request, teacher_id):
+    """Renew an expired teacher ID card"""
+    teacher = get_object_or_404(Staff, id=teacher_id)
+    id_card = get_object_or_404(TeacherIDCard, teacher=teacher)
+    
+    # Renew the card by updating expiry date
+    id_card.expiry_date = timezone.now().date() + timedelta(days=365)
+    id_card.is_active = True
+    id_card.save()
+    
+    messages.success(request, f'ID card renewed for Teacher {teacher.firstname} {teacher.surname}. Valid until {id_card.expiry_date}')
+    return redirect('idcards:generate-teacher-idcard', teacher_id=teacher_id)
