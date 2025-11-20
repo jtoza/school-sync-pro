@@ -1,10 +1,9 @@
 {% extends 'base.html' %}
 
-{% block title %}staffs{% endblock title %}
+{% block title %}Staff{% endblock title %}
 
 {% block breadcrumb %}
-<a class="btn btn-primary" href="{% url 'staff-create' %}"><i
-    class="fas fa-plus"></i> New staff</a>
+<a class="btn btn-primary" href="{% url 'staffs:staff-create' %}"><i class="fas fa-plus"></i> New Staff</a>
 {% endblock breadcrumb %}
 
 {% block content %}
@@ -22,7 +21,7 @@
     <tbody>
 
       {% for staff in object_list %}
-        <tr class='clickable-row' data-href="{% url 'staff-detail' staff.id %}">
+        <tr class='clickable-row' data-href="{% url 'staffs:staff-detail' staff.id %}"></tr>
           <td>{{ forloop.counter}}</td>
           <td>
             {% if staff.image %}
