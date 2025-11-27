@@ -1,3 +1,4 @@
+import uuid
 from django.core.validators import RegexValidator
 from django.db import models
 from django.urls import reverse
@@ -8,7 +9,6 @@ from apps.corecode.models import StudentClass
 
 class Student(models.Model):
     STATUS_CHOICES = [("active", "Active"), ("inactive", "Inactive")]
-
     GENDER_CHOICES = [("male", "Male"), ("female", "Female")]
 
     current_status = models.CharField(
@@ -51,11 +51,27 @@ class Student(models.Model):
     others = models.TextField(blank=True)
     passport = models.ImageField(blank=True, upload_to="students/passports/")
 
+    # SYNC FIELDS - FIXED: Remove default and make nullable initially
+    sync_id = models.UUIDField(unique=True, blank=True, null=True)
+    sync_status = models.CharField(
+        max_length=20, 
+        choices=[('synced', 'Synced'), ('pending', 'Pending'), ('conflict', 'Conflict')],
+        default='synced'
+    )
+    last_modified = models.DateTimeField(auto_now=True)
+    device_id = models.CharField(max_length=100, blank=True, null=True)
+
     class Meta:
         ordering = ["surname", "firstname", "other_name"]
 
     def __str__(self):
         return f"{self.surname} {self.firstname} {self.other_name} ({self.registration_number})"
+
+    def save(self, *args, **kwargs):
+        # Generate sync_id if it doesn't exist
+        if not self.sync_id:
+            self.sync_id = uuid.uuid4()
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse("student-detail", kwargs={"pk": self.pk})

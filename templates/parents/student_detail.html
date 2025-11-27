@@ -1,0 +1,339 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .fee-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2rem;
+        margin: -1rem -1rem 2rem -1rem;
+        color: white;
+        border-radius: 0 0 20px 20px;
+    }
+
+    .student-info-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #858796;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .section-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+
+    .section-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.25rem 1.5rem;
+        border: none;
+    }
+
+    .table-modern {
+        margin-bottom: 0;
+    }
+
+    .table-modern thead th {
+        background: #f8f9fc;
+        border: none;
+        color: #5a5c69;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+        padding: 1rem;
+    }
+
+    .table-modern tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-color: #e3e6f0;
+    }
+
+    .table-modern tbody tr:hover {
+        background: #f8f9fc;
+    }
+
+    .badge-status {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.75rem;
+    }
+
+    .badge-active {
+        background: #1cc88a;
+        color: white;
+    }
+
+    .badge-closed {
+        background: #858796;
+        color: white;
+    }
+
+    .btn-download {
+        background: linear-gradient(135deg, #36b9cc 0%, #258391 100%);
+        border: none;
+        border-radius: 20px;
+        padding: 0.5rem 1.25rem;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-download:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(54, 185, 204, 0.4);
+        color: white;
+    }
+
+    .amount-positive {
+        color: #1cc88a;
+        font-weight: 600;
+    }
+
+    .amount-negative {
+        color: #e74a3b;
+        font-weight: 600;
+    }
+
+    .back-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid white;
+        color: white;
+        border-radius: 25px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+        background: white;
+        color: #667eea;
+    }
+</style>
+
+<div class="fee-header">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="h2 mb-2">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    Fee Details
+                </h1>
+                <p class="mb-0 h5">{{ object.get_full_name }}</p>
+                <small class="opacity-75">{{ object.registration_number }}</small>
+            </div>
+            <div class="col-md-4 text-right">
+                <a href="{% url 'parent-dashboard' %}" class="btn back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <!-- Financial Summary -->
+    <div class="row mb-4">
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card stat-card h-100">
+                <div class="card-body text-center">
+                    <div class="stat-icon mx-auto"
+                        style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%); color: white;">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="stat-value text-primary">
+                        {% if invoices %}
+                        {{ invoices.0.total_amount_payable|default:"0" }}
+                        {% else %}
+                        0
+                        {% endif %}
+                    </div>
+                    <div class="stat-label">Total Payable</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card stat-card h-100">
+                <div class="card-body text-center">
+                    <div class="stat-icon mx-auto"
+                        style="background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%); color: white;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-value text-success">
+                        {% if invoices %}
+                        {{ invoices.0.total_amount_paid|default:"0" }}
+                        {% else %}
+                        0
+                        {% endif %}
+                    </div>
+                    <div class="stat-label">Amount Paid</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card stat-card h-100">
+                <div class="card-body text-center">
+                    <div class="stat-icon mx-auto"
+                        style="background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%); color: white;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-value text-warning">
+                        {{ total_outstanding|default:"0" }}
+                    </div>
+                    <div class="stat-label">Outstanding Balance</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoices Section -->
+    <div class="section-card">
+        <div class="section-header">
+            <h5 class="mb-0">
+                <i class="fas fa-file-invoice"></i> Invoices
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-modern">
+                    <thead>
+                        <tr>
+                            <th>Session</th>
+                            <th>Term</th>
+                            <th>Class</th>
+                            <th>Amount Payable</th>
+                            <th>Amount Paid</th>
+                            <th>Balance</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for invoice in invoices %}
+                        <tr>
+                            <td><strong>{{ invoice.session }}</strong></td>
+                            <td>{{ invoice.term }}</td>
+                            <td>{{ invoice.class_for }}</td>
+                            <td class="amount-positive">{{ invoice.total_amount_payable }}</td>
+                            <td class="amount-positive">{{ invoice.total_amount_paid }}</td>
+                            <td class="{% if invoice.balance > 0 %}amount-negative{% else %}amount-positive{% endif %}">
+                                {{ invoice.balance }}
+                            </td>
+                            <td>
+                                <span
+                                    class="badge-status {% if invoice.status == 'active' %}badge-active{% else %}badge-closed{% endif %}">
+                                    {{ invoice.get_status_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <i class="fas fa-inbox fa-3x text-gray-300 mb-3"></i>
+                                <p class="text-muted mb-0">No invoices found</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment History Section -->
+    <div class="section-card">
+        <div class="section-header">
+            <h5 class="mb-0">
+                <i class="fas fa-history"></i> Payment History
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-modern">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Amount Paid</th>
+                            <th>Invoice</th>
+                            <th>Comment</th>
+                            <th>Receipt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for receipt in receipts %}
+                        <tr>
+                            <td>
+                                <i class="far fa-calendar-alt text-primary mr-2"></i>
+                                {{ receipt.date_paid|date:"M d, Y" }}
+                            </td>
+                            <td class="amount-positive">
+                                <strong>{{ receipt.amount_paid }}</strong>
+                            </td>
+                            <td>{{ receipt.invoice }}</td>
+                            <td>
+                                <small class="text-muted">{{ receipt.comment|default:"No comment" }}</small>
+                            </td>
+                            <td>
+                                <a href="{% url 'download-receipt' receipt.id %}" class="btn btn-download btn-sm">
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4">
+                                <i class="fas fa-receipt fa-3x text-gray-300 mb-3"></i>
+                                <p class="text-muted mb-0">No payments found</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -44,6 +44,10 @@ INSTALLED_APPS = [
     "attendance",
     "crispy_bootstrap4",
     'apps.idcards',
+    'apps.sync',
+    'student_portfolio',
+    'backup_manager',
+    'apps.parents',
 ]
 
 MIDDLEWARE = [
@@ -189,3 +193,13 @@ CSRF_TRUSTED_ORIGINS = [
     "https://school-management-framework.onrender.com",
     "https://edusync-5jgu.onrender.com",
 ]
+BACKUP_CONFIG = {
+    'ENABLED': True,
+    'BACKUP_DIR': 'backups/',
+    'EXPORT_DIR': 'exports/',
+    'RETENTION_DAYS': 30,
+    'CLOUD_STORAGE': False,  # Set to True if you want cloud backup
+}
+
+# For Excel/PDF exports
+EXPORT_FORMATS = ['excel', 'pdf']

@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -18,8 +19,24 @@ class Invoice(models.Model):
         default="active",
     )
 
+    # SYNC FIELDS - FIXED: Remove default and make nullable initially
+    sync_id = models.UUIDField(unique=True, blank=True, null=True)
+    sync_status = models.CharField(
+        max_length=20, 
+        choices=[('synced', 'Synced'), ('pending', 'Pending'), ('conflict', 'Conflict')],
+        default='synced'
+    )
+    last_modified = models.DateTimeField(auto_now=True)
+    device_id = models.CharField(max_length=100, blank=True, null=True)
+
     class Meta:
         ordering = ["student", "term"]
+
+    def save(self, *args, **kwargs):
+        # Generate sync_id if it doesn't exist
+        if not self.sync_id:
+            self.sync_id = uuid.uuid4()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.student}"
@@ -55,12 +72,44 @@ class InvoiceItem(models.Model):
     description = models.CharField(max_length=200)
     amount = models.IntegerField()
 
+    # SYNC FIELDS - FIXED: Remove default and make nullable initially
+    sync_id = models.UUIDField(unique=True, blank=True, null=True)
+    sync_status = models.CharField(
+        max_length=20, 
+        choices=[('synced', 'Synced'), ('pending', 'Pending'), ('conflict', 'Conflict')],
+        default='synced'
+    )
+    last_modified = models.DateTimeField(auto_now=True)
+    device_id = models.CharField(max_length=100, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        # Generate sync_id if it doesn't exist
+        if not self.sync_id:
+            self.sync_id = uuid.uuid4()
+        super().save(*args, **kwargs)
+
 
 class Receipt(models.Model):
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     amount_paid = models.IntegerField()
     date_paid = models.DateField(default=timezone.now)
     comment = models.CharField(max_length=200, blank=True)
+
+    # SYNC FIELDS - FIXED: Remove default and make nullable initially
+    sync_id = models.UUIDField(unique=True, blank=True, null=True)
+    sync_status = models.CharField(
+        max_length=20, 
+        choices=[('synced', 'Synced'), ('pending', 'Pending'), ('conflict', 'Conflict')],
+        default='synced'
+    )
+    last_modified = models.DateTimeField(auto_now=True)
+    device_id = models.CharField(max_length=100, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        # Generate sync_id if it doesn't exist
+        if not self.sync_id:
+            self.sync_id = uuid.uuid4()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Receipt on {self.date_paid}"

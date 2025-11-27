@@ -1,0 +1,308 @@
+{% extends 'parents/base_parent.html' %}
+
+{% block content %}
+<style>
+    .portal-hero {
+        background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+        padding: 4rem 0;
+        margin: -1rem -1rem 3rem -1rem;
+        color: white;
+        text-align: center;
+    }
+
+    .hero-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.3rem;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+    }
+
+    .lookup-card {
+        max-width: 600px;
+        margin: 0 auto;
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+    }
+
+    .lookup-card-header {
+        background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .lookup-card-body {
+        padding: 3rem 2rem;
+        background: white;
+    }
+
+    .student-id-input {
+        border: 2px solid #e3e6f0;
+        border-radius: 10px;
+        padding: 1rem 1.5rem;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+
+    .student-id-input:focus {
+        border-color: #047857;
+        box-shadow: 0 0 0 0.2rem rgba(4, 120, 87, 0.25);
+    }
+
+    .btn-lookup {
+        background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 1rem 3rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+    .btn-lookup:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(4, 120, 87, 0.4);
+        color: white;
+    }
+
+    .info-section {
+        background: #f8f9fc;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-top: 3rem;
+    }
+
+    .info-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin: 0 auto 1rem;
+    }
+
+    .feature-item {
+        text-align: center;
+        padding: 1.5rem;
+    }
+
+    .feature-item h5 {
+        color: #5a5c69;
+        margin-top: 1rem;
+    }
+
+    .feature-item p {
+        color: #858796;
+        font-size: 0.9rem;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .portal-hero {
+            padding: 2.5rem 0;
+        }
+
+        .hero-title {
+            font-size: 2rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+        }
+
+        .lookup-card {
+            margin: 0 1rem;
+        }
+
+        .lookup-card-header {
+            padding: 1.5rem;
+        }
+
+        .lookup-card-header h3 {
+            font-size: 1.3rem;
+        }
+
+        .lookup-card-body {
+            padding: 2rem 1.5rem;
+        }
+
+        .student-id-input {
+            padding: 0.9rem 1.2rem;
+            font-size: 1rem;
+        }
+
+        .btn-lookup {
+            padding: 0.9rem 2rem;
+            font-size: 1rem;
+        }
+
+        .info-section {
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .feature-item {
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.3rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .portal-hero {
+            padding: 2rem 0;
+        }
+
+        .hero-title {
+            font-size: 1.75rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+            padding: 0 1rem;
+        }
+
+        .lookup-card {
+            margin: 0 0.5rem;
+        }
+
+        .lookup-card-header {
+            padding: 1.25rem 1rem;
+        }
+
+        .lookup-card-header h3 {
+            font-size: 1.1rem;
+        }
+
+        .lookup-card-header p {
+            font-size: 0.85rem;
+        }
+
+        .lookup-card-body {
+            padding: 1.5rem 1rem;
+        }
+
+        .student-id-input {
+            padding: 0.8rem 1rem;
+            font-size: 0.95rem;
+        }
+
+        .btn-lookup {
+            padding: 0.8rem 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .info-section {
+            padding: 1rem;
+        }
+
+        .feature-item h5 {
+            font-size: 1rem;
+        }
+
+        .feature-item p {
+            font-size: 0.85rem;
+        }
+    }
+</style>
+
+<div class="portal-hero">
+    <div class="container">
+        <h1 class="hero-title">
+            <i class="fas fa-graduation-cap"></i> Parent Portal
+        </h1>
+        <p class="hero-subtitle">
+            View your child's fee balance, payment history, and academic performance
+        </p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="lookup-card">
+                <div class="lookup-card-header">
+                    <h3 class="mb-0">
+                        <i class="fas fa-search"></i> Check Student Information
+                    </h3>
+                    <p class="mb-0 mt-2" style="opacity: 0.9;">Enter your child's student ID or registration number</p>
+                </div>
+                <div class="lookup-card-body">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    <form method="post" action="{% url 'student-fee-lookup' %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="student_id" class="font-weight-bold">Student ID / Registration Number</label>
+                            <input type="text" class="form-control student-id-input" id="student_id" name="student_id"
+                                placeholder="e.g., STU001 or 12345" required autofocus>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle"></i> Enter the student ID found on the student's ID card
+                                or report card
+                            </small>
+                        </div>
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-lookup">
+                                <i class="fas fa-search"></i> View Student Information
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="info-section">
+        <div class="row">
+            <div class="col-md-4 feature-item">
+                <div class="info-icon">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                </div>
+                <h5>View Invoices</h5>
+                <p>See all fee invoices for the current and previous terms</p>
+            </div>
+            <div class="col-md-4 feature-item">
+                <div class="info-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h5>Payment History</h5>
+                <p>Track all payments made and download receipts</p>
+            </div>
+            <div class="col-md-4 feature-item">
+                <div class="info-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h5>Academic Performance</h5>
+                <p>View exam results, grades, and academic progress</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

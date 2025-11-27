@@ -47,6 +47,12 @@ urlpatterns = [
     path('service-worker.js', service_worker_view, name='service_worker'),
     path('offline/', TemplateView.as_view(template_name='offline.html'), name='offline'),
     path('idcards/', include('apps.idcards.urls', namespace='idcards')),  # ADDED NAMESPACE
+
+    path('sync/', include('apps.sync.urls')),
+    path('sync/test/', TemplateView.as_view(template_name='sync_test.html'), name='sync_test'),
+    path('portfolio/', include('student_portfolio.urls')),
+    path('backup/', include('backup_manager.urls')),
+    path('parents/', include('apps.parents.urls')),
 ]
 
 if settings.DEBUG:

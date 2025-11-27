@@ -1,4 +1,6 @@
+import uuid
 from django.db import models
+from django.core.exceptions import ValidationError
 
 from apps.corecode.models import (
     AcademicSession,
@@ -23,14 +25,29 @@ class Result(models.Model):
     teacher_comment = models.CharField(max_length=255, blank=True, default="")
     headteacher_comment = models.CharField(max_length=255, blank=True, default="")
 
+    # SYNC FIELDS - FIXED: Remove default and make nullable initially
+    sync_id = models.UUIDField(unique=True, blank=True, null=True)
+    sync_status = models.CharField(
+        max_length=20, 
+        choices=[('synced', 'Synced'), ('pending', 'Pending'), ('conflict', 'Conflict')],
+        default='synced'
+    )
+    last_modified = models.DateTimeField(auto_now=True)
+    device_id = models.CharField(max_length=100, blank=True, null=True)
+
     class Meta:
         ordering = ["subject"]
+
+    def save(self, *args, **kwargs):
+        # Generate sync_id if it doesn't exist
+        if not self.sync_id:
+            self.sync_id = uuid.uuid4()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.student} {self.session} {self.term} {self.subject}"
 
     def clean(self):
-        from django.core.exceptions import ValidationError
         errors = {}
         if self.test_score is not None and self.test_score > 40:
             errors['test_score'] = 'CA must be ≤ 40'

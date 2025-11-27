@@ -4,11 +4,10 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
-
 from apps.students.models import Student
-
 from .forms import InvoiceItemFormset, InvoiceReceiptFormSet, Invoices
 from .models import Invoice, InvoiceItem, Receipt
+from django.db import IntegrityError
 
 
 class InvoiceListView(LoginRequiredMixin, ListView):

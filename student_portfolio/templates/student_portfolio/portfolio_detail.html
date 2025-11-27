@@ -1,0 +1,394 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load portfolio_filters %}
+
+{% block title %}{{ item.title }} - Portfolio{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'student_portfolio/css/portfolio.css' %}">
+<style>
+.portfolio-gallery {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+}
+
+.portfolio-gallery img {
+    transition: transform 0.5s ease;
+}
+
+.portfolio-gallery:hover img {
+    transform: scale(1.05);
+}
+
+.metadata-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.meta-item {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 1rem;
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.meta-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.meta-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.skills-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.skill-tag {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.action-btn-group {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.download-btn {
+    background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4);
+    color: white;
+}
+
+.file-preview-container {
+    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    border: 2px dashed #667eea30;
+}
+
+.icon-container {
+    flex-shrink: 0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Enhanced Header -->
+<div class="portfolio-header">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'student_portfolio:portfolio_list' %}" class="text-white-50">Portfolio</a></li>
+                <li class="breadcrumb-item active text-white">{{ item.title|truncatewords:4 }}</li>
+            </ol>
+        </nav>
+        
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="avatar me-3 floating">
+                        {{ item.student.user|get_first_chars }}
+                    </div>
+                    <div>
+                        <h1 class="display-6 fw-bold text-white mb-1">{{ item.title }}</h1>
+                        <p class="lead text-white-50 mb-0">
+                            <i class="fas fa-user-graduate me-1"></i>
+                            by {{ item.student.user.get_full_name }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                {% if user.student == item.student %}
+                <div class="action-btn-group justify-content-lg-end">
+                    <a href="{% url 'student_portfolio:portfolio_update' item.pk %}" class="btn btn-light btn-portfolio">
+                        <i class="fas fa-edit me-2"></i>Edit
+                    </a>
+                    <a href="{% url 'student_portfolio:portfolio_delete' item.pk %}" class="btn btn-outline-light">
+                        <i class="fas fa-trash me-2"></i>Delete
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <div class="card portfolio-card mb-4 glass-card">
+                <div class="card-body p-4">
+                    <!-- Enhanced File Preview -->
+                    <div class="file-preview-container">
+                        {% if item.image_file %}
+                        <div class="portfolio-gallery mb-4">
+                            <img src="{{ item.image_file.url }}" alt="{{ item.title }}" class="img-fluid rounded-3 shadow-lg" style="max-height: 500px; width: 100%; object-fit: cover;">
+                        </div>
+                        {% elif item.document_file %}
+                        <div class="text-center">
+                            <i class="fas fa-file-pdf file-type-document fa-7x mb-4 floating"></i>
+                            <h3 class="text-gradient mb-3">Document Preview</h3>
+                            <p class="text-muted mb-4">{{ item.document_file.name }}</p>
+                            <a href="{{ item.document_file.url }}" class="download-btn" target="_blank" download>
+                                <i class="fas fa-download me-2"></i>Download Document
+                            </a>
+                        </div>
+                        {% elif item.code_file %}
+                        <div class="text-center">
+                            <i class="fas fa-code file-type-code fa-7x mb-4 floating"></i>
+                            <h3 class="text-gradient mb-3">Code File</h3>
+                            <p class="text-muted mb-4">{{ item.code_file.name }}</p>
+                            <a href="{{ item.code_file.url }}" class="download-btn" target="_blank" download>
+                                <i class="fas fa-download me-2"></i>Download Source Code
+                            </a>
+                        </div>
+                        {% else %}
+                        <div class="text-center">
+                            <i class="fas fa-file file-type-other fa-7x mb-4 floating"></i>
+                            <h3 class="text-gradient mb-3">Portfolio Item</h3>
+                            <p class="text-muted">External resource or general item</p>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Description Section -->
+                    <div class="mb-5">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="icon-container bg-primary rounded-circle p-3 me-3">
+                                <i class="fas fa-align-left text-white fa-lg"></i>
+                            </div>
+                            <h3 class="text-gradient mb-0">Project Description</h3>
+                        </div>
+                        <div class="ps-5">
+                            <p class="lead text-dark lh-lg">{{ item.description|linebreaks }}</p>
+                        </div>
+                    </div>
+
+                    <!-- External URL Section -->
+                    {% if item.external_url %}
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="icon-container bg-success rounded-circle p-3 me-3">
+                                <i class="fas fa-external-link-alt text-white fa-lg"></i>
+                            </div>
+                            <h3 class="text-gradient mb-0">External Resources</h3>
+                        </div>
+                        <div class="ps-5">
+                            <a href="{{ item.external_url }}" target="_blank" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-external-link-alt me-2"></i>View External Resource
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Sidebar -->
+        <div class="col-lg-4">
+            <!-- Student Info Card -->
+            <div class="card portfolio-card mb-4 glass-card">
+                <div class="card-header gradient-primary text-white py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <i class="fas fa-user-graduate me-2"></i>Student Profile
+                    </h5>
+                </div>
+                <div class="card-body text-center p-4">
+                    <div class="avatar mx-auto mb-3 floating">
+                        {{ item.student.user|get_first_chars }}
+                    </div>
+                    <h5 class="text-gradient">{{ item.student.user.get_full_name }}</h5>
+                    <p class="text-muted mb-3">@{{ item.student.user.username }}</p>
+                    
+                    <div class="student-meta">
+                        {% if item.student.current_class %}
+                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                            <span class="text-muted"><i class="fas fa-graduation-cap me-2"></i>Class:</span>
+                            <strong>{{ item.student.current_class }}</strong>
+                        </div>
+                        {% endif %}
+                        
+                        {% if item.student.department %}
+                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                            <span class="text-muted"><i class="fas fa-building me-2"></i>Department:</span>
+                            <strong>{{ item.student.department }}</strong>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-flex justify-content-between align-items-center py-2">
+                            <span class="text-muted"><i class="fas fa-calendar me-2"></i>Member Since:</span>
+                            <strong>{{ item.student.user.date_joined|date:"M Y" }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Details Card -->
+            <div class="card portfolio-card mb-4 glass-card">
+                <div class="card-header gradient-success text-white py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <i class="fas fa-chart-bar me-2"></i>Project Analytics
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="metadata-grid">
+                        <div class="meta-item">
+                            <i class="fas fa-folder meta-icon text-primary"></i>
+                            <strong>Category</strong>
+                            <div class="mt-1">
+                                {% if item.category %}
+                                <span class="badge gradient-primary">{{ item.category.name }}</span>
+                                {% else %}
+                                <span class="text-muted small">Uncategorized</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="meta-item">
+                            <i class="fas fa-file meta-icon text-info"></i>
+                            <strong>File Type</strong>
+                            <div class="mt-1">
+                                <span class="badge bg-info text-white text-capitalize">{{ item.file_type }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if item.skills_used %}
+                    <div class="mt-4">
+                        <h6 class="text-gradient mb-2"><i class="fas fa-tools me-2"></i>Skills Demonstrated</h6>
+                        <div class="skills-cloud">
+                            {% for skill in item.skills_used|split %}
+                            <span class="skill-tag">{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="timeline mt-4">
+                        <div class="timeline-item">
+                            <small class="text-muted">Created</small>
+                            <div class="fw-bold">{{ item.created_at|date:"F d, Y" }}</div>
+                        </div>
+                        {% if item.updated_at != item.created_at %}
+                        <div class="timeline-item">
+                            <small class="text-muted">Last Updated</small>
+                            <div class="fw-bold">{{ item.updated_at|date:"F d, Y" }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sharing Card -->
+            <div class="card portfolio-card glass-card">
+                <div class="card-header gradient-warning text-white py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <i class="fas fa-share-alt me-2"></i>Share Project
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <p class="small text-muted mb-3">
+                        Share this portfolio item with teachers, colleges, or potential employers:
+                    </p>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'student_portfolio:portfolio_public' item.pk %}" 
+                           class="btn btn-success btn-portfolio" 
+                           target="_blank">
+                            <i class="fas fa-link me-2"></i>Public View Link
+                        </a>
+                        <button class="btn btn-outline-secondary" 
+                                onclick="copyToClipboard('{{ request.scheme }}://{{ request.get_host }}{% url 'student_portfolio:portfolio_public' item.pk %}')">
+                            <i class="fas fa-copy me-2"></i>Copy Link
+                        </button>
+                    </div>
+
+                    <div class="mt-3 p-3 bg-light rounded">
+                        <small class="text-muted d-block mb-1">
+                            <i class="fas fa-info-circle me-1"></i>This link provides public access without login
+                        </small>
+                        <small class="text-muted">
+                            <i class="fas fa-eye me-1"></i>Perfect for resumes and applications
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        showNotification('Link copied to clipboard!', 'success');
+    }).catch(function(err) {
+        // Fallback for older browsers
+        var textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+        showNotification('Link copied to clipboard!', 'success');
+    });
+}
+
+function showNotification(message, type) {
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px;';
+    toast.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
+// Add floating animation to elements
+document.addEventListener('DOMContentLoaded', function() {
+    const floatingElements = document.querySelectorAll('.floating');
+    floatingElements.forEach(el => {
+        el.style.animation = 'floating 3s ease-in-out infinite';
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .parent-dashboard {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2rem 0;
+        margin: -1rem -1rem 2rem -1rem;
+        color: white;
+    }
+
+    .student-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+
+    .student-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .student-card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem;
+        border: none;
+    }
+
+    .student-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+        font-weight: bold;
+        margin: 0 auto 1rem;
+    }
+
+    .info-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: #f8f9fc;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        margin: 0.25rem;
+    }
+
+    .btn-view-details {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 25px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-view-details:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .welcome-text {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .subtitle-text {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+</style>
+
+<div class="parent-dashboard">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h1 class="welcome-text">Welcome, {{ request.user.get_full_name|default:request.user.username }}!</h1>
+                <p class="subtitle-text">Manage your children's academic and financial information</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <h4 class="text-gray-800 mb-3">
+                <i class="fas fa-users text-primary"></i> Your Children
+            </h4>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for student in students %}
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card student-card h-100">
+                <div class="student-card-header text-center">
+                    <div class="student-avatar">
+                        {{ student.firstname.0 }}{{ student.surname.0 }}
+                    </div>
+                    <h5 class="mb-0">{{ student.get_full_name }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <span class="info-badge">
+                            <i class="fas fa-id-card text-primary"></i>
+                            {{ student.registration_number }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center"
+                style="border-radius: 15px; border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <i class="fas fa-info-circle fa-2x mb-3"></i>
+                <h5>No Students Linked</h5>
+                <p class="mb-0">No students are currently linked to your account. Please contact the school
+                    administration.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

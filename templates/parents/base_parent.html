@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ school_name|default:"School" }} - Parent Portal</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fc;
+            min-height: 100vh;
+        }
+
+        .parent-navbar {
+            background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .parent-navbar .navbar-brand {
+            color: white !important;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .parent-navbar .navbar-brand:hover {
+            opacity: 0.9;
+        }
+
+        .content-wrapper {
+            padding: 2rem 0;
+        }
+
+        .footer {
+            background: #f8f9fc;
+            padding: 2rem 0;
+            margin-top: 4rem;
+            border-top: 1px solid #e3e6f0;
+            text-align: center;
+            color: #858796;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <!-- Simple Navbar for Parent Portal -->
+    <nav class="navbar parent-navbar">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'parent-portal-home' %}">
+                <i class="fas fa-graduation-cap"></i> {{ school_name|default:"School" }} - Parent Portal
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="content-wrapper">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="container">
+            <p class="mb-0">&copy; {% now "Y" %} {{ school_name|default:"School Management System" }}. All rights
+                reserved.</p>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

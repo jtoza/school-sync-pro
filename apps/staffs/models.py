@@ -1,3 +1,4 @@
+import uuid
 from django.core.validators import RegexValidator
 from django.db import models
 from django.urls import reverse
@@ -28,6 +29,22 @@ class Staff(models.Model):
     
     # Add image field
     image = models.ImageField(upload_to='staffs/', blank=True, null=True)
+
+    # SYNC FIELDS - FIXED: Remove default and make nullable initially
+    sync_id = models.UUIDField(unique=True, blank=True, null=True)
+    sync_status = models.CharField(
+        max_length=20, 
+        choices=[('synced', 'Synced'), ('pending', 'Pending'), ('conflict', 'Conflict')],
+        default='synced'
+    )
+    last_modified = models.DateTimeField(auto_now=True)
+    device_id = models.CharField(max_length=100, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        # Generate sync_id if it doesn't exist
+        if not self.sync_id:
+            self.sync_id = uuid.uuid4()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.surname} {self.firstname} {self.other_name}"
@@ -64,11 +81,27 @@ class TeacherAttendance(models.Model):
     time_out = models.TimeField(blank=True, null=True)
     notes = models.TextField(blank=True)
     
+    # SYNC FIELDS - FIXED: Remove default and make nullable initially
+    sync_id = models.UUIDField(unique=True, blank=True, null=True)
+    sync_status = models.CharField(
+        max_length=20, 
+        choices=[('synced', 'Synced'), ('pending', 'Pending'), ('conflict', 'Conflict')],
+        default='synced'
+    )
+    last_modified = models.DateTimeField(auto_now=True)
+    device_id = models.CharField(max_length=100, blank=True, null=True)
+    
     class Meta:
         verbose_name = "Teacher Attendance"
         verbose_name_plural = "Teacher Attendances"
         unique_together = ['teacher', 'date']  # One attendance per teacher per day
         ordering = ['-date', 'teacher']
+
+    def save(self, *args, **kwargs):
+        # Generate sync_id if it doesn't exist
+        if not self.sync_id:
+            self.sync_id = uuid.uuid4()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.teacher} - {self.date} - {self.status}"
@@ -82,4 +115,4 @@ class TeacherAttendance(models.Model):
             duration = time_out - time_in
             hours = duration.total_seconds() / 3600
             return round(hours, 2)
-        return None    
+        return None
