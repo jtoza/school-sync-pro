@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Generate ID Card - Search Student{% endblock title %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-id-card me-2"></i>Generate ID Card
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-search fa-3x text-primary mb-3"></i>
+                        <h3>Find Student</h3>
+                        <p class="text-muted">Enter student registration number to generate ID card</p>
+                    </div>
+
+                    {% if messages %}
+                    <div class="mb-4">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label for="registration_number" class="form-label fw-bold">Registration Number</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-user-graduate text-primary"></i>
+                                </span>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="registration_number" 
+                                       name="registration_number" 
+                                       placeholder="Enter student registration number" 
+                                       required
+                                       autofocus>
+                            </div>
+                            <div class="form-text">
+                                Enter the exact registration number as it appears in the system
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-search me-2"></i>Find Student & Generate ID
+                            </button>
+                            <a href="{% url 'students:student-list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-list me-2"></i>View All Students
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Quick Help Section -->
+            <div class="card shadow mt-4">
+                <div class="card-header bg-light py-3">
+                    <h5 class="card-title mb-0 text-primary">
+                        <i class="fas fa-info-circle me-2"></i>Need Help?
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-success">
+                                <i class="fas fa-question-circle me-2"></i>Where to find?
+                            </h6>
+                            <p class="small text-muted">
+                                Registration numbers can be found in the student list or student profile pages.
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-info">
+                                <i class="fas fa-bulk me-2"></i>Bulk Generation
+                            </h6>
+                            <p class="small text-muted">
+                                Need to generate multiple ID cards? Use the bulk generation feature.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.shadow {
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+}
+
+.input-group-text {
+    border-radius: 0.5rem 0 0 0.5rem;
+}
+
+.form-control {
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+</style>
+{% endblock content %}

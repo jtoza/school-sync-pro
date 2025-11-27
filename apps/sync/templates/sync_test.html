@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Offline Sync Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            font-weight: 300;
+        }
+        
+        .header p {
+            margin: 8px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .content {
+            padding: 25px;
+        }
+        
+        .status-panel {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .status-panel h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .status-item {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .status-label {
+            font-weight: 600;
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .status-value {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+        
+        .controls {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .controls h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+        
+        button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #219a52);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        .btn-info {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+        }
+        
+        .results {
+            background: #2c3e50;
+            border-radius: 8px;
+            padding: 20px;
+            color: white;
+        }
+        
+        .results h3 {
+            margin-top: 0;
+            color: #ecf0f1;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        #results {
+            margin-top: 15px;
+            padding: 15px;
+            border: 1px solid #34495e;
+            border-radius: 6px;
+            background: #1a252f;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .log-success {
+            color: #2ecc71;
+            padding: 5px 0;
+            border-bottom: 1px solid #34495e;
+        }
+        
+        .log-error {
+            color: #e74c3c;
+            padding: 5px 0;
+            border-bottom: 1px solid #34495e;
+        }
+        
+        .log-info {
+            color: #3498db;
+            padding: 5px 0;
+            border-bottom: 1px solid #34495e;
+        }
+        
+        .log-warning {
+            color: #f39c12;
+            padding: 5px 0;
+            border-bottom: 1px solid #34495e;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        /* Scrollbar styling */
+        #results::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        #results::-webkit-scrollbar-track {
+            background: #34495e;
+            border-radius: 4px;
+        }
+        
+        #results::-webkit-scrollbar-thumb {
+            background: #3498db;
+            border-radius: 4px;
+        }
+        
+        #results::-webkit-scrollbar-thumb:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Offline Sync Test Panel</h1>
+            <p>Test your offline functionality and sync capabilities</p>
+        </div>
+        
+        <div class="content">
+            <div class="status-panel">
+                <h3>📊 System Status</h3>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <div class="status-label">Device ID</div>
+                        <div class="status-value" id="deviceId">-</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Network Status</div>
+                        <div class="status-value" id="onlineStatus">-</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Database Status</div>
+                        <div class="status-value" id="dbStatus">-</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Pending Items</div>
+                        <div class="status-value" id="pendingCount">-</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <h3>🎮 Test Controls</h3>
+                <div class="button-grid">
+                    <button class="btn-success" onclick="testSaveLocal()">
+                        💾 Test Save Locally
+                    </button>
+                    <button class="btn-primary" onclick="testGetAllLocal()">
+                        📊 Test Get All Local
+                    </button>
+                    <button class="btn-info" onclick="testGetPending()">
+                        📋 Test Get Pending
+                    </button>
+                    <button class="btn-warning" onclick="testSync()">
+                        🔄 Test Sync API
+                    </button>
+                    <button class="btn-danger" onclick="clearResults()">
+                        🗑️ Clear Results
+                    </button>
+                    <button class="btn-primary" onclick="testDirectSave()">
+                        ⚡ Test Direct Save
+                    </button>
+                </div>
+            </div>
+            
+            <div class="results">
+                <h3>📝 Test Results</h3>
+                <div id="results">Waiting for tests...</div>
+            </div>
+            
+            <div class="footer">
+                <p>Offline Sync System • Django School Management</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include the offline manager -->
+    <script src="/static/js/offline-manager.js"></script>
+    
+    <script>
+    function log(message, type = 'info') {
+        const results = document.getElementById('results');
+        const timestamp = new Date().toLocaleTimeString();
+        const logEntry = document.createElement('div');
+        logEntry.className = `log-${type}`;
+        logEntry.innerHTML = `<strong>${timestamp}</strong> - ${message}`;
+        results.appendChild(logEntry);
+        results.scrollTop = results.scrollHeight;
+        console.log(message);
+        
+        // Update pending count if it's a sync-related message
+        if (message.includes('pending') || message.includes('synced')) {
+            updatePendingCount();
+        }
+    }
+
+async function testSaveLocal() {
+    log('Testing local save functionality...', 'info');
+    try {
+        // Generate a random date to avoid unique constraint issues
+        const randomDays = Math.floor(Math.random() * 30); // Random day in next 30 days
+        const testDate = new Date();
+        testDate.setDate(testDate.getDate() + randomDays);
+        const dateString = testDate.toISOString().split('T')[0];
+        
+        const sampleData = {
+            teacher_sync_id: 'test_teacher_' + Date.now(),
+            date: dateString, // Use random date instead of today
+            status: 'present',
+            time_in: '08:00',
+            time_out: '16:00',
+            notes: 'Test from browser ' + new Date().toLocaleTimeString()
+        };
+        
+        const syncId = await offlineManager.saveLocal('teacher_attendances', sampleData);
+        log('✅ SUCCESS: Saved locally with ID: ' + syncId + ' for date: ' + dateString, 'success');
+        updatePendingCount();
+    } catch (error) {
+        log('❌ FAILED: Local save error: ' + error.message, 'error');
+        console.error('Detailed error:', error);
+    }
+}
+
+    async function testGetAllLocal() {
+        log('Retrieving all local records...', 'info');
+        try {
+            const allData = await offlineManager.getAllLocal('teacher_attendances');
+            log('📊 Local teacher attendances: ' + allData.length + ' records', 'info');
+            
+            if (allData.length === 0) {
+                log('No local records found', 'info');
+            } else {
+                allData.forEach(item => {
+                    log(`📅 ${item.date}: ${item.status} (${item.sync_id.substring(0, 20)}...) - ${item.sync_status}`, 'info');
+                });
+            }
+        } catch (error) {
+            log('❌ FAILED: Get all error: ' + error.message, 'error');
+        }
+    }
+
+    async function testGetPending() {
+        log('Checking for pending items...', 'info');
+        try {
+            const pending = await offlineManager.getPendingItems();
+            log(`📋 Pending items: ${pending.length} records`, 'info');
+            
+            if (pending.length === 0) {
+                log('No pending items found', 'info');
+            } else {
+                pending.forEach(item => {
+                    log(`⏳ ${item.date}: ${item.status} (${item.sync_id.substring(0, 20)}...)`, 'info');
+                });
+            }
+            updatePendingCount();
+        } catch (error) {
+            log('❌ FAILED: Get pending error: ' + error.message, 'error');
+        }
+    }
+
+    async function testSync() {
+        log('Starting sync with server...', 'info');
+        try {
+            await offlineManager.syncWithServer();
+            log('✅ Sync process completed', 'success');
+            updatePendingCount();
+        } catch (error) {
+            log('❌ FAILED: Sync error: ' + error.message, 'error');
+        }
+    }
+
+    async function testDirectSave() {
+        log('Testing direct IndexedDB save...', 'info');
+        try {
+            const db = offlineManager.db;
+            const transaction = db.transaction(['teacher_attendances'], 'readwrite');
+            const store = transaction.objectStore('teacher_attendances');
+            
+            const testData = {
+                sync_id: 'direct_test_' + Date.now(),
+                teacher_sync_id: 'test_teacher_direct',
+                date: new Date().toISOString().split('T')[0],
+                status: 'present',
+                sync_status: 'pending',
+                last_modified: new Date().toISOString(),
+                device_id: offlineManager.deviceId
+            };
+            
+            const request = store.add(testData);
+            
+            request.onsuccess = () => {
+                log('✅ DIRECT TEST PASSED! Data saved successfully', 'success');
+                updatePendingCount();
+            };
+            
+            request.onerror = (event) => {
+                log('❌ DIRECT TEST FAILED: ' + event.target.error, 'error');
+            };
+        } catch (error) {
+            log('❌ DIRECT TEST ERROR: ' + error.message, 'error');
+        }
+    }
+
+    function clearResults() {
+        document.getElementById('results').innerHTML = 'Waiting for tests...';
+        log('Results cleared', 'info');
+    }
+
+    async function updatePendingCount() {
+        try {
+            const pending = await offlineManager.getPendingItems();
+            document.getElementById('pendingCount').textContent = pending.length + ' items';
+        } catch (error) {
+            document.getElementById('pendingCount').textContent = 'Error';
+        }
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        // Update status
+        document.getElementById('deviceId').textContent = offlineManager.deviceId;
+        document.getElementById('onlineStatus').textContent = navigator.onLine ? '✅ Online' : '❌ Offline';
+        document.getElementById('dbStatus').textContent = offlineManager.db ? '✅ Connected' : '❌ Disconnected';
+        
+        // Initial pending count
+        updatePendingCount();
+        
+        log('🎉 System initialized successfully!', 'success');
+        log('Device ID: ' + offlineManager.deviceId, 'info');
+        log('Online: ' + navigator.onLine, 'info');
+        log('Ready for testing!', 'info');
+        
+        // Listen for network changes
+        window.addEventListener('online', function() {
+            document.getElementById('onlineStatus').textContent = '✅ Online';
+            log('🌐 Network connection restored', 'success');
+        });
+        
+        window.addEventListener('offline', function() {
+            document.getElementById('onlineStatus').textContent = '❌ Offline';
+            log('📵 Network connection lost - working offline', 'warning');
+        });
+        
+        // Listen for sync events from offline manager
+        window.addEventListener('syncCompleted', function(event) {
+            log('🔄 Background sync completed', 'success');
+            updatePendingCount();
+        });
+    });
+
+    // Add this to your sync_test.html script section
+async function emergencyReset() {
+    log('🚨 Performing emergency database reset...', 'warning');
+    try {
+        await offlineManager.resetDatabase();
+        log('✅ Database reset completed', 'success');
+        
+        // Update status
+        document.getElementById('dbStatus').textContent = offlineManager.db ? '✅ Connected' : '❌ Disconnected';
+        document.getElementById('pendingCount').textContent = '0 items';
+        
+    } catch (error) {
+        log('❌ Emergency reset failed: ' + error.message, 'error');
+    }
+}
+
+// Add a reset button to your HTML
+// <button class="btn-danger" onclick="emergencyReset()">🚨 Emergency Reset</button>
+    </script>
+</body>
+</html>

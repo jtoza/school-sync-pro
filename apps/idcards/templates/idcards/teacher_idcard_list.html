@@ -1,0 +1,178 @@
+[file name]: teacher_idcard_list.html
+[file content begin]
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Teacher ID Cards{% endblock title %}
+
+{% block breadcrumb %}
+<a class="btn btn-success" href="{% url 'idcards:bulk-generate-teachers' %}">
+    <i class="fas fa-layer-group me-2"></i> Bulk Generate Teacher IDs
+</a>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-id-card me-2"></i>Teacher ID Cards
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if idcards %}
+                    <div class="table-responsive">
+                        <table id="teacheridcardtable" class="table table-bordered table-hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>S/N</th>
+                                    <th>Teacher</th>
+                                    <th>ID Number</th>
+                                    <th>Status</th>
+                                    <th>Expiry Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for idcard in idcards %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-sm me-3">
+                                                {% if idcard.teacher.image %}
+                                                    <img src="{{ idcard.teacher.image.url }}" alt="{{ idcard.teacher.firstname }}" class="img-fluid rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                                                {% else %}
+                                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                        <i class="fas fa-user text-muted"></i>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <div>
+                                                <strong>{{ idcard.teacher.firstname }} {{ idcard.teacher.surname }}</strong>
+                                                {% if idcard.teacher.other_name %}
+                                                <br><small class="text-muted">{{ idcard.teacher.other_name }}</small>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success">{{ idcard.id_number }}</span>
+                                    </td>
+                                    <td>
+                                        {% if idcard.is_active %}
+                                            {% if idcard.expiry_date > today %}
+                                                <span class="badge bg-success">Active</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">Expired</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="badge bg-secondary">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ idcard.expiry_date }}
+                                        {% if idcard.expiry_date < today %}
+                                            <br><small class="text-danger">(Expired)</small>
+                                        {% elif idcard.expiry_date <= today|add:"30" %}
+                                            <br><small class="text-warning">(Expiring soon)</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{% url 'idcards:generate-teacher-idcard' idcard.teacher.id %}" 
+                                               class="btn btn-sm btn-outline-success" title="View ID Card">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'idcards:download-teacher-idcard-pdf' idcard.teacher.id %}" 
+                                               class="btn btn-sm btn-success" title="Download PDF">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                            {% if not idcard.is_active or idcard.expiry_date < today %}
+                                            <a href="{% url 'idcards:renew-teacher-idcard' idcard.teacher.id %}" 
+                                               class="btn btn-sm btn-warning" title="Renew ID Card">
+                                                <i class="fas fa-sync-alt"></i>
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if idcards.has_other_pages %}
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            {% if idcards.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link text-success" href="?page={{ idcards.previous_page_number }}">Previous</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Previous</span>
+                            </li>
+                            {% endif %}
+
+                            {% for i in idcards.paginator.page_range %}
+                                {% if idcards.number == i %}
+                                <li class="page-item active">
+                                    <span class="page-link bg-success border-success">{{ i }}</span>
+                                </li>
+                                {% else %}
+                                <li class="page-item">
+                                    <a class="page-link text-success" href="?page={{ i }}">{{ i }}</a>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if idcards.has_next %}
+                            <li class="page-item">
+                                <a class="page-link text-success" href="?page={{ idcards.next_page_number }}">Next</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Next</span>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-id-card fa-4x text-muted mb-3"></i>
+                        <h4 class="text-muted">No Teacher ID Cards Generated</h4>
+                        <p class="text-muted">You haven't generated any teacher ID cards yet.</p>
+                        <a href="{% url 'idcards:bulk-generate-teachers' %}" class="btn btn-success btn-lg">
+                            <i class="fas fa-layer-group me-2"></i>Generate Teacher ID Cards
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block morejs %}
+<script>
+    $(document).ready(function() {
+        $('#teacheridcardtable').DataTable({
+            "pageLength": 25,
+            "responsive": true,
+            "order": [[1, 'asc']],
+            "language": {
+                "search": "Search teachers:",
+                "lengthMenu": "Show _MENU_ entries"
+            }
+        });
+    });
+</script>
+{% endblock morejs %}
+[file content end]

@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}
+Configure Results Settings
+{% endblock title %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header bg-success text-white">
+    <h5 class="card-title mb-0">
+      <i class="fas fa-cog me-2"></i>
+      Configure Results Settings
+    </h5>
+  </div>
+  
+  <div class="card-body">
+    <div class="alert alert-info mb-4">
+      <i class="fas fa-info-circle me-2"></i>
+      You selected <strong>{{ count }} students</strong> from the previous page.
+    </div>
+
+    <form method="POST">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+          {% for error in form.non_field_errors %}
+            {{ error }}
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="row g-3">
+        <!-- Session Selection -->
+        <div class="col-12 col-md-6">
+          <label class="form-label fw-medium">{{ form.session.label }} *</label>
+          {{ form.session|add_class:"form-control" }}
+          {% if form.session.errors %}
+            <div class="text-danger small mt-1">{{ form.session.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Term Selection -->
+        <div class="col-12 col-md-6">
+          <label class="form-label fw-medium">{{ form.term.label }} *</label>
+          {{ form.term|add_class:"form-control" }}
+          {% if form.term.errors %}
+            <div class="text-danger small mt-1">{{ form.term.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Subjects Selection -->
+        <div class="col-12">
+          <label class="form-label fw-medium mb-3">{{ form.subjects.label }} *</label>
+          {% if form.subjects.errors %}
+            <div class="text-danger small mb-2">{{ form.subjects.errors.0 }}</div>
+          {% endif %}
+          
+          <div class="card">
+            <div class="card-body">
+              <div class="row g-2">
+                {% for checkbox in form.subjects %}
+                  <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                    <div class="form-check">
+                      {{ checkbox.tag }}
+                      <label class="form-check-label" for="{{ checkbox.id_for_label }}">
+                        {{ checkbox.choice_label }}
+                      </label>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <input type="hidden" name="finish" value="True">
+      <input type="hidden" name="students" value="{{ students }}">
+
+      <div class="mt-4 text-center">
+        <button type="submit" class="btn btn-success btn-lg px-5">
+          <i class="fas fa-plus-circle me-2"></i>
+          Create Results
+        </button>
+        <a href="{% url 'create-result' %}" class="btn btn-outline-secondary ms-2">
+          <i class="fas fa-arrow-left me-2"></i>
+          Back to Student Selection
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+.form-check-input {
+  transform: scale(1.1);
+  margin-right: 0.5rem;
+}
+
+.form-check-label {
+  font-size: 0.9rem;
+}
+
+.card .card {
+  border: 1px solid #dee2e6;
+}
+
+@media (max-width: 768px) {
+  .btn-lg {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .btn-outline-secondary {
+    width: 100%;
+  }
+}
+</style>
+{% endblock content %}

@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card card-primary">
+      <div class="card-header">
+        <h3 class="card-title mb-0">
+          <i class="fas fa-plus-circle mr-2"></i>
+          Create Attendance Register
+        </h3>
+        <small class="text-white">Create a new attendance register for a class</small>
+      </div>
+      <div class="card-body">
+        <form method="post" id="attendance-register-form">
+          {% csrf_token %}
+          <div class="form-container">
+            {{ form|crispy }}
+          </div>
+          <div class="form-footer text-right mt-4">
+            <a href="{% url 'attendance:register_list' %}" class="btn btn-outline-secondary mr-2">
+              <i class="fas fa-arrow-left mr-1"></i> Cancel
+            </a>
+            <button type="submit" class="btn btn-success" id="submit-btn">
+              <i class="fas fa-save mr-1"></i> Save Register
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.card-header {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+}
+
+.form-container {
+  padding: 1rem 0;
+}
+
+.form-footer {
+  border-top: 1px solid #e9ecef;
+  padding-top: 1.5rem;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  border: none;
+  font-weight: 500;
+  padding: 0.5rem 1.5rem;
+}
+
+.btn-success:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.btn-outline-secondary {
+  padding: 0.5rem 1.5rem;
+}
+
+/* Crispy forms enhancement */
+.control-group {
+  margin-bottom: 1.5rem;
+}
+
+.control-label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.form-control {
+  border: 2px solid #e9ecef;
+  border-radius: 0.375rem;
+  padding: 0.75rem 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.help-block {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .col-md-8 {
+    padding: 0 15px;
+  }
+  
+  .form-footer {
+    text-align: center;
+  }
+  
+  .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}
+</style>
+
+<script>
+document.getElementById('attendance-register-form').addEventListener('submit', function() {
+    const submitBtn = document.getElementById('submit-btn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Saving...';
+});
+</script>
+{% endblock %}

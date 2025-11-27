@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Teacher Attendance Records{% endblock title %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-gradient-success text-white">
+                <div class="card-body py-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="card-title mb-1">
+                                <i class="fas fa-list me-3"></i>Attendance Records
+                            </h2>
+                            <p class="card-text opacity-75 mb-0">View and filter teacher attendance history</p>
+                        </div>
+                        <div class="text-end">
+                            <a href="{% url 'staffs:attendance-dashboard' %}" class="btn btn-light">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label"><strong>Teacher:</strong></label>
+                            <select name="teacher" class="form-select">
+                                <option value="">All Teachers</option>
+                                {% for teacher in teachers %}
+                                <option value="{{ teacher.id }}" {% if selected_teacher == teacher.id|stringformat:"i" %}selected{% endif %}>
+                                    {{ teacher.firstname }} {{ teacher.surname }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label"><strong>Month:</strong></label>
+                            <select name="month" class="form-select">
+                                <option value="">All Months</option>
+                                {% for i in "123456789101112" %}
+                                <option value="{{ i }}" {% if selected_month == i %}selected{% endif %}>
+                                    {{ i }} - {{ i|add:"0" }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label"><strong>Status:</strong></label>
+                            <select name="status" class="form-select">
+                                <option value="">All Status</option>
+                                <option value="present" {% if selected_status == 'present' %}selected{% endif %}>Present</option>
+                                <option value="absent" {% if selected_status == 'absent' %}selected{% endif %}>Absent</option>
+                                <option value="late" {% if selected_status == 'late' %}selected{% endif %}>Late</option>
+                                <option value="half_day" {% if selected_status == 'half_day' %}selected{% endif %}>Half Day</option>
+                                <option value="leave" {% if selected_status == 'leave' %}selected{% endif %}>On Leave</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <div>
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="fas fa-filter me-2"></i>Filter
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Records Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0 text-success">
+                        <i class="fas fa-table me-2"></i>Attendance Records ({{ page_obj.paginator.count }} records)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="recordsTable">
+                            <thead class="table-success">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Teacher</th>
+                                    <th>Status</th>
+                                    <th>Time In</th>
+                                    <th>Time Out</th>
+                                    <th>Hours</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in page_obj %}
+                                <tr>
+                                    <td>{{ record.date }}</td>
+                                    <td>
+                                        <strong>{{ record.teacher.firstname }} {{ record.teacher.surname }}</strong>
+                                        {% if record.teacher.other_name %}
+                                        <br><small class="text-muted">{{ record.teacher.other_name }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if record.status == 'present' %}
+                                        <span class="badge bg-success">{{ record.get_status_display }}</span>
+                                        {% elif record.status == 'absent' %}
+                                        <span class="badge bg-danger">{{ record.get_status_display }}</span>
+                                        {% elif record.status == 'late' %}
+                                        <span class="badge bg-warning">{{ record.get_status_display }}</span>
+                                        {% elif record.status == 'half_day' %}
+                                        <span class="badge bg-info">{{ record.get_status_display }}</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ record.get_status_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ record.time_in|default:"--:--" }}</td>
+                                    <td>{{ record.time_out|default:"--:--" }}</td>
+                                    <td>
+                                        {% if record.hours_worked %}
+                                        <span class="badge bg-primary">{{ record.hours_worked }}h</span>
+                                        {% else %}
+                                        <span class="text-muted">--</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if record.notes %}
+                                        <small class="text-muted">{{ record.notes|truncatewords:5 }}</small>
+                                        {% else %}
+                                        <span class="text-muted">--</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">
+                                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                        <h5 class="text-muted">No attendance records found</h5>
+                                        <p class="text-muted">No attendance records match your filters.</p>
+                                        <a href="{% url 'staffs:mark-attendance' %}" class="btn btn-success">
+                                            <i class="fas fa-plus me-2"></i>Mark Attendance
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if page_obj.has_other_pages %}
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if selected_teacher %}&teacher={{ selected_teacher }}{% endif %}{% if selected_month %}&month={{ selected_month }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}">Previous</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Previous</span>
+                            </li>
+                            {% endif %}
+
+                            {% for i in page_obj.paginator.page_range %}
+                                {% if page_obj.number == i %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ i }}</span>
+                                </li>
+                                {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ i }}{% if selected_teacher %}&teacher={{ selected_teacher }}{% endif %}{% if selected_month %}&month={{ selected_month }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}">{{ i }}</a>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if selected_teacher %}&teacher={{ selected_teacher }}{% endif %}{% if selected_month %}&month={{ selected_month }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}">Next</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Next</span>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.table th {
+    border-top: none;
+    font-weight: 600;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    $('#recordsTable').DataTable({
+        pageLength: 25,
+        responsive: true,
+        order: [[0, 'desc']] // Sort by date descending
+    });
+});
+</script>
+{% endblock %}

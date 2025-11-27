@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ student.get_full_name|default:student }} - Payment History{% endblock %}
+
+{% block content %}
+<div class="payments-header" style="background: linear-gradient(135deg,#4f46e5,#3b82f6); padding: 1.5rem; border-radius: 12px; color: #fff;">
+  <h3 class="mb-1"><i class="fas fa-user-graduate me-2"></i>{{ student.get_full_name|default:student }}</h3>
+  {% if student.current_class %}
+  <div><i class="fas fa-chalkboard me-1"></i>Class: {{ student.current_class }}</div>
+  {% endif %}
+</div>
+
+<div class="mt-3">
+  <!-- Summary Cards -->
+  <div class="row g-3">
+    <div class="col-sm-4">
+      <div class="card">
+        <div class="card-body">
+          <div class="text-muted">Total Payable</div>
+          <div class="h4">₦{{ summary.total_payable|default:0 }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="card">
+        <div class="card-body">
+          <div class="text-muted">Total Paid</div>
+          <div class="h4">₦{{ summary.total_paid|default:0 }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="card">
+        <div class="card-body">
+          <div class="text-muted">Outstanding</div>
+          <div class="h4">₦{{ summary.outstanding|default:0 }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Invoices -->
+  <div class="card mt-3">
+    <div class="card-header">
+      <strong><i class="fas fa-file-invoice-dollar me-2"></i>Invoices</strong>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th>Invoice #</th>
+              <th>Session</th>
+              <th>Term</th>
+              <th>Class</th>
+              <th>Total Payable</th>
+              <th>Total Paid</th>
+              <th>Balance</th>
+              <th>Status</th>
+              <th>Updated</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for inv in invoices %}
+            <tr>
+              <td>{{ inv.invoice_number }}</td>
+              <td>{{ inv.session }}</td>
+              <td>{{ inv.term }}</td>
+              <td>{{ inv.class_for }}</td>
+              <td>₦{{ inv.total_amount_payable }}</td>
+              <td>₦{{ inv.total_amount_paid }}</td>
+              <td>₦{{ inv.balance }}</td>
+              <td><span class="badge {% if inv.status == 'closed' %}bg-success{% else %}bg-warning text-dark{% endif %}">{{ inv.status|title }}</span></td>
+              <td>{{ inv.last_modified|date:'Y-m-d' }}</td>
+              <td><a class="btn btn-sm btn-outline-primary" href="{% url 'invoice-detail' inv.pk %}">View</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="10" class="text-center text-muted">No invoices</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Receipts -->
+  <div class="card mt-3">
+    <div class="card-header">
+      <strong><i class="fas fa-receipt me-2"></i>Receipts</strong>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th>Receipt #</th>
+              <th>Date</th>
+              <th>Amount</th>
+              <th>Method</th>
+              <th>Reference</th>
+              <th>Invoice</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in receipts %}
+            <tr>
+              <td>{{ r.receipt_number }}</td>
+              <td>{{ r.date_paid|date:'Y-m-d' }}</td>
+              <td>₦{{ r.amount_paid }}</td>
+              <td>{{ r.get_payment_method_display }}</td>
+              <td>{{ r.reference_code|default:'—' }}</td>
+              <td><a href="{% url 'invoice-detail' r.invoice.pk %}">{{ r.invoice.invoice_number }}</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center text-muted">No receipts</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

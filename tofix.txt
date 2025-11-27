@@ -1,0 +1,12 @@
+AttributeError: 'SyncData' object has no attribute 'process_teacher_attendance_change'
+
+❌ Sync error: 'SyncData' object has no attribute 'get_server_changes_since'
+Traceback: Traceback (most recent call last):
+  File "C:\Users\PC\Pictures\django-school-management-main\django-school-management-main\apps\sync\views.py", line 40, in post
+    server_changes = self.get_server_changes_since(last_sync)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'SyncData' object has no attribute 'get_server_changes_since'
+
+📥 Received sync request from device: test_browser
+📦 Pending changes: 0
+📤 Sync response: Processed 0 changes, sent 0 server changes

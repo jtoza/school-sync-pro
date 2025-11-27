@@ -1,0 +1,313 @@
+<!-- backup_manager/templates/backup_manager/dashboard.html -->
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div class="backup-dashboard">
+    <h1>📊 School Data Backup & Export Center</h1>
+    
+    <div class="module">
+        <h2>🔒 Database Backups</h2>
+        <div class="form-row">
+            <button onclick="createBackup()" class="button">Create New Backup</button>
+            <a href="/admin/backup_manager/backuplog/" class="button">View Backup History</a>
+        </div>
+        <p class="help">Backups are stored in the 'backups' folder as JSON files</p>
+    </div>
+
+    <div class="module">
+        <h2>📥 Data Exports (Printable Sheets)</h2>
+        <div class="export-grid">
+            <a href="{% url 'export_students_excel' %}" class="export-button">
+                <span class="icon">👨‍🎓</span>
+                <span class="text">Students Data</span>
+            </a>
+            
+            <a href="{% url 'export_teachers_excel' %}" class="export-button">
+                <span class="icon">👨‍🏫</span>
+                <span class="text">Teachers & Staff</span>
+            </a>
+            
+            <a href="{% url 'export_finance_excel' %}" class="export-button">
+                <span class="icon">💰</span>
+                <span class="text">Finance Data</span>
+            </a>
+            
+            <a href="{% url 'export_academic_excel' %}" class="export-button">
+                <span class="icon">📚</span>
+                <span class="text">Academic Data</span>
+            </a>
+            
+            <a href="{% url 'export_results_excel' %}" class="export-button">
+                <span class="icon">📊</span>
+                <span class="text">Results Data</span>
+            </a>
+            
+            <a href="{% url 'export_attendance_excel' %}" class="export-button">
+                <span class="icon">📅</span>
+                <span class="text">Attendance Data</span>
+            </a>
+            
+            <a href="{% url 'export_idcards_excel' %}" class="export-button">
+                <span class="icon">🪪</span>
+                <span class="text">ID Cards Data</span>
+            </a>
+            
+            <a href="{% url 'export_portfolio_excel' %}" class="export-button">
+                <span class="icon">📁</span>
+                <span class="text">Portfolio Data</span>
+            </a>
+            
+            <button onclick="exportAllData()" class="export-button export-all">
+                <span class="icon">📦</span>
+                <span class="text">Export ALL Data</span>
+            </button>
+        </div>
+        <p class="help">Exports are stored in the 'exports' folder as Excel files</p>
+    </div>
+
+    <div class="module">
+        <h2>Recent Backups</h2>
+        {% if recent_backups %}
+        <table class="backup-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Size</th>
+                    <th>Status</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for backup in recent_backups %}
+                <tr class="status-{{ backup.status }}">
+                    <td>{{ backup.timestamp|date:"M d, Y H:i" }}</td>
+                    <td>{{ backup.get_backup_type_display }}</td>
+                    <td>{{ backup.file_size }}</td>
+                    <td>
+                        <span class="status-badge status-{{ backup.status }}">
+                            {{ backup.get_status_display }}
+                        </span>
+                    </td>
+                    <td>{{ backup.notes|truncatewords:5 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="no-data">No backups created yet. Click "Create New Backup" to get started.</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function createBackup() {
+    if(confirm('Are you sure you want to create a new backup? This may take a few minutes.')) {
+        // Show loading state
+        const button = event.target;
+        button.disabled = true;
+        button.innerHTML = 'Creating Backup...';
+        
+        fetch('/backup/create-backup/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            if(data.status === 'success') {
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            } else {
+                button.disabled = false;
+                button.innerHTML = 'Create New Backup';
+            }
+        })
+        .catch(error => {
+            alert('Error creating backup: ' + error);
+            button.disabled = false;
+            button.innerHTML = 'Create New Backup';
+        });
+    }
+}
+
+function exportAllData() {
+    if(confirm('This will export ALL school data to Excel files. This may take a few minutes. Continue?')) {
+        // Show loading state
+        const button = event.target;
+        button.disabled = true;
+        button.innerHTML = 'Exporting All Data...';
+        
+        fetch('/backup/export/all/')
+        .then(response => response.json())
+        .then(data => {
+            if(data.status === 'success') {
+                alert('✅ All data has been exported successfully!\n\nLocation: ' + data.export_path);
+            } else {
+                alert('❌ Error: ' + data.message);
+            }
+            button.disabled = false;
+            button.innerHTML = '<span class="icon">📦</span><span class="text">Export ALL Data</span>';
+        })
+        .catch(error => {
+            alert('Error exporting data: ' + error);
+            button.disabled = false;
+            button.innerHTML = '<span class="icon">📦</span><span class="text">Export ALL Data</span>';
+        });
+    }
+}
+
+// Add click handlers for export buttons to show loading states
+document.addEventListener('DOMContentLoaded', function() {
+    const exportButtons = document.querySelectorAll('.export-button[href]');
+    exportButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            const originalText = this.innerHTML;
+            this.innerHTML = 'Downloading...';
+            this.style.opacity = '0.7';
+            
+            // Reset after 5 seconds in case download doesn't start
+            setTimeout(() => {
+                this.innerHTML = originalText;
+                this.style.opacity = '1';
+            }, 5000);
+        });
+    });
+});
+</script>
+
+<style>
+.backup-dashboard {
+    padding: 20px;
+    max-width: 1200px;
+}
+.module {
+    background: #f8f8f8;
+    border: 1px solid #ddd;
+    margin: 20px 0;
+    padding: 25px;
+    border-radius: 8px;
+}
+.module h2 {
+    margin-top: 0;
+    color: #333;
+    border-bottom: 2px solid #417690;
+    padding-bottom: 10px;
+}
+.export-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+.export-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background: #417690;
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s ease;
+    min-height: 80px;
+    justify-content: center;
+}
+.export-button:hover {
+    background: #205067;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+.export-all {
+    background: #28a745;
+    grid-column: 1 / -1;
+}
+.export-all:hover {
+    background: #1e7e34;
+}
+.export-button .icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+.export-button .text {
+    font-weight: bold;
+    font-size: 14px;
+}
+.backup-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.backup-table th, .backup-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+.backup-table th {
+    background: #417690;
+    color: white;
+    font-weight: bold;
+}
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+.status-success {
+    background: #d4edda;
+    color: #155724;
+}
+.status-failed {
+    background: #f8d7da;
+    color: #721c24;
+}
+.status-in_progress {
+    background: #fff3cd;
+    color: #856404;
+}
+.no-data {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 20px;
+}
+.help {
+    color: #666;
+    font-size: 13px;
+    margin: 10px 0 0 0;
+    font-style: italic;
+}
+.form-row {
+    margin: 15px 0;
+}
+.button {
+    display: inline-block;
+    padding: 12px 20px;
+    background: #417690;
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+.button:hover {
+    background: #205067;
+}
+.button:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+</style>
+{% endblock %}

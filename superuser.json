@@ -1,0 +1,56 @@
+[
+{
+  "model": "auth.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$260000$examplehash$examplehashedpassword",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "admin@schoolapp.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-11-04T00:00:00Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$6mUo2RNWz0cwVBUoRiU9jL$J4TSOWSqzUXxG+8i617f4bn/FQ0gbszInvLMKB3p2g8=",
+    "last_login": "2025-11-04T10:23:45.519Z",
+    "is_superuser": true,
+    "username": "greenbells",
+    "first_name": "",
+    "last_name": "",
+    "email": "jnlearner22@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-11-04T10:23:08.109Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$z6YBUpd4Kh65AC8r5Ixt34$Q2ek7KEuv+FD7C4gCuLUcybpveNOhgcyPGySFRVf+lU=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "GREENBELLS",
+    "first_name": "",
+    "last_name": "",
+    "email": "jnlearner22@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-11-05T08:02:22.062Z",
+    "groups": [],
+    "user_permissions": []
+  }
+}
+]

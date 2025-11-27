@@ -1,0 +1,535 @@
+{% load humanize static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Report Card - {{ student }}</title>
+<style>
+  @page { 
+    size: A4; 
+    margin: 15mm 20mm;
+  }
+  
+  body { 
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11pt; 
+    color: #2c3e50;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Header Section */
+  .header {
+    border-bottom: 3px solid #007bff;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .header-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .header-table td {
+    vertical-align: top;
+    padding: 0;
+  }
+  
+  .school-info {
+    width: 75%;
+  }
+  
+  .logo-cell {
+    width: 25%;
+    text-align: right;
+  }
+  
+  .logo-container {
+    width: 80px;
+    height: 80px;
+    border: 2px solid #fff;
+    border-radius: 8px;
+    padding: 5px;
+    background: #f8f9fa;
+    display: inline-block;
+  }
+  
+  .logo {
+    width: 70px;
+    height: 70px;
+    display: block;
+  }
+  
+  .school-name {
+    font-size: 24pt;
+    font-weight: bold;
+    color: #28a745;
+    margin-bottom: 5px;
+  }
+  
+  .school-tagline {
+    font-size: 9pt;
+    color: #6c757d;
+    font-style: italic;
+  }
+  
+  .report-title {
+    text-align: center;
+    font-size: 20pt;
+    font-weight: bold;
+    color: #2c3e50;
+    margin: 20px 0;
+    text-transform: uppercase;
+  }
+  
+  /* Student Information Section */
+  .student-info {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .info-table td {
+    padding: 8px 10px;
+    vertical-align: top;
+  }
+  
+  .info-label {
+    font-size: 9pt;
+    color: #6c757d;
+    font-weight: bold;
+    text-transform: uppercase;
+    width: 30%;
+  }
+  
+  .info-value {
+    font-size: 11pt;
+    color: #2c3e50;
+    font-weight: bold;
+  }
+  
+  /* Results Table */
+  .results-section {
+    margin-bottom: 20px;
+  }
+  
+  .section-title {
+    font-size: 13pt;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #007bff;
+  }
+  
+  .results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+    background: #fff;
+  }
+  
+  .results-table thead {
+    background: #007bff;
+    color: #fff;
+  }
+  
+  .results-table thead th {
+    padding: 12px 10px;
+    text-align: left;
+    font-weight: bold;
+    font-size: 10pt;
+    text-transform: uppercase;
+    border: 1px solid #0056b3;
+  }
+  
+  .results-table thead th.center {
+    text-align: center;
+  }
+  
+  .results-table tbody td {
+    padding: 10px;
+    border: 1px solid #dee2e6;
+    font-size: 10pt;
+  }
+  
+  .results-table tbody tr.even {
+    background: #f8f9fa;
+  }
+  
+  .results-table tbody td.center {
+    text-align: center;
+  }
+  
+  .results-table tbody td.subject {
+    font-weight: bold;
+  }
+  
+  .results-table tfoot {
+    background: #e9ecef;
+    font-weight: bold;
+  }
+  
+  .results-table tfoot td, 
+  .results-table tfoot th {
+    padding: 12px 10px;
+    border: 1px solid #dee2e6;
+    font-size: 11pt;
+  }
+  
+  .results-table tfoot th {
+    text-align: right;
+    color: #2c3e50;
+  }
+  
+  .results-table tfoot td {
+    text-align: center;
+    color: #007bff;
+    font-size: 12pt;
+  }
+  
+  /* Summary Cards */
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  .summary-table td {
+    vertical-align: top;
+    padding: 0 10px;
+  }
+  
+  .summary-card {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 15px;
+    width: 100%;
+  }
+  
+  .summary-card h4 {
+    font-size: 11pt;
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e9ecef;
+    text-transform: uppercase;
+  }
+  
+  .summary-item-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .summary-item-table td {
+    padding: 6px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .summary-item-table tr.last-row td {
+    border-bottom: none;
+    border-top: 2px solid #007bff;
+    margin-top: 8px;
+    padding-top: 8px;
+  }
+  
+  .summary-label {
+    color: #6c757d;
+    font-size: 10pt;
+    width: 70%;
+  }
+  
+  .summary-value {
+    color: #2c3e50;
+    font-weight: bold;
+    font-size: 10pt;
+    text-align: right;
+  }
+  
+  .summary-value.highlight {
+    font-size: 12pt;
+    color: #007bff;
+  }
+  
+  .comment-box {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+    min-height: 80px;
+  }
+  
+  .comment-box h4 {
+    font-size: 11pt;
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+  
+  .comment-text {
+    color: #495057;
+    font-size: 10pt;
+    line-height: 1.6;
+    font-style: italic;
+    min-height: 40px;
+  }
+  
+  /* Footer Section */
+  .footer {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #dee2e6;
+  }
+  
+  .signature-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .signature-table td {
+    width: 50%;
+    text-align: center;
+    padding: 0 15px;
+  }
+  
+  .signature-line {
+    border-top: 2px solid #2c3e50;
+    margin-top: 50px;
+    padding-top: 8px;
+    font-size: 10pt;
+    font-weight: bold;
+    color: #495057;
+  }
+  
+  .signature-date {
+    margin-top: 5px;
+    font-size: 9pt;
+    color: #6c757d;
+  }
+  
+  .footer-info {
+    text-align: center;
+    font-size: 9pt;
+    color: #6c757d;
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #e9ecef;
+  }
+  
+  /* Grade Badge */
+  .grade-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 10pt;
+  }
+  
+  .grade-A { background: #28a745; color: #fff; }
+  .grade-B { background: #17a2b8; color: #fff; }
+  .grade-C { background: #ffc107; color: #000; }
+  .grade-D { background: #fd7e14; color: #fff; }
+  .grade-F { background: #dc3545; color: #fff; }
+  
+  .status-cleared { color: #28a745; }
+  .status-outstanding { color: #dc3545; }
+</style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <table class="header-table">
+      <tr>
+        <td class="school-info">
+  <div class="school-name">GREEN BELLS ACADEMY</div>
+  <div class="school-tagline">IN PURSUIT OF EXCELLENCE</div>
+</td>
+      <td class="logo-container">
+  <div class="logo-container">
+    <img class="logo" src="http://127.0.0.1:8000/static/dist/img/school-logo.png" alt="School Logo">
+  </div>
+</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Report Title -->
+  <div class="report-title">Academic Report Card</div>
+
+  <!-- Student Information -->
+  <div class="student-info">
+    <table class="info-table">
+      <tr>
+        <td class="info-label">Student Name</td>
+        <td class="info-value">{{ student.get_full_name|default:student }}</td>
+        <td class="info-label">Registration Number</td>
+        <td class="info-value">{{ student.registration_number|default:'N/A' }}</td>
+      </tr>
+      <tr>
+        <td class="info-label">Class</td>
+        <td class="info-value">{{ current_class }}</td>
+        <td class="info-label">Academic Session</td>
+        <td class="info-value">{{ session }}</td>
+      </tr>
+      <tr>
+        <td class="info-label">Term</td>
+        <td class="info-value">{{ term }}</td>
+        <td class="info-label">Date Generated</td>
+        <td class="info-value">{% now "F d, Y" %}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Academic Results -->
+  <div class="results-section">
+    <div class="section-title">Academic Performance</div>
+    <table class="results-table">
+      <thead>
+        <tr>
+          <th style="width: 30%;">Subject</th>
+          <th style="width: 12%;" class="center">CA (40)</th>
+          <th style="width: 12%;" class="center">Exam (60)</th>
+          <th style="width: 12%;" class="center">Total</th>
+          <th style="width: 12%;" class="center">Grade</th>
+          <th style="width: 22%;">Remark</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in results %}
+        <tr class="{% if forloop.counter|divisibleby:2 %}even{% endif %}">
+          <td class="subject">{{ r.subject }}</td>
+          <td class="center">{{ r.test_score|floatformat:0|default:"—" }}</td>
+          <td class="center">{{ r.exam_score|floatformat:0|default:"—" }}</td>
+          <td class="center"><strong>{{ r.total_score|floatformat:0|default:"—" }}</strong></td>
+          <td class="center">
+            <span class="grade-badge grade-{{ r.grade|first|upper }}">{{ r.grade }}</span>
+          </td>
+          <td style="font-size: 9pt;">{{ r.remarks|default:"—" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 20px; color: #6c757d;">
+            No results available for this term
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="3" style="text-align: right;">Overall Average:</th>
+          <td colspan="3" style="font-size: 13pt;">{{ average_total|floatformat:2 }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- Summary Section -->
+  <table class="summary-table">
+    <tr>
+      <!-- Attendance Summary -->
+      <td style="width: 50%;">
+        <div class="summary-card">
+          <h4>Attendance Summary</h4>
+          <table class="summary-item-table">
+            <tr>
+              <td class="summary-label">Days Present:</td>
+              <td class="summary-value">{{ attendance.present|default:0 }}</td>
+            </tr>
+            <tr>
+              <td class="summary-label">Days Absent:</td>
+              <td class="summary-value">{{ attendance.absent|default:0 }}</td>
+            </tr>
+            <tr>
+              <td class="summary-label">Days Late:</td>
+              <td class="summary-value">{{ attendance.late|default:0 }}</td>
+            </tr>
+            <tr class="last-row">
+              <td class="summary-label" style="font-weight: bold; color: #007bff;">Attendance Rate:</td>
+              <td class="summary-value highlight">{{ attendance.percent|default:0|floatformat:1 }}%</td>
+            </tr>
+          </table>
+        </div>
+      </td>
+      
+      <!-- Financial Summary -->
+      <td style="width: 50%;">
+        <div class="summary-card">
+          <h4>Financial Information</h4>
+          <table class="summary-item-table">
+            <tr>
+              <td class="summary-label">Outstanding Balance:</td>
+              <td class="summary-value {% if fee_balance > 0 %}status-outstanding{% else %}status-cleared{% endif %}">
+                ₦{{ fee_balance|floatformat:2|default:"0.00" }}
+              </td>
+            </tr>
+            <tr class="last-row">
+              <td colspan="2" style="padding-top: 10px; border-top: 1px solid #e9ecef;">
+                <span style="font-size: 9pt; color: #6c757d;">
+                  Status: <span class="{% if fee_balance > 0 %}status-outstanding{% else %}status-cleared{% endif %}" style="font-weight: bold;">
+                    {% if fee_balance > 0 %}Outstanding{% else %}Cleared{% endif %}
+                  </span>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Comments Section -->
+  <table class="summary-table">
+    <tr>
+      <td style="width: 50%;">
+        <div class="comment-box">
+          <h4>Teacher's Comment</h4>
+          <div class="comment-text">
+            {{ teacher_comment|default:"No comment provided." }}
+          </div>
+        </div>
+      </td>
+      <td style="width: 50%;">
+        <div class="comment-box">
+          <h4>Headteacher's Comment</h4>
+          <div class="comment-text">
+            {{ headteacher_comment|default:"No comment provided." }}
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Footer with Signatures -->
+  <div class="footer">
+    <table class="signature-table">
+      <tr>
+        <td>
+          <div class="signature-line">Class Teacher's Signature</div>
+          <div class="signature-date">Date: _______________</div>
+        </td>
+        <td>
+          <div class="signature-line">Headteacher's Signature</div>
+          <div class="signature-date">Date: _______________</div>
+        </td>
+      </tr>
+    </table>
+    <div class="footer-info">
+      <div>This is a computer-generated document. No signature required for digital copies.</div>
+      <div style="margin-top: 5px;">Generated on {% now "F d, Y \a\t g:i A" %}</div>
+    </div>
+  </div>
+</body>
+</html>
