@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Results Access - Enter Student ID</title>
+  <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
+  <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css' %}">
+  <style>
+    :root{ --primary:#16a34a; --secondary:#15803d; --ring:rgba(22,163,74,.20); --muted:#6b7280; }
+    body{min-height:100vh;margin:0;background:linear-gradient(135deg,#bbf7d0,#86efac);display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif}
+    .wrap{width:100%;max-width:960px}
+    .box{display:grid;grid-template-columns:1.1fr 1fr;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 20px 50px rgba(16,185,129,.35)}
+    .left{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;padding:36px 24px;display:flex;align-items:center;justify-content:center;text-align:center}
+    .left h1{margin:0 0 10px;font-weight:900;font-size:28px}
+    .left p{opacity:.95;margin:0}
+    .badge{display:inline-flex;gap:8px;align-items:center;background:rgba(255,255,255,.15);padding:6px 10px;border-radius:999px;margin-bottom:12px}
+    .right{padding:36px 24px}
+    .title{margin:0 0 6px;font-weight:900;font-size:22px}
+    .subtitle{color:var(--muted);margin:0 0 18px}
+    .form-group{margin-bottom:14px}
+    label{display:block;margin-bottom:8px;font-weight:700}
+    .input-wrap{position:relative}
+    input{width:100%;border:2px solid #e5e7eb;border-radius:12px;padding:14px 44px 14px 14px;font-size:15px}
+    input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 4px var(--ring)}
+    .icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#9ca3af}
+    .btn{display:inline-flex;align-items:center;gap:8px;width:100%;justify-content:center;border:none;border-radius:12px;background:linear-gradient(90deg,var(--primary),var(--secondary));color:#fff;font-weight:800;padding:14px 16px;box-shadow:0 10px 22px rgba(16,185,129,.35)}
+    .links{margin-top:12px}
+    .link{color:var(--primary);text-decoration:none;font-weight:700}
+    .link:hover{text-decoration:underline}
+    .alert{border-radius:12px;padding:12px 14px;margin-bottom:12px}
+    .alert-error{background:rgba(220,38,38,.08);color:#b91c1c;border:1px solid rgba(220,38,38,.18)}
+
+    @media (max-width: 920px){ .box{grid-template-columns:1fr} .left{min-height:200px} .wrap{padding:0}}
+  </style>
+</head>
+<body>
+  <main class="wrap" aria-label="Results Access">
+    <section class="box">
+      <aside class="left">
+        <div>
+          <div class="badge"><i class="fas fa-chart-line"></i> Results Portal</div>
+          <h1>View a Student's Results</h1>
+          <p>Enter a valid Student ID to view academic performance grouped by session and term.</p>
+        </div>
+      </aside>
+      <div class="right">
+        <h2 class="title">Enter Student ID</h2>
+        <p class="subtitle">Provide the registration number assigned to the student.</p>
+
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-error">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="reg">Student ID (Registration Number)</label>
+            <div class="input-wrap">
+              <input id="reg" name="registration_number" type="text" placeholder="e.g. STU-2024-00123" required>
+              <span class="icon"><i class="fas fa-id-card"></i></span>
+            </div>
+          </div>
+          <button type="submit" class="btn"><i class="fas fa-search"></i> Submit</button>
+        </form>
+
+        <div class="links"><a href="{% url 'home' %}" class="link"><i class="fas fa-arrow-left"></i> Back to Dashboard</a></div>
+      </div>
+    </section>
+  </main>
+  <script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+  <script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'dist/js/adminlte.min.js' %}"></script>
+</body>
+</html>

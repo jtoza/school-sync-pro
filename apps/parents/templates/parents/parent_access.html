@@ -1,0 +1,142 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Parent Access - Enter Student ID</title>
+  <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/toastr/toastr.min.css' %}">
+  <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css' %}">
+  <style>
+    :root{
+      --primary:#6CCF6C; /* softer green */
+      --secondary:#2E7D32; /* toned forest */
+      --text:#1f2937;
+      --muted:#6b7280;
+      --ring:rgba(108,207,108,.15);
+    }
+    *{box-sizing:border-box}
+    body{
+      min-height:100vh;
+      margin:0;
+      background:#f7f9fc;
+      display:flex;align-items:center;justify-content:center;
+      padding:24px;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
+      color:var(--text);
+    }
+    .shell{width:100%;max-width:980px}
+    .card-wrap{
+      display:grid;grid-template-columns: 1.15fr 1fr;gap:0;align-items:stretch;
+      background:#fff;border-radius:18px;overflow:hidden;
+      box-shadow:0 20px 50px rgba(0,0,0,.20);
+    }
+    .visual{
+      background:linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      padding:40px 28px;display:flex;align-items:center;justify-content:center;position:relative;
+      color:#fff;text-align:center;
+    }
+    .visual-inner{max-width:420px}
+    .visual h1{font-size:28px;font-weight:800;margin:0 0 10px}
+    .visual p{margin:0;opacity:.9}
+    .visual .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      background:rgba(255,255,255,.15);color:#fff;border-radius:999px;
+      padding:6px 12px;font-size:13px;margin-bottom:14px;
+    }
+    .panel{padding:42px 28px}
+    .title{font-weight:800;font-size:22px;margin:0 0 6px}
+    .subtitle{color:var(--muted);font-size:14px;margin-bottom:22px}
+
+    .form-group{margin-bottom:16px}
+    .label{display:block;margin:0 0 8px;font-weight:600;font-size:14px}
+    .input-wrap{position:relative}
+    .input{
+      width:100%;border:2px solid #e5e7eb;border-radius:12px;padding:14px 44px 14px 14px;
+      font-size:15px;transition:.2s;background:#fff;color:#111827;
+    }
+    .input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 4px var(--ring)}
+    .right-icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#9ca3af}
+
+    .btn-primary{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      width:100%;border:none;border-radius:12px;color:#fff;cursor:pointer;
+      padding:14px 18px;font-weight:700;font-size:15px;
+      background:linear-gradient(90deg,var(--primary),var(--secondary));
+      box-shadow:0 8px 18px rgba(49, 196, 141, .22);
+      transition:transform .15s ease, box-shadow .15s ease, filter .2s ease;
+    }
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 22px rgba(49, 196, 141, .30)}
+    .btn-primary:active{transform:translateY(0)}
+
+    .links{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
+    .link{color:var(--primary);text-decoration:none;font-weight:600}
+    .link:hover{text-decoration:underline}
+
+    .alert{border-radius:12px;padding:12px 14px;font-size:14px;margin-bottom:14px}
+    .alert-error{background:rgba(220,38,38,.08);color:#b91c1c;border:1px solid rgba(220,38,38,.18)}
+    .alert-success{background:rgba(22,163,74,.08);color:#15803d;border:1px solid rgba(22,163,74,.18)}
+
+    /* Responsive */
+    @media (max-width: 960px){
+      .card-wrap{grid-template-columns:1fr}
+      .visual{min-height:200px}
+      .panel{padding:28px 20px}
+    }
+    @media (max-width: 420px){
+      body{padding:16px}
+      .visual h1{font-size:22px}
+    }
+  </style>
+</head>
+<body>
+  <main class="shell" aria-label="Parent Access">
+    <section class="card-wrap">
+      <aside class="visual">
+        <div class="visual-inner">
+          <div class="badge"><i class="fas fa-user-friends"></i> Parent Portal</div>
+          <h1>Access Your Child's Records</h1>
+          <p>Quickly preview school fees summary and academic performance with a valid Student ID.</p>
+        </div>
+      </aside>
+
+      <div class="panel">
+        <h2 class="title">Enter Student ID</h2>
+        <p class="subtitle">Provide the registration number assigned to your child.</p>
+
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'success' }} alert-{{ message.tags }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="reg" class="label">Student ID (Registration Number)</label>
+            <div class="input-wrap">
+              <input id="reg" name="registration_number" type="text" class="input" placeholder="e.g. STU-2024-00123" required>
+              <span class="right-icon"><i class="fas fa-id-card"></i></span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary">
+            <i class="fas fa-search"></i>
+            Submit
+          </button>
+        </form>
+
+        <div class="links">
+          <a class="link" href="{% url 'corecode:login' %}"><i class="fas fa-arrow-left"></i> Back to Login</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+  <script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'plugins/toastr/toastr.min.js' %}"></script>
+  <script src="{% static 'dist/js/adminlte.min.js' %}"></script>
+</body>
+</html>

@@ -612,7 +612,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a href="{% url 'home' %}" class="nav-link" title="Home">
+          <a href="{% url 'corecode:home' %}" class="nav-link" title="Home">
             <i class="fa fa-home"></i>
             <span class="d-none d-sm-inline">Home</span>
           </a>
@@ -712,7 +712,7 @@
               <i class="fas fa-cog mr-2"></i> Settings
             </a>
             <div class="dropdown-divider"></div>
-            <a href="{% url 'logout' %}" class="dropdown-item">
+            <a href="{% url 'corecode:logout' %}" class="dropdown-item">
               <i class="fas fa-sign-out-alt mr-2"></i> Sign out
             </a>
           </div>
@@ -738,7 +738,7 @@
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
-      <a href="{% url 'home' %}" class="brand-link text-center">
+      <a href="{% url 'corecode:home' %}" class="brand-link text-center">
         <i class="fas fa-graduation-cap brand-icon mx-2"></i>
         <span class="brand-text font-weight-bold">{{ school_name | default:"MySchool" }}</span>
       </a>
@@ -764,7 +764,7 @@
 
             <!-- Teacher Classes Section -->
             <li class="nav-item">
-              <a href="{% url 'teacher-class-list' %}" class="nav-link">
+              <a href="{% url 'corecode:teacher-class-list' %}" class="nav-link">
                 <i class="nav-icon fas fa-chalkboard-teacher"></i>
                 <p>My Classes</p>
               </a>
@@ -869,25 +869,25 @@
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
-                  <a href="{% url 'sessions' %}" class="nav-link">
+                  <a href="{% url 'corecode:sessions' %}" class="nav-link">
                     <i class="nav-icon fas fa-calendar-alt"></i>
                     <p>Sessions</p>
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a href="{% url 'terms' %}" class="nav-link">
+                  <a href="{% url 'corecode:terms' %}" class="nav-link">
                     <i class="nav-icon fas fa-clock"></i>
                     <p>Terms</p>
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a href="{% url 'subjects' %}" class="nav-link">
+                  <a href="{% url 'corecode:subjects' %}" class="nav-link">
                     <i class="nav-icon fas fa-book"></i>
                     <p>Subjects</p>
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a href="{% url 'classes' %}" class="nav-link">
+                  <a href="{% url 'corecode:classes' %}" class="nav-link">
                     <i class="nav-icon fas fa-chalkboard"></i>
                     <p>Classes</p>
                   </a>
@@ -899,20 +899,20 @@
             <li class="nav-header">Account</li>
             {% if not user.is_authenticated %}
             <li class="nav-item">
-              <a href="{% url 'login' %}" class="nav-link">
+              <a href="{% url 'corecode:login' %}" class="nav-link">
                 <i class="nav-icon fas fa-sign-in-alt"></i>
                 <p>Login</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="{% url 'signup' %}" class="nav-link">
+              <a href="{% url 'corecode:signup' %}" class="nav-link">
                 <i class="nav-icon fas fa-user-plus"></i>
                 <p>Sign Up</p>
               </a>
             </li>
             {% else %}
             <li class="nav-item">
-              <a href="{% url 'logout' %}" class="nav-link">
+              <a href="{% url 'corecode:logout' %}" class="nav-link">
                 <i class="nav-icon fas fa-sign-out-alt"></i>
                 <p>Logout</p>
               </a>
@@ -921,7 +921,7 @@
 
             <!-- Settings -->
             <li class="nav-item">
-              <a href="{% url 'configs' %}" class="nav-link">
+              <a href="{% url 'corecode:configs' %}" class="nav-link">
                 <i class="nav-icon fas fa-cog"></i>
                 <p>System Settings</p>
               </a>

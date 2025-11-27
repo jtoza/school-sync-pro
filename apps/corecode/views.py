@@ -10,6 +10,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.http import JsonResponse, HttpResponse
 from django.db.models import Q
+from django.utils import timezone
 
 from .forms import (
     AcademicSessionForm,
@@ -338,13 +339,57 @@ class CurrentSessionAndTermView(LoginRequiredMixin, View):
 
 
 def signup_view(request):
+    ACCESS_CODE = '7BJW'
+    LOCK_MINUTES = 30
+    MAX_ATTEMPTS = 5
+
+    # Initialize session counters
+    attempts = int(request.session.get('signup_attempts', 0))
+    lock_until_str = request.session.get('signup_lock_until')
+    lock_until = None
+    if lock_until_str:
+        try:
+            lock_until = timezone.datetime.fromisoformat(lock_until_str)
+        except Exception:
+            lock_until = None
+
+    # Check lock status
+    now = timezone.now()
+    if lock_until and now < lock_until:
+        remaining = (lock_until - now).seconds // 60 + 1
+        messages.error(request, f'Too many invalid access code attempts. Try again in about {remaining} minute(s).')
+        return render(request, 'registration/signup.html', {'form': UserCreationForm()})
+
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
+        access_code = (request.POST.get('access_code') or '').strip()
+
+        # Validate access code first
+        if access_code != ACCESS_CODE:
+            attempts += 1
+            request.session['signup_attempts'] = attempts
+            if attempts >= MAX_ATTEMPTS:
+                lock_until = now + timezone.timedelta(minutes=LOCK_MINUTES)
+                request.session['signup_lock_until'] = lock_until.isoformat()
+                messages.error(request, f'Too many invalid access code attempts. Locked for {LOCK_MINUTES} minute(s).')
+            else:
+                remaining = MAX_ATTEMPTS - attempts
+                messages.error(request, f'Invalid access code. You have {remaining} attempt(s) left.')
+            return render(request, 'registration/signup.html', {'form': form})
+
+        # Access code correct; reset counters
+        request.session['signup_attempts'] = 0
+        request.session['signup_lock_until'] = None
+
         if form.is_valid():
             user = form.save()
             login(request, user)
             messages.success(request, 'Account created successfully!')
-            return redirect('home')
+            return redirect('corecode:home')
+        else:
+            # Do not count as rate-limit attempt; just show form errors
+            messages.error(request, 'Please correct the errors below.')
+            return render(request, 'registration/signup.html', {'form': form})
     else:
         form = UserCreationForm()
     return render(request, 'registration/signup.html', {'form': form})
@@ -360,7 +405,7 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.info(request, f'Welcome back, {username}!')
-                return redirect('home')
+                return redirect('corecode:home')
             else:
                 messages.error(request, 'Invalid username or password.')
         else:
@@ -373,7 +418,7 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     messages.info(request, 'You have been logged out successfully.')
-    return redirect('login')
+    return redirect('corecode:login')
 
 
 @login_required

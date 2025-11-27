@@ -326,6 +326,16 @@
 
         <form method="post">
             {% csrf_token %}
+
+            <div class="form-group">
+                <label for="access_code" class="form-label">Access Code</label>
+                <div class="input-container">
+                    <input type="text" name="access_code" id="access_code" class="form-control" placeholder="Enter staff access code" required>
+                    <span class="input-icon"><i class="fas fa-key"></i></span>
+                </div>
+                <div class="password-hints">Only authorized staff should have this code.</div>
+            </div>
+
             <div class="form-group">
                 <label for="id_username" class="form-label">Username</label>
                 <div class="input-container">
@@ -380,7 +390,7 @@
         </form>
         
         <div class="login-link">
-            <p>Already have an account? <a href="{% url 'login' %}">Sign in here</a></p>
+            <p>Already have an account? <a href="{% url 'corecode:login' %}">Sign in here</a></p>
         </div>
     </div>
 </div>

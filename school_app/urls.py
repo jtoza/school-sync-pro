@@ -35,11 +35,12 @@ urlpatterns = [
     path('accounts/logout/', RedirectView.as_view(pattern_name='logout', permanent=True)),
     
     path('admin/', admin.site.urls),
-    path('', include('apps.corecode.urls')),
+    path('', include(('apps.corecode.urls', 'corecode'), namespace='corecode')),
     path('students/', include('apps.students.urls', namespace='students')),  # ADDED NAMESPACE
     path('staffs/', include('apps.staffs.urls', namespace='staffs')),
     path('finance/', include('apps.finance.urls')),
     path('result/', include('apps.result.urls')),
+    path('parents/', include('apps.parents.urls')),
     path('attendance/', include('attendance.urls', namespace='attendance')),
     
     # PWA URLs - serve with proper headers

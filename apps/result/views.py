@@ -22,6 +22,54 @@ from .models import Result
 
 
 @login_required
+def results_access(request):
+    """Search results by Student registration number and display only that student's results."""
+    if request.method == 'POST':
+        reg_no = (request.POST.get('registration_number') or '').strip()
+        if not reg_no:
+            messages.error(request, 'Please enter a Student ID (registration number).')
+            return render(request, 'result/results_access.html')
+
+        student = Student.objects.filter(registration_number__iexact=reg_no).first()
+        if not student:
+            messages.error(request, 'Student not found. Check the Student ID and try again.')
+            return render(request, 'result/results_access.html')
+
+        # Fetch results grouped by session/term, with subject breakdown
+        results = (
+            Result.objects.filter(student=student)
+            .select_related('session', 'term', 'current_class', 'subject')
+            .order_by('session__name', 'term__name', 'subject__name')
+        )
+        performance = {}
+        for r in results:
+            key = f"{getattr(r.session, 'name', '')} - {getattr(r.term, 'name', '')}"
+            perf = performance.setdefault(key, { 'subjects': [], 'total': 0, 'count': 0, 'avg': 0 })
+            total_score = r.total_score() if hasattr(r, 'total_score') else (r.test_score + r.exam_score)
+            perf['subjects'].append({
+                'subject': getattr(r.subject, 'name', ''),
+                'ca': r.test_score,
+                'exam': r.exam_score,
+                'total': total_score,
+                'grade': r.grade() if hasattr(r, 'grade') else '',
+            })
+            perf['total'] += total_score
+            perf['count'] += 1
+        for k, v in performance.items():
+            if v['count']:
+                v['avg'] = round(v['total'] / v['count'], 2)
+
+        context = {
+            'student': student,
+            'performance': performance,
+        }
+        return render(request, 'result/results_student.html', context)
+
+    # GET request -> show form
+    return render(request, 'result/results_access.html')
+
+
+@login_required
 def student_performance(request):
     student = None
     labels = []

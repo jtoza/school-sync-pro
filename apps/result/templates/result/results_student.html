@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Student Results</title>
+  <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
+  <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css' %}">
+  <style>
+    :root{ --primary:#16a34a; --accent:#22c55e; --bg:#f0fdf4; --muted:#64748b; --ring:rgba(34,197,94,.25)}
+    body{margin:0;min-height:100vh;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;color:#0f172a}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    .top{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(90deg,var(--primary),var(--accent));color:#fff;border-radius:14px;padding:10px 14px;box-shadow:0 10px 28px rgba(16,185,129,.28)}
+    .brand{font-weight:900;letter-spacing:.2px}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;text-decoration:none;font-weight:800}
+    .btn-light{background:#fff;color:var(--primary)}
+    .head{margin:14px 0}
+    .name{font-weight:900;font-size:24px;margin:0}
+    .muted{color:var(--muted)}
+    .tag{display:inline-flex;gap:6px;align-items:center;background:#dcfce7;color:#065f46;border:1px solid #a7f3d0;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800}
+
+    .card{background:#fff;border-radius:14px;box-shadow:0 10px 26px rgba(16,185,129,.12)}
+    .card .body{padding:16px}
+    .card + .card{margin-top:14px}
+
+    .table-resp{overflow:auto;border-radius:10px;border:1px solid #e2e8f0}
+    table{width:100%;border-collapse:collapse}
+    thead th{background:linear-gradient(180deg,#ecfdf5,#d1fae5);font-size:12px;text-transform:uppercase;color:#065f46;letter-spacing:.03em}
+    th,td{padding:10px 12px;border-bottom:1px solid #eef2f7;white-space:nowrap}
+    td.num{text-align:right}
+
+    .divider{height:1px;background:#e2e8f0;margin:12px 0}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand"><i class="fas fa-chart-line"></i> Student Results</div>
+      <div>
+        <a class="btn btn-light" href="{% url 'results-access' %}"><i class="fas fa-search"></i> Search Another</a>
+      </div>
+    </div>
+
+    <header class="head">
+      <h1 class="name">{{ student.get_full_name }} <span class="muted">({{ student.registration_number }})</span></h1>
+      <div class="muted">Class: <span class="tag"><i class="fas fa-graduation-cap"></i> {{ student.current_class }}</span></div>
+    </header>
+
+    <section class="card">
+      <div class="body">
+        {% if performance %}
+          {% for key, perf in performance.items %}
+            <div class="tag" style="margin:6px 0"><i class="fas fa-calendar-alt"></i> {{ key }}</div>
+            <div class="muted" style="margin-bottom:10px">Average: <strong>{{ perf.avg }}</strong></div>
+            <div class="table-resp">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Subject</th>
+                    <th class="num">CA</th>
+                    <th class="num">Exam</th>
+                    <th class="num">Total</th>
+                    <th>Grade</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for s in perf.subjects %}
+                  <tr>
+                    <td>{{ s.subject }}</td>
+                    <td class="num">{{ s.ca }}</td>
+                    <td class="num">{{ s.exam }}</td>
+                    <td class="num">{{ s.total }}</td>
+                    <td>
+                      {% if s.grade %}
+                        <span class="tag" style="padding:4px 8px">{{ s.grade }}</span>
+                      {% else %}
+                        <span class="muted">-</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <div class="divider"></div>
+          {% endfor %}
+        {% else %}
+          <p class="muted">No results found for this student.</p>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+
+  <script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+  <script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'dist/js/adminlte.min.js' %}"></script>
+</body>
+</html>

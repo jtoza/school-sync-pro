@@ -1,0 +1,204 @@
+{% load humanize %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Parent Access - Summary</title>
+  <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/toastr/toastr.min.css' %}">
+  <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css' %}">
+  <style>
+    :root{
+      --primary:#16a34a; /* emerald-600 */
+      --primary-dark:#15803d; /* emerald-700 */
+      --accent:#22c55e; /* emerald-500 */
+      --accent-soft:#dcfce7; /* emerald-100 */
+      --ring:rgba(34,197,94,.25);
+      --bg:#f0fdf4; /* emerald-50 */
+      --muted:#64748b; /* slate-500 */
+      --ink:#0f172a; /* slate-900 */
+      --danger:#dc2626; /* red-600 */
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;min-height:100%;background:radial-gradient(1200px 600px at 10% -10%, #bbf7d0 0%, transparent 60%), radial-gradient(1000px 500px at 110% 20%, #86efac 0%, transparent 50%), var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;color:var(--ink)}
+    .wrap{max-width:1120px;margin:0 auto;padding:18px}
+
+    /* Topbar */
+    .topbar{display:flex;align-items:center;justify-content:space-between;border-radius:16px;padding:12px 14px;margin-bottom:16px;background:linear-gradient(90deg, var(--primary), var(--accent));color:#fff;box-shadow:0 10px 28px rgba(16,185,129,.30)}
+    .brand{font-weight:900;letter-spacing:.2px;display:flex;align-items:center;gap:8px}
+    .nav-links{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border-radius:12px;font-weight:800;text-decoration:none;transition:transform .15s ease, box-shadow .15s ease}
+    .btn:active{transform:translateY(1px)}
+    .btn-light{background:#fff;color:var(--primary)}
+    .btn-light:hover{box-shadow:0 0 0 5px rgba(255,255,255,.25)}
+    .btn-primary{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.35)}
+    .btn-primary:hover{box-shadow:0 0 0 4px rgba(255,255,255,.2)}
+
+    /* Header */
+    .header{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin:14px 0}
+    .student-name{font-size:26px;font-weight:900;margin:0}
+    .muted{color:var(--muted)}
+    .tag{display:inline-flex;align-items:center;gap:6px;background:var(--accent-soft);color:var(--primary-dark);border:1px solid #bbf7d0;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700}
+
+    /* Grid */
+    .grid{display:grid;grid-template-columns: 1fr 1.2fr; gap:16px}
+    .card{position:relative;background:#fff;border-radius:16px;box-shadow:0 12px 30px rgba(16,185,129,.10), 0 6px 16px rgba(0,0,0,.04);overflow:hidden}
+    .card::before{content:"";position:absolute;inset:0;height:6px;background:linear-gradient(90deg,var(--primary),var(--accent));}
+    .card .body{padding:18px}
+    .card .title{font-weight:900;margin:6px 0 10px}
+
+    /* Stats */
+    .stat{font-size:18px;font-weight:900}
+    .stat.success{color:var(--primary-dark)}
+    .stat.danger{color:var(--danger)}
+    .key{color:var(--muted)}
+
+    /* Tables */
+    .table-resp{width:100%;overflow:auto;border-radius:12px;border:1px solid #e2e8f0}
+    table{width:100%;border-collapse:collapse}
+    thead th{background:linear-gradient(180deg,#ecfdf5,#d1fae5);font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:#065f46;border-bottom:1px solid #a7f3d0}
+    th,td{padding:10px 12px;border-bottom:1px solid #eef2f7;white-space:nowrap}
+    td.num{text-align:right}
+
+    .divider{height:1px;background:#e2e8f0;margin:12px 0}
+
+    /* Ribbons and accents */
+    .ribbon{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(90deg, var(--accent-soft), #ecfdf5);border:1px solid #a7f3d0;color:#065f46;border-radius:10px;padding:6px 10px;font-weight:800}
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+      .wrap{padding:12px}
+      .topbar{border-radius:12px}
+      .student-name{font-size:22px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand"><i class="fas fa-seedling"></i> Parent Portal</div>
+      <div class="nav-links">
+        <a class="btn btn-primary" href="{% url 'parent-access' %}"><i class="fas fa-search"></i> Search Another</a>
+        <a class="btn btn-light" href="{% url 'corecode:login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
+      </div>
+    </div>
+
+    <header class="header">
+      <div>
+        <h1 class="student-name">{{ student.get_full_name }} <span class="muted">({{ student.registration_number }})</span></h1>
+        <div class="muted">Class: <span class="tag"><i class="fas fa-graduation-cap"></i> {{ student.current_class }}</span></div>
+      </div>
+    </header>
+
+    <section class="grid">
+      <article class="card">
+        <div class="body">
+          <h3 class="title">Fees Summary</h3>
+          {% if fees_summary.balance > 0 %}
+            <div class="stat danger"><i class="fas fa-exclamation-circle"></i> Outstanding Balance: {{ fees_summary.balance|intcomma }}</div>
+          {% else %}
+            <div class="stat success"><i class="fas fa-check-circle"></i> No Outstanding Balance</div>
+          {% endif %}
+          <div class="key">Total Payable: <strong>{{ fees_summary.total_payable|intcomma }}</strong></div>
+          <div class="key">Total Paid: <strong>{{ fees_summary.total_paid|intcomma }}</strong></div>
+          {% if latest_invoice %}
+          <div class="divider"></div>
+          <div class="ribbon"><i class="fas fa-receipt"></i> Latest Invoice</div>
+          <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+            <span class="tag">#{{ latest_invoice.invoice_number }}</span>
+            <span class="muted">{{ latest_invoice.session }} • {{ latest_invoice.term }}</span>
+            <span class="tag"><i class="fas fa-chalkboard-teacher"></i> {{ latest_invoice.class_for }}</span>
+          </div>
+          {% endif %}
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="body">
+          <h3 class="title">Recent Invoices</h3>
+          <div class="table-resp">
+            <table>
+              <thead>
+                <tr>
+                  <th><i class="fas fa-file-invoice"></i> Invoice</th>
+                  <th>Session/Term</th>
+                  <th class="num">Payable</th>
+                  <th class="num">Paid</th>
+                  <th class="num">Balance</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for inv in invoices %}
+                <tr>
+                  <td>#{{ inv.invoice_number }}</td>
+                  <td>{{ inv.session }} {{ inv.term }}</td>
+                  <td class="num">{{ inv.total_amount_payable|intcomma }}</td>
+                  <td class="num">{{ inv.total_amount_paid|intcomma }}</td>
+                  <td class="num">{{ inv.balance|intcomma }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="muted">No invoices found</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="card" style="margin-top:16px;">
+      <div class="body">
+        <h3 class="title">Academic Performance</h3>
+        {% if performance %}
+          {% for key, perf in performance.items %}
+            <div class="ribbon" style="margin:6px 0"><i class="fas fa-calendar-alt"></i> {{ key }}</div>
+            <div class="key" style="margin-bottom:10px">Average: <strong>{{ perf.avg }}</strong></div>
+            <div class="table-resp">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Subject</th>
+                    <th class="num">CA</th>
+                    <th class="num">Exam</th>
+                    <th class="num">Total</th>
+                    <th>Grade</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for s in perf.subjects %}
+                  <tr>
+                    <td>{{ s.subject }}</td>
+                    <td class="num">{{ s.ca }}</td>
+                    <td class="num">{{ s.exam }}</td>
+                    <td class="num">{{ s.total }}</td>
+                    <td>
+                      {% if s.grade %}
+                        <span class="tag" style="padding:4px 8px">{{ s.grade }}</span>
+                      {% else %}
+                        <span class="muted">-</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <div class="divider"></div>
+          {% endfor %}
+        {% else %}
+          <p class="muted">No performance data found.</p>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+
+  <script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+  <script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'plugins/toastr/toastr.min.js' %}"></script>
+  <script src="{% static 'dist/js/adminlte.min.js' %}"></script>
+</body>
+</html>

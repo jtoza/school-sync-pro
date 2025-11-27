@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "apps.result",
     "attendance",
     "crispy_bootstrap4",
+    'apps.parents',
     'apps.idcards',
     'apps.sync',
     'student_portfolio',

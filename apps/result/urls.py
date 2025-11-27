@@ -9,11 +9,13 @@ from .views import (
     class_report_sheet,
     report_card_pdf,
     class_report_cards_pdf,
+    results_access,
 )
 
 urlpatterns = [
     path("create/", create_result, name="create-result"),
     path("edit-results/", edit_results, name="edit-results"),
+    path("access/", results_access, name="results-access"),
     path("view/all", ResultListView.as_view(), name="view-results"),
     path("performance/", student_performance, name="student-performance"),
     path("report-card/<int:student_id>/", report_card, name="report-card"),
