@@ -15,4 +15,6 @@ typing_extensions==4.15.0
 tzdata==2025.2
 whitenoise==6.11.0
 playwright>=1.40.0
-weasyprint==62.3     # <-- added
+weasyprint==62.3 
+psycopg2-binary
+
