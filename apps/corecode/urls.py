@@ -29,7 +29,6 @@ from .views import (
 )
 
 urlpatterns = [
-    path("", IndexView.as_view(), name="home"),
     path("notices/send/", send_notice, name="notice_create"),
     path("site-config", SiteConfigView.as_view(), name="configs"),
     path(

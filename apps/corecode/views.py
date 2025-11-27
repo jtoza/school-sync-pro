@@ -33,6 +33,7 @@ class IndexView(LoginRequiredMixin, TemplateView):
     template_name = "index.html"
 
     def get_context_data(self, **kwargs):
+
         context = super().get_context_data(**kwargs)
         # Live dashboard stats
         try:
@@ -396,6 +397,9 @@ def signup_view(request):
 
 
 def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('corecode:dashboard')
+        
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -405,7 +409,7 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.info(request, f'Welcome back, {username}!')
-                return redirect('corecode:home')
+                return redirect('dashboard')
             else:
                 messages.error(request, 'Invalid username or password.')
         else:
@@ -413,6 +417,11 @@ def login_view(request):
     else:
         form = AuthenticationForm()
     return render(request, 'registration/login.html', {'form': form})
+
+def landing_view(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    return render(request, 'landing.html')
 
 
 def logout_view(request):

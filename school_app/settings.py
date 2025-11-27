@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'apps.sync',
     'student_portfolio',
     'backup_manager',
+    'apps.homework',
 ]
 
 MIDDLEWARE = [

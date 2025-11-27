@@ -1,12 +1,13 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>{{ school_name | default:"MySchool" }} - Login</title>
-    
+
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/toastr/toastr.min.css' %}">
@@ -16,13 +17,14 @@
     <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css' %}">
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
     <style>
         :root {
-            --primary: #4361ee;
-            --primary-dark: #3a56d4;
-            --secondary: #7209b7;
+            --primary: #2e7d32;
+            --primary-dark: #1b5e20;
+            --secondary: #43a047;
             --accent: #4cc9f0;
             --light: #f8f9fa;
             --dark: #212529;
@@ -31,395 +33,429 @@
             --gray: #6c757d;
             --light-gray: #e9ecef;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Poppins', 'Source Sans Pro', sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .login-container {
-            width: 100%;
-            max-width: 1000px;
-            animation: slideUp 0.8s ease-out;
-        }
-        
-        .login-card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-            width: 100%;
-            display: flex;
-            min-height: 580px;
-            position: relative;
-        }
-        
-        .login-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            z-index: 2;
-        }
-        
-        .login-image {
-            flex: 1.2;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 50px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .login-image::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 200%;
-            background: rgba(255, 255, 255, 0.1);
-            transform: rotate(30deg);
-        }
-        
-        .login-image-content {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-            color: white;
-        }
-        
-        .login-image img {
-            max-width: 100%;
-            height: auto;
-            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2));
-            margin-bottom: 30px;
-        }
-        
-        .image-title {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-        
-        .image-subtitle {
-            font-size: 16px;
-            opacity: 0.9;
-            line-height: 1.6;
-        }
-        
-        .login-form {
-            flex: 1;
-            padding: 60px 50px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            background: white;
-        }
-        
-        .login-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        
-        .school-brand {
-            font-size: 32px;
-            font-weight: 700;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 10px;
-        }
-        
-        .login-title {
-            font-size: 18px;
-            color: var(--gray);
-            font-weight: 400;
-        }
-        
-        .form-group {
-            margin-bottom: 28px;
-            position: relative;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--dark);
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-        
-        .input-container {
-            position: relative;
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 16px 20px;
-            border: 2px solid var(--light-gray);
-            border-radius: 12px;
-            font-size: 15px;
-            transition: all 0.3s;
-            background-color: white;
-            color: var(--dark);
-        }
-        
-        .form-control:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
-            outline: none;
-            transform: translateY(-1px);
-        }
-        
-        .input-icon {
-            position: absolute;
-            right: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray);
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-        
-        .form-control:focus + .input-icon {
-            color: var(--primary);
-        }
-        
-        .btn-login {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.3);
-            margin-top: 10px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn-login:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(67, 97, 238, 0.4);
-        }
-        
-        .btn-login:active {
-            transform: translateY(-1px);
-        }
-        
-        .btn-login::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: 0.5s;
-        }
-        
-        .btn-login:hover::after {
-            left: 100%;
-        }
-        
-        .login-links {
-            text-align: center;
-            margin-top: 30px;
-        }
-        
-        .login-links a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            margin: 0 8px;
-        }
-        
-        .login-links a:hover {
-            color: var(--primary-dark);
-            text-decoration: underline;
-        }
-        
-        .login-links a i {
-            margin-right: 6px;
-            font-size: 14px;
-        }
-        
-        .divider {
-            height: 1px;
-            background: var(--light-gray);
-            margin: 25px 0;
-            position: relative;
-        }
-        
-        .divider::before {
-            content: 'or';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 0 15px;
-            color: var(--gray);
-            font-size: 14px;
-        }
-        
-        .error-message {
-            background: rgba(230, 57, 70, 0.1);
-            color: var(--error);
-            padding: 14px 18px;
-            border-radius: 12px;
-            border: 1px solid rgba(230, 57, 70, 0.2);
-            margin-bottom: 25px;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .error-message i {
-            margin-right: 10px;
-            font-size: 16px;
-        }
-        
-        .info-message {
-            background: rgba(75, 181, 67, 0.1);
-            color: var(--success);
-            padding: 14px 18px;
-            border-radius: 12px;
-            border: 1px solid rgba(75, 181, 67, 0.2);
-            margin-bottom: 25px;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .info-message i {
-            margin-right: 10px;
-            font-size: 16px;
-        }
-        
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Responsive Design */
-        @media (max-width: 968px) {
-            .login-card {
-                flex-direction: column;
-                max-width: 500px;
-                min-height: auto;
+
+            body {
+                background: linear-gradient(135deg, #a5d6a7 0%, #81c784 100%);
+                min-height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
+                position: relative;
             }
-            
-            .login-image {
-                padding: 40px 30px;
-                min-height: 250px;
+
+            body::before {
+                content: '';
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 500px;
+                height: 500px;
+                background-image: url("{% static 'dist/img/logo (1).png' %}");
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
+                opacity: 0.35;
+                z-index: 0;
+                pointer-events: none;
             }
-            
-            .login-form {
-                padding: 40px 35px;
-            }
-            
-            .image-title {
-                font-size: 24px;
-            }
-        }
-        
-        @media (max-width: 576px) {
+
+
             .login-container {
-                padding: 15px;
+                width: 100%;
+                max-width: 1000px;
+                animation: slideUp 0.8s ease-out;
+                position: relative;
+                z-index: 1;
             }
-            
+
             .login-card {
-                border-radius: 16px;
+                background: rgba(255, 255, 255, 0.15);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 20px;
+                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+                overflow: hidden;
+                width: 100%;
+                display: flex;
+                min-height: 580px;
+                position: relative;
             }
-            
+
+            .login-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 5px;
+                background: linear-gradient(to right, var(--primary), var(--secondary));
+                z-index: 2;
+            }
+
             .login-image {
-                padding: 30px 25px;
-                min-height: 200px;
+                flex: 1.2;
+                background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 50px;
+                position: relative;
+                overflow: hidden;
             }
-            
-            .login-form {
-                padding: 35px 25px;
+
+            .login-image::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                right: -50%;
+                width: 100%;
+                height: 200%;
+                background: rgba(255, 255, 255, 0.1);
+                transform: rotate(30deg);
             }
-            
-            .school-brand {
+
+            .login-image-content {
+                position: relative;
+                z-index: 1;
+                text-align: center;
+                color: white;
+            }
+
+            .login-image img {
+                max-width: 100%;
+                height: auto;
+                filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2));
+                margin-bottom: 30px;
+            }
+
+            .image-title {
                 font-size: 28px;
+                font-weight: 700;
+                margin-bottom: 15px;
+                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             }
-            
-            .form-control {
-                padding: 14px 16px;
+
+            .image-subtitle {
+                font-size: 16px;
+                opacity: 0.9;
+                line-height: 1.6;
             }
-        }
-        
-        @media (max-width: 400px) {
-            .login-image {
-                padding: 25px 20px;
-            }
-            
+
             .login-form {
-                padding: 30px 20px;
+                flex: 1;
+                padding: 60px 50px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                background: rgba(255, 255, 255, 0.25);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
             }
-            
+
+            .login-header {
+                text-align: center;
+                margin-bottom: 40px;
+            }
+
             .school-brand {
-                font-size: 24px;
+                font-size: 32px;
+                font-weight: 700;
+                background: linear-gradient(to right, var(--primary), var(--secondary));
+                -webkit-background-clip: text;
+                background-clip: text;
+                color: transparent;
+                margin-bottom: 10px;
             }
-        }
+
+            .login-title {
+                font-size: 18px;
+                color: var(--gray);
+                font-weight: 400;
+            }
+
+            .form-group {
+                margin-bottom: 28px;
+                position: relative;
+            }
+
+            .form-label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 500;
+                color: var(--dark);
+                font-size: 14px;
+                transition: all 0.3s;
+            }
+
+            .input-container {
+                position: relative;
+            }
+
+            .form-control {
+                width: 100%;
+                padding: 16px 20px;
+                border: 2px solid var(--light-gray);
+                border-radius: 12px;
+                font-size: 15px;
+                transition: all 0.3s;
+                background-color: white;
+                color: var(--dark);
+            }
+
+            .form-control:focus {
+                border-color: var(--primary);
+                box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+                outline: none;
+                transform: translateY(-1px);
+            }
+
+            .input-icon {
+                position: absolute;
+                right: 18px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--gray);
+                font-size: 16px;
+                transition: all 0.3s;
+            }
+
+            .form-control:focus+.input-icon {
+                color: var(--primary);
+            }
+
+            .btn-login {
+                width: 100%;
+                padding: 16px;
+                background: linear-gradient(to right, var(--primary), var(--secondary));
+                color: white;
+                border: none;
+                border-radius: 12px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s;
+                box-shadow: 0 6px 20px rgba(67, 97, 238, 0.3);
+                margin-top: 10px;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .btn-login:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 25px rgba(67, 97, 238, 0.4);
+            }
+
+            .btn-login:active {
+                transform: translateY(-1px);
+            }
+
+            .btn-login::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+                transition: 0.5s;
+            }
+
+            .btn-login:hover::after {
+                left: 100%;
+            }
+
+            .login-links {
+                text-align: center;
+                margin-top: 30px;
+            }
+
+            .login-links a {
+                color: var(--primary);
+                text-decoration: none;
+                font-weight: 500;
+                transition: all 0.3s;
+                display: inline-flex;
+                align-items: center;
+                margin: 0 8px;
+            }
+
+            .login-links a:hover {
+                color: var(--primary-dark);
+                text-decoration: underline;
+            }
+
+            .login-links a i {
+                margin-right: 6px;
+                font-size: 14px;
+            }
+
+            .divider {
+                height: 1px;
+                background: var(--light-gray);
+                margin: 25px 0;
+                position: relative;
+            }
+
+            .divider::before {
+                content: 'or';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: white;
+                padding: 0 15px;
+                color: var(--gray);
+                font-size: 14px;
+            }
+
+            .error-message {
+                background: rgba(230, 57, 70, 0.1);
+                color: var(--error);
+                padding: 14px 18px;
+                border-radius: 12px;
+                border: 1px solid rgba(230, 57, 70, 0.2);
+                margin-bottom: 25px;
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+            }
+
+            .error-message i {
+                margin-right: 10px;
+                font-size: 16px;
+            }
+
+            .info-message {
+                background: rgba(75, 181, 67, 0.1);
+                color: var(--success);
+                padding: 14px 18px;
+                border-radius: 12px;
+                border: 1px solid rgba(75, 181, 67, 0.2);
+                margin-bottom: 25px;
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+            }
+
+            .info-message i {
+                margin-right: 10px;
+                font-size: 16px;
+            }
+
+            @keyframes slideUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Responsive Design */
+            @media (max-width: 968px) {
+                .login-card {
+                    flex-direction: column;
+                    max-width: 500px;
+                    min-height: auto;
+                }
+
+                .login-image {
+                    padding: 40px 30px;
+                    min-height: 250px;
+                }
+
+                .login-form {
+                    padding: 40px 35px;
+                }
+
+                .image-title {
+                    font-size: 24px;
+                }
+            }
+
+            @media (max-width: 576px) {
+                .login-container {
+                    padding: 15px;
+                }
+
+                .login-card {
+                    border-radius: 16px;
+                }
+
+                .login-image {
+                    padding: 30px 25px;
+                    min-height: 200px;
+                }
+
+                .login-form {
+                    padding: 35px 25px;
+                }
+
+                .school-brand {
+                    font-size: 28px;
+                }
+
+                .form-control {
+                    padding: 14px 16px;
+                }
+            }
+
+            @media (max-width: 400px) {
+                .login-image {
+                    padding: 25px 20px;
+                }
+
+                .login-form {
+                    padding: 30px 20px;
+                }
+
+                .school-brand {
+                    font-size: 24px;
+                }
+            }
     </style>
 </head>
-<body>
-<div class="login-container">
-    <div class="login-card">
-        <div class="login-image">
-            <div class="login-image-content">
-                <img src="{% static 'dist/img/logo (1).png' %}" alt="Login Illustration">
-                <h2 class="image-title">Welcome Back!</h2>
-                <p class="image-subtitle">Sign in to manage your classroom, create assignments, monitor student performance, and streamline your teaching workflow..</p>
-            </div>
-        </div>
-        
-        <div class="login-form">
-            <div class="login-header">
-                <div class="school-brand">
-                    {{ school_name | default:"MySchool" }}
-                </div>
-                <p class="login-title">Sign in to your account</p>
-            </div>
-            
-            {% if form.errors %}
-            <div class="error-message">
-                <i class="fas fa-exclamation-circle"></i> 
-                Invalid username or password. Please try again.
-            </div>
-            {% endif %}
 
-            {% if next %}
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-image">
+                <div class="login-image-content">
+                    <img src="{% static 'dist/img/logo (1).png' %}" alt="Login Illustration">
+                    <h2 class="image-title">Welcome Back!</h2>
+                    <p class="image-subtitle">Sign in to manage your classroom, create assignments, monitor student
+                        performance, and streamline your teaching workflow..</p>
+                </div>
+            </div>
+
+            <div class="login-form">
+                <div class="login-header">
+                    <div class="school-brand">
+                        {{ school_name | default:"MySchool" }}
+                    </div>
+                    <p class="login-title">Sign in to your account</p>
+                </div>
+
+                {% if form.errors %}
+                <div class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    Invalid username or password. Please try again.
+                </div>
+                {% endif %}
+
+                {% if next %}
                 {% if user.is_authenticated %}
                 <div class="error-message">
                     <i class="fas fa-exclamation-triangle"></i>
@@ -431,73 +467,73 @@
                     Please login to access this page.
                 </div>
                 {% endif %}
-            {% endif %}
+                {% endif %}
 
-            <form method="post" action="{% url 'corecode:login' %}">
-                {% csrf_token %}
-                
-                <div class="form-group">
-                    <label for="id_username" class="form-label">Username</label>
-                    <div class="input-container">
-                        <input class="form-control" id="id_username" name="username" 
-                               type="text" placeholder="Enter your username" required>
-                        <div class="input-icon">
-                            <i class="fas fa-user"></i>
+                <form method="post" action="{% url 'corecode:login' %}">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="id_username" class="form-label">Username</label>
+                        <div class="input-container">
+                            <input class="form-control" id="id_username" name="username" type="text"
+                                placeholder="Enter your username" required>
+                            <div class="input-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label for="id_password" class="form-label">Password</label>
-                    <div class="input-container">
-                        <input class="form-control" type="password" id="id_password" name="password" 
-                               placeholder="Enter your password" required>
-                        <div class="input-icon">
-                            <i class="fas fa-lock"></i>
+                    <div class="form-group">
+                        <label for="id_password" class="form-label">Password</label>
+                        <div class="input-container">
+                            <input class="form-control" type="password" id="id_password" name="password"
+                                placeholder="Enter your password" required>
+                            <div class="input-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
                         </div>
                     </div>
-                </div>
-                
-                <button class="btn-login" type="submit">
-                    <i class="fas fa-sign-in-alt"></i> Sign In
-                </button>
-                <input type="hidden" name="next" value="{{ next }}">
-            </form>
 
-            <div class="divider"></div>
+                    <button class="btn-login" type="submit">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </button>
+                    <input type="hidden" name="next" value="{{ next }}">
+                </form>
 
-            <div class="login-links">
-                <div style="margin-bottom: 15px;">
-                    <a href="#">
-                        <i class="fas fa-key"></i> Forgot Password?
-                    </a>
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <a href="{% url 'parent-access' %}">
-                        <i class="fas fa-user-friends"></i> Access as Parent
-                    </a>
-                </div>
-                <div>
-                    <span style="color: var(--gray);">New to {{ school_name | default:"MySchool" }}?</span>
-                    <a href="{% url 'corecode:signup' %}">
-                        <i class="fas fa-user-plus"></i> Create Account
-                    </a>
+                <div class="divider"></div>
+
+                <div class="login-links">
+                    <div style="margin-bottom: 15px;">
+                        <a href="#">
+                            <i class="fas fa-key"></i> Forgot Password?
+                        </a>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <a href="{% url 'parent-access' %}">
+                            <i class="fas fa-user-friends"></i> Access as Parent
+                        </a>
+                    </div>
+                    <div>
+                        <span style="color: var(--gray);">New to {{ school_name | default:"MySchool" }}?</span>
+                        <a href="{% url 'corecode:signup' %}">
+                            <i class="fas fa-user-plus"></i> Create Account
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- REQUIRED SCRIPTS -->
-<script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
-<script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-<script src="{% static 'plugins/toastr/toastr.min.js' %}"></script>
-<script src="{% static 'plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js' %}"></script>
-<script src="{% static 'dist/js/adminlte.js' %}"></script>
+    <!-- REQUIRED SCRIPTS -->
+    <script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'plugins/toastr/toastr.min.js' %}"></script>
+    <script src="{% static 'plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js' %}"></script>
+    <script src="{% static 'dist/js/adminlte.js' %}"></script>
 
-{% if messages %}
-{% for message in messages %}
-<script type=text/javascript>
+    {% if messages %}
+    {% for message in messages %}
+    <script type=text/javascript>
     toastr.options = {
         progressBar: true,
         closeButton: true,
@@ -506,42 +542,43 @@
     };
     toastr.{{ message.tags }}('{{ message }}');
 </script>
-{% endfor %}
-{% endif %}
+    {% endfor %}
+    {% endif %}
 
-<script>
-    // Enhanced form interactions
-    $(document).ready(function() {
-        // Input focus effects
-        $('.form-control').on('focus', function() {
-            $(this).parent().prev('.form-label').css({
-                'color': 'var(--primary)',
-                'font-weight': '600'
+    <script>
+        // Enhanced form interactions
+        $(document).ready(function () {
+            // Input focus effects
+            $('.form-control').on('focus', function () {
+                $(this).parent().prev('.form-label').css({
+                    'color': 'var(--primary)',
+                    'font-weight': '600'
+                });
+            }).on('blur', function () {
+                $(this).parent().prev('.form-label').css({
+                    'color': 'var(--dark)',
+                    'font-weight': '500'
+                });
             });
-        }).on('blur', function() {
-            $(this).parent().prev('.form-label').css({
-                'color': 'var(--dark)',
-                'font-weight': '500'
-            });
-        });
-        
-        // Button hover effects
-        $('.btn-login').hover(
-            function() {
-                $(this).css('transform', 'translateY(-3px)');
-            },
-            function() {
-                $(this).css('transform', 'translateY(0)');
+
+            // Button hover effects
+            $('.btn-login').hover(
+                function () {
+                    $(this).css('transform', 'translateY(-3px)');
+                },
+                function () {
+                    $(this).css('transform', 'translateY(0)');
+                }
+            );
+
+            // Check for CSRF token
+            if ($('input[name="csrfmiddlewaretoken"]').length === 0) {
+                console.error('CSRF token missing!');
+            } else {
+                console.log('CSRF token present');
             }
-        );
-        
-        // Check for CSRF token
-        if ($('input[name="csrfmiddlewaretoken"]').length === 0) {
-            console.error('CSRF token missing!');
-        } else {
-            console.log('CSRF token present');
-        }
-    });
-</script>
+        });
+    </script>
 </body>
+
 </html>

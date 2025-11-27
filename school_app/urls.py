@@ -5,7 +5,9 @@ from django.conf.urls.static import static
 from django.views.generic import RedirectView, TemplateView
 from django.shortcuts import redirect
 from django.http import HttpResponse, FileResponse
+from django.http import HttpResponse, FileResponse
 import os
+from apps.corecode import views
 
 # Custom redirect view to handle the accounts/login issue
 def redirect_to_login(request):
@@ -35,7 +37,9 @@ urlpatterns = [
     path('accounts/logout/', RedirectView.as_view(pattern_name='logout', permanent=True)),
     
     path('admin/', admin.site.urls),
-    path('', include(('apps.corecode.urls', 'corecode'), namespace='corecode')),
+    path('', views.landing_view, name='home'),
+    path('dashboard/', views.IndexView.as_view(), name='dashboard'),
+    path('core/', include(('apps.corecode.urls', 'corecode'), namespace='corecode')),
     path('students/', include('apps.students.urls', namespace='students')),  # ADDED NAMESPACE
     path('staffs/', include('apps.staffs.urls', namespace='staffs')),
     path('finance/', include('apps.finance.urls')),
@@ -53,6 +57,7 @@ urlpatterns = [
     path('sync/test/', TemplateView.as_view(template_name='sync_test.html'), name='sync_test'),
     path('portfolio/', include('student_portfolio.urls')),
     path('backup/', include('backup_manager.urls')),
+    path('homework/', include('apps.homework.urls')),
 ]
 
 if settings.DEBUG:

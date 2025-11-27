@@ -2,6 +2,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,7 +11,7 @@
   <title>{{ school_name | default:"MySchool" }}</title>
 
   <!-- PWA Meta Tags -->
-  <meta name="theme-color" content="#007bff"/>
+  <meta name="theme-color" content="#007bff" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="{{ school_name|default:'MySchool' }}">
@@ -23,7 +24,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="{% static 'dist/img/icon-128x128.png' %}">
   <link rel="icon" type="image/png" sizes="16x16" href="{% static 'dist/img/icon-96x96.png' %}">
   <link rel="shortcut icon" type="image/png" href="{% static 'dist/img/icon-192x192.png' %}">
-  
+
   <!-- Apple Touch Icons -->
   <link rel="apple-touch-icon" sizes="180x180" href="{% static 'dist/img/icon-192x192.png' %}">
   <link rel="apple-touch-icon" sizes="152x152" href="{% static 'dist/img/icon-152x152.png' %}">
@@ -31,11 +32,11 @@
   <link rel="apple-touch-icon" sizes="128x128" href="{% static 'dist/img/icon-128x128.png' %}">
   <link rel="apple-touch-icon" sizes="72x72" href="{% static 'dist/img/icon-72x72.png' %}">
   <link rel="apple-touch-startup-image" href="{% static 'dist/img/icon-192x192.png' %}">
-  
+
   <!-- Android Chrome Icons -->
   <link rel="icon" type="image/png" sizes="192x192" href="{% static 'dist/img/icon-192x192.png' %}">
   <link rel="icon" type="image/png" sizes="512x512" href="{% static 'dist/img/icon-512x512.png' %}">
-  
+
   <!-- Microsoft Tiles -->
   <meta name="msapplication-TileImage" content="{% static 'dist/img/icon-144x144.png' %}">
   <meta name="msapplication-TileColor" content="#007bff">
@@ -53,18 +54,18 @@
   <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css' %}">
   <!-- Google Font: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-  
+
   <!-- Performance Hints -->
   <link rel="dns-prefetch" href="//fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  
+
   <style>
     /* ===== PWA INSTALL BUTTON STYLES ===== */
     #pwaInstallContainer {
       animation: slideIn 0.3s ease-out;
     }
-    
+
     #pwaInstallBtn {
       background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
       border: none;
@@ -73,96 +74,102 @@
       transition: all 0.3s ease;
       box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
     }
-    
+
     #pwaInstallBtn:hover {
       background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
     }
-    
+
     #pwaInstallBtn:active {
       transform: translateY(0);
     }
-    
+
     #pwaInstallBtn i {
       animation: pulse 2s infinite;
     }
-    
+
     @keyframes slideIn {
       from {
         opacity: 0;
         transform: translateX(10px);
       }
+
       to {
         opacity: 1;
         transform: translateX(0);
       }
     }
-    
+
     @keyframes pulse {
-      0%, 100% {
+
+      0%,
+      100% {
         transform: scale(1);
       }
+
       50% {
         transform: scale(1.1);
       }
     }
-    
+
     /* ===== ENHANCED RESPONSIVE STYLES ===== */
-    
+
     /* Mobile-First Breakpoints */
     @media (max-width: 576px) {
+
       /* Navbar Mobile Optimizations */
       .main-header.navbar {
         padding: 0.25rem 0.5rem;
         min-height: 50px;
       }
-      
+
       .navbar-nav {
         flex-direction: row;
         align-items: center;
         flex-wrap: nowrap;
       }
-      
+
       .navbar-nav .nav-item {
         margin: 0 2px;
       }
-      
+
       .navbar-nav .nav-link {
         padding: 0.4rem 0.5rem;
         font-size: 0.9rem;
       }
-      
+
       .navbar-nav .nav-link i {
         font-size: 1rem;
       }
-      
+
       /* Hide text on mobile, show only icons */
       .navbar-nav .nav-link span,
       .navbar-nav .nav-link .d-sm-inline {
         display: none !important;
       }
-      
+
       /* Mobile academic info - compact single line */
       .mobile-academic-compact {
-        display: none; /* Hide on very small screens */
+        display: none;
+        /* Hide on very small screens */
       }
-      
+
       .mobile-academic-info {
         display: none;
       }
-      
+
       /* Compact buttons */
       .btn-sm {
         padding: 0.25rem 0.5rem;
         font-size: 0.85rem;
       }
-      
+
       /* User dropdown - icon only */
       .user-dropdown .nav-link {
         padding: 0.4rem;
       }
-      
+
       /* Notifications badge positioning */
       .navbar-badge {
         font-size: 0.65rem;
@@ -170,7 +177,7 @@
         top: 2px;
         right: 2px;
       }
-      
+
       /* Dropdown menus */
       .dropdown-menu {
         font-size: 0.9rem;
@@ -179,36 +186,37 @@
         right: 0 !important;
         left: auto !important;
       }
-      
+
       .card-body {
         padding: 1rem;
       }
-      
+
       .content-wrapper {
         padding: 0.5rem;
       }
-      
+
       /* Hide PWA install text on mobile */
       #pwaInstallBtn span {
         display: none !important;
       }
     }
-    
+
     @media (max-width: 480px) {
+
       /* Extra small phones */
       .main-header.navbar {
         padding: 0.2rem 0.3rem;
       }
-      
+
       .navbar-nav .nav-link {
         padding: 0.35rem 0.4rem;
         font-size: 0.85rem;
       }
-      
+
       .navbar-nav .nav-item {
         margin: 0 1px;
       }
-      
+
       /* Hide theme toggle on very small screens */
       #themeToggle {
         padding: 0.25rem 0.4rem;
@@ -216,42 +224,43 @@
     }
 
     @media (max-width: 768px) {
+
       /* Tablet and small mobile */
       .navbar-nav .nav-item.d-none.d-sm-inline-block {
         display: inline-block !important;
       }
-      
+
       .main-sidebar {
         transform: translateX(-100%);
         transition: transform 0.3s ease-in-out;
-        box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+        box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
       }
-      
+
       .sidebar-open .main-sidebar {
         transform: translateX(0);
       }
-      
+
       .brand-link {
         text-align: center;
         font-size: 1.1rem;
         padding: 0.8rem 0.5rem;
       }
-      
-      .nav-sidebar > .nav-item > .nav-link {
+
+      .nav-sidebar>.nav-item>.nav-link {
         padding: 0.8rem 0.6rem;
         font-size: 0.9rem;
         border-left: 3px solid transparent;
       }
-      
+
       .content-header h1 {
         font-size: 1.4rem;
         margin-bottom: 0.5rem;
       }
-      
+
       .breadcrumb {
         font-size: 0.8rem;
       }
-      
+
       .mobile-nav-overlay {
         display: none;
         position: fixed;
@@ -259,24 +268,24 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0,0,0,0.5);
+        background: rgba(0, 0, 0, 0.5);
         z-index: 1038;
       }
-      
+
       .sidebar-open .mobile-nav-overlay {
         display: block;
       }
-      
+
       /* Hide academic info on tablets too if needed */
       .d-md-none.mobile-academic-compact {
         display: none;
       }
-      
+
       /* Compact navbar */
       .main-header.navbar {
         padding: 0.3rem 0.5rem;
       }
-      
+
       .navbar-nav .nav-link span.d-sm-inline {
         display: none !important;
       }
@@ -286,15 +295,15 @@
       .brand-link {
         font-size: 1.1rem;
       }
-      
-      .nav-sidebar > .nav-item > .nav-link {
+
+      .nav-sidebar>.nav-item>.nav-link {
         font-size: 0.9rem;
         padding: 0.7rem 0.8rem;
       }
     }
 
     /* ===== ENHANCED STYLING ===== */
-    
+
     /* Brand Styling */
     .brand-link {
       font-weight: 700;
@@ -321,7 +330,7 @@
     .navbar-white {
       background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
       border-bottom: 1px solid #dee2e6;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
       backdrop-filter: blur(10px);
       min-height: 57px;
     }
@@ -335,7 +344,7 @@
 
     .navbar-nav .nav-link:hover {
       color: #007bff !important;
-      background: rgba(0,123,255,0.1);
+      background: rgba(0, 123, 255, 0.1);
     }
 
     /* Session and Term Info Styling */
@@ -347,26 +356,26 @@
       font-size: 0.82rem;
       font-weight: 500;
       margin: 0 0.2rem;
-      box-shadow: 0 2px 8px rgba(0,123,255,0.3);
-      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       white-space: nowrap;
     }
 
     /* Enhanced Sidebar Styling */
-    .sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active {
+    .sidebar-dark-primary .nav-sidebar>.nav-item>.nav-link.active {
       background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
       border-left: 4px solid #fff;
-      box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+      box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
     }
 
-    .nav-sidebar > .nav-item > .nav-link {
+    .nav-sidebar>.nav-item>.nav-link {
       margin-bottom: 2px;
       border-radius: 0;
       transition: all 0.3s ease;
       border-left: 3px solid transparent;
     }
 
-    .nav-sidebar > .nav-item > .nav-link:hover {
+    .nav-sidebar>.nav-item>.nav-link:hover {
       background-color: #4b545c;
       padding-left: 1.3rem;
       border-left-color: #007bff;
@@ -381,7 +390,7 @@
       padding: 0.6rem 1rem;
       color: #8fa0af;
       border-bottom: 1px solid #4b545c;
-      background: rgba(0,0,0,0.1);
+      background: rgba(0, 0, 0, 0.1);
     }
 
     /* Card Enhancements */
@@ -441,12 +450,12 @@
     }
 
     .navbar-toggler:hover {
-      background: rgba(0,123,255,0.1);
+      background: rgba(0, 123, 255, 0.1);
     }
 
     .navbar-toggler:focus {
       outline: none;
-      box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
     }
 
     /* Dropdown Menu Enhancement */
@@ -455,7 +464,7 @@
       box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15);
       border-radius: 0.75rem;
       margin-top: 0.5rem;
-      border: 1px solid rgba(0,0,0,0.05);
+      border: 1px solid rgba(0, 0, 0, 0.05);
     }
 
     .dropdown-item {
@@ -492,7 +501,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(255,255,255,0.8);
+      background: rgba(255, 255, 255, 0.8);
       z-index: 1000;
     }
 
@@ -511,19 +520,27 @@
 
     /* Print Styles */
     @media print {
-      .navbar, .main-sidebar, .content-header, .breadcrumb,
-      .control-sidebar, .card-header .btn-tool {
+
+      .navbar,
+      .main-sidebar,
+      .content-header,
+      .breadcrumb,
+      .control-sidebar,
+      .card-header .btn-tool {
         display: none !important;
       }
+
       .content-wrapper {
         margin: 0 !important;
         padding: 0 !important;
       }
+
       .card {
         box-shadow: none !important;
         border: 1px solid #ddd !important;
         border-radius: 0 !important;
       }
+
       .card-header {
         background: #f8f9fa !important;
         color: #000 !important;
@@ -541,7 +558,7 @@
     .form-control:focus,
     .dropdown-item:focus {
       outline: none;
-      box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
     }
 
     /* Better Table Responsiveness */
@@ -591,6 +608,7 @@
     .pwa-standalone .navbar {
       padding-top: env(safe-area-inset-top);
     }
+
     .pwa-standalone .content-wrapper {
       padding-top: env(safe-area-inset-top);
     }
@@ -612,7 +630,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a href="{% url 'corecode:home' %}" class="nav-link" title="Home">
+          <a href="{% url 'dashboard' %}" class="nav-link" title="Home">
             <i class="fa fa-home"></i>
             <span class="d-none d-sm-inline">Home</span>
           </a>
@@ -655,12 +673,14 @@
         {% if user.is_authenticated %}
         <li class="nav-item mr-2 d-none d-md-block" style="min-width:200px; max-width:280px; position: relative;">
           <div class="input-group input-group-sm">
-            <input id="globalSearchInput" type="search" class="form-control" placeholder="Search students, staff, invoices..." aria-label="Search" autocomplete="off">
+            <input id="globalSearchInput" type="search" class="form-control"
+              placeholder="Search students, staff, invoices..." aria-label="Search" autocomplete="off">
             <div class="input-group-append">
               <span class="input-group-text"><i class="fas fa-search"></i></span>
             </div>
           </div>
-          <div id="globalSearchResults" class="dropdown-menu dropdown-menu-right shadow" style="max-height:320px; overflow:auto; width: 320px; position: absolute; right: 0; z-index: 1061;"></div>
+          <div id="globalSearchResults" class="dropdown-menu dropdown-menu-right shadow"
+            style="max-height:320px; overflow:auto; width: 320px; position: absolute; right: 0; z-index: 1061;"></div>
         </li>
 
         <!-- Notifications -->
@@ -680,14 +700,16 @@
 
         <!-- Dark Mode Toggle -->
         <li class="nav-item">
-          <button id="themeToggle" class="btn btn-sm btn-outline-secondary nav-link" style="border: none; background: transparent; padding: 0.4rem 0.5rem;" title="Toggle dark mode">
+          <button id="themeToggle" class="btn btn-sm btn-outline-secondary nav-link"
+            style="border: none; background: transparent; padding: 0.4rem 0.5rem;" title="Toggle dark mode">
             <i class="fas fa-moon"></i>
           </button>
         </li>
 
         <!-- PWA Install Button -->
         <li class="nav-item" id="pwaInstallContainer" style="display: none;">
-          <button id="pwaInstallBtn" class="btn btn-sm btn-primary nav-link" style="border: none; padding: 0.4rem 0.5rem;" title="Install App">
+          <button id="pwaInstallBtn" class="btn btn-sm btn-primary nav-link"
+            style="border: none; padding: 0.4rem 0.5rem;" title="Install App">
             <i class="fas fa-download"></i>
             <span class="d-none d-sm-inline ml-1">Install</span>
           </button>
@@ -738,7 +760,7 @@
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
-      <a href="{% url 'corecode:home' %}" class="brand-link text-center">
+      <a href="{% url 'dashboard' %}" class="brand-link text-center">
         <i class="fas fa-graduation-cap brand-icon mx-2"></i>
         <span class="brand-text font-weight-bold">{{ school_name | default:"MySchool" }}</span>
       </a>
@@ -767,6 +789,13 @@
               <a href="{% url 'corecode:teacher-class-list' %}" class="nav-link">
                 <i class="nav-icon fas fa-chalkboard-teacher"></i>
                 <p>My Classes</p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="{% url 'homework_list' %}" class="nav-link">
+                <i class="nav-icon fas fa-book-reader"></i>
+                <p>Homework</p>
               </a>
             </li>
 
@@ -998,9 +1027,9 @@
   <script>
     // Register service worker and handle updates
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
+      window.addEventListener('load', function () {
         navigator.serviceWorker.register('/service-worker.js')
-          .then(function(reg) {
+          .then(function (reg) {
             console.log('✅ SW registered:', reg.scope);
 
             // Listen for waiting service worker
@@ -1026,7 +1055,7 @@
             // Check on page focus
             window.addEventListener('focus', () => reg.update());
           })
-          .catch(function(err) { console.log('❌ SW registration failed:', err); });
+          .catch(function (err) { console.log('❌ SW registration failed:', err); });
       });
 
       // Support triggering skipWaiting from UI
@@ -1040,9 +1069,9 @@
 
     // Detect if app is running in standalone mode
     function isRunningStandalone() {
-      return (window.matchMedia('(display-mode: standalone)').matches) || 
-             (window.navigator.standalone) || 
-             (document.referrer.includes('android-app://'));
+      return (window.matchMedia('(display-mode: standalone)').matches) ||
+        (window.navigator.standalone) ||
+        (document.referrer.includes('android-app://'));
     }
 
     if (isRunningStandalone()) {
@@ -1086,10 +1115,10 @@
 
           // Show the install prompt
           deferredPrompt.prompt();
-          
+
           // Wait for the user to respond to the prompt
           const { outcome } = await deferredPrompt.userChoice;
-          
+
           if (outcome === 'accepted') {
             console.log('✅ User accepted the install prompt');
             toastr.success('App is being installed...', 'Installation Started', {
@@ -1098,10 +1127,10 @@
           } else {
             console.log('❌ User dismissed the install prompt');
           }
-          
+
           // Clear the deferredPrompt variable
           deferredPrompt = null;
-          
+
           // Hide the install button
           if (installContainer) {
             installContainer.style.display = 'none';
@@ -1125,14 +1154,34 @@
 
   <!-- Online/Offline & SW Update Banners -->
   <style>
-    .net-banner, .sw-banner {
-      position: fixed; left: 0; right: 0; bottom: 0; z-index: 1060;
-      display: none; padding: .75rem 1rem; text-align: center; color: #fff;
+    .net-banner,
+    .sw-banner {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1060;
+      display: none;
+      padding: .75rem 1rem;
+      text-align: center;
+      color: #fff;
     }
-    .net-banner.offline { background: #dc3545; }
-    .net-banner.online { background: #28a745; }
-    .sw-banner { background: #007bff; }
-    .banner-btn { margin-left: .75rem; }
+
+    .net-banner.offline {
+      background: #dc3545;
+    }
+
+    .net-banner.online {
+      background: #28a745;
+    }
+
+    .sw-banner {
+      background: #007bff;
+    }
+
+    .banner-btn {
+      margin-left: .75rem;
+    }
   </style>
   <div id="netBanner" class="net-banner" role="status"></div>
   <div id="swBanner" class="sw-banner" role="status">
@@ -1140,7 +1189,7 @@
     <button id="swRefresh" class="btn btn-sm btn-light banner-btn">Update</button>
   </div>
   <script>
-    (function(){
+    (function () {
       const netBanner = document.getElementById('netBanner');
       const swBanner = document.getElementById('swBanner');
       const swRefresh = document.getElementById('swRefresh');
@@ -1195,52 +1244,52 @@
     })(jQuery);
 
     // Enhanced mobile menu handling
-    $(document).ready(function() {
+    $(document).ready(function () {
       // Toggle sidebar on mobile
-      $('[data-widget="pushmenu"]').click(function() {
+      $('[data-widget="pushmenu"]').click(function () {
         $('body').toggleClass('sidebar-open');
       });
 
       // Close sidebar when clicking overlay on mobile
-      $('.mobile-nav-overlay').click(function() {
+      $('.mobile-nav-overlay').click(function () {
         $('body').removeClass('sidebar-open');
       });
 
       // Close sidebar when clicking outside on mobile
-      $(document).click(function(event) {
+      $(document).click(function (event) {
         if ($(window).width() < 768) {
-          if (!$(event.target).closest('.main-sidebar').length && 
-              !$(event.target).closest('[data-widget="pushmenu"]').length &&
-              !$(event.target).closest('.mobile-nav-overlay').length) {
+          if (!$(event.target).closest('.main-sidebar').length &&
+            !$(event.target).closest('[data-widget="pushmenu"]').length &&
+            !$(event.target).closest('.mobile-nav-overlay').length) {
             $('body').removeClass('sidebar-open');
           }
         }
       });
 
       // Handle window resize
-      $(window).resize(function() {
+      $(window).resize(function () {
         if ($(window).width() >= 768) {
           $('body').removeClass('sidebar-open');
         }
       });
     });
 
-    function reportCardPrompt(e){
+    function reportCardPrompt(e) {
       e.preventDefault();
       var id = prompt('Enter Student ID (numeric)');
-      if(!id) return;
-      if(isNaN(id)) {
+      if (!id) return;
+      if (isNaN(id)) {
         toastr.error('Please enter a valid numeric Student ID');
         return;
       }
       window.location.href = '/result/report-card/' + id + '/';
     }
 
-    function classSheetPrompt(e){
+    function classSheetPrompt(e) {
       e.preventDefault();
       var id = prompt('Enter Class ID (numeric)');
-      if(!id) return;
-      if(isNaN(id)) {
+      if (!id) return;
+      if (isNaN(id)) {
         toastr.error('Please enter a valid numeric Class ID');
         return;
       }
@@ -1248,32 +1297,32 @@
     }
 
     // Enhanced loading state for forms
-    $(document).on('submit', 'form', function() {
+    $(document).on('submit', 'form', function () {
       var $form = $(this);
       var $submitBtn = $form.find('button[type="submit"]');
-      
+
       // Only show loading if form is valid
       if ($form[0].checkValidity()) {
         $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Saving...');
-        
+
         // Add loading class to form
         $form.addClass('loading');
       }
     });
 
     // Enhanced touch interactions for mobile
-    document.addEventListener('touchstart', function() {}, { passive: true });
+    document.addEventListener('touchstart', function () { }, { passive: true });
   </script>
 
   {% block morejs %}{% endblock morejs %}
 
   <!-- Navbar UX Scripts: Quick Search, Notifications, Dark Mode, FAB -->
   <script>
-    (function(){
+    (function () {
       // Dark mode
       const THEME_KEY = 'edusync-theme';
       const root = document.documentElement;
-      function applyTheme(theme){
+      function applyTheme(theme) {
         if (theme === 'dark') {
           document.body.classList.add('dark-mode');
           root.classList.add('dark-mode');
@@ -1285,7 +1334,7 @@
       const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
       applyTheme(savedTheme);
       const toggleBtn = document.getElementById('themeToggle');
-      if (toggleBtn) toggleBtn.addEventListener('click', function(){
+      if (toggleBtn) toggleBtn.addEventListener('click', function () {
         const cur = localStorage.getItem(THEME_KEY) || 'light';
         const next = cur === 'light' ? 'dark' : 'light';
         localStorage.setItem(THEME_KEY, next);
@@ -1296,13 +1345,13 @@
       const qInput = document.getElementById('globalSearchInput');
       const qMenu = document.getElementById('globalSearchResults');
       let qTimer = null; let items = []; let idx = -1;
-      function renderItems(data){
+      function renderItems(data) {
         const sections = [];
-        function section(title, arr){
+        function section(title, arr) {
           if (!arr || !arr.length) return '';
-          return `<div class="dropdown-header">${title}</div>` + arr.map((it,i)=>`<a href="${it.url}" class="dropdown-item result-item" data-index="${items.length + i}"><i class="fas fa-angle-right mr-2"></i>${it.label}</a>`).join('') + '<div class="dropdown-divider"></div>';
+          return `<div class="dropdown-header">${title}</div>` + arr.map((it, i) => `<a href="${it.url}" class="dropdown-item result-item" data-index="${items.length + i}"><i class="fas fa-angle-right mr-2"></i>${it.label}</a>`).join('') + '<div class="dropdown-divider"></div>';
         }
-        items = [].concat(data.students||[], data.staffs||[], data.invoices||[], data.classes||[]);
+        items = [].concat(data.students || [], data.staffs || [], data.invoices || [], data.classes || []);
         const html = [
           section('Students', data.students),
           section('Staff', data.staffs),
@@ -1310,44 +1359,44 @@
           section('Classes', data.classes)
         ].join('');
         qMenu.innerHTML = html || '<span class="dropdown-item text-muted">No results</span>';
-        if (qInput.value.trim()) { qMenu.classList.add('show'); qMenu.style.display='block'; }
+        if (qInput.value.trim()) { qMenu.classList.add('show'); qMenu.style.display = 'block'; }
       }
-      function searchNow(){
+      function searchNow() {
         const q = qInput.value.trim();
-        if (!q){ qMenu.classList.remove('show'); qMenu.style.display='none'; return; }
-        fetch(`/search/?q=${encodeURIComponent(q)}`, { credentials:'same-origin' })
-          .then(r=>r.json()).then(renderItems).catch(()=>{});
+        if (!q) { qMenu.classList.remove('show'); qMenu.style.display = 'none'; return; }
+        fetch(`/search/?q=${encodeURIComponent(q)}`, { credentials: 'same-origin' })
+          .then(r => r.json()).then(renderItems).catch(() => { });
       }
       if (qInput) {
-        qInput.addEventListener('input', function(){ clearTimeout(qTimer); qTimer = setTimeout(searchNow, 220); });
-        qInput.addEventListener('keydown', function(e){
+        qInput.addEventListener('input', function () { clearTimeout(qTimer); qTimer = setTimeout(searchNow, 220); });
+        qInput.addEventListener('keydown', function (e) {
           const links = qMenu.querySelectorAll('.result-item');
-          if (e.key === 'ArrowDown'){ idx = Math.min(idx+1, links.length-1); links[idx]?.focus(); e.preventDefault(); }
-          if (e.key === 'ArrowUp'){ idx = Math.max(idx-1, 0); links[idx]?.focus(); e.preventDefault(); }
-          if (e.key === 'Enter'){ if (links.length){ window.location = links[0].getAttribute('href'); } }
-          if (e.key === 'Escape'){ qMenu.classList.remove('show'); qMenu.style.display='none'; }
+          if (e.key === 'ArrowDown') { idx = Math.min(idx + 1, links.length - 1); links[idx]?.focus(); e.preventDefault(); }
+          if (e.key === 'ArrowUp') { idx = Math.max(idx - 1, 0); links[idx]?.focus(); e.preventDefault(); }
+          if (e.key === 'Enter') { if (links.length) { window.location = links[0].getAttribute('href'); } }
+          if (e.key === 'Escape') { qMenu.classList.remove('show'); qMenu.style.display = 'none'; }
         });
-        document.addEventListener('click', function(ev){ if (!qMenu.contains(ev.target) && ev.target !== qInput){ qMenu.classList.remove('show'); qMenu.style.display='none'; }});
+        document.addEventListener('click', function (ev) { if (!qMenu.contains(ev.target) && ev.target !== qInput) { qMenu.classList.remove('show'); qMenu.style.display = 'none'; } });
       }
 
       // Notifications
       const notifCount = document.getElementById('notifCount');
       const notifItems = document.getElementById('notifItems');
-      function loadNotifs(){
-        fetch('/notifications/', { credentials:'same-origin' })
-          .then(r=>r.json())
-          .then(data=>{
+      function loadNotifs() {
+        fetch('/notifications/', { credentials: 'same-origin' })
+          .then(r => r.json())
+          .then(data => {
             const items = data.items || [];
-            notifItems.innerHTML = items.map(it=>`<a href="${it.url}" class="dropdown-item"><span class="badge badge-${it.type} mr-2">&nbsp;</span>${it.text}</a>`).join('') || '<span class="dropdown-item text-muted">No notifications</span>';
-            if (items.length){ notifCount.textContent = items.length; notifCount.style.display = 'inline-block'; } else { notifCount.style.display='none'; }
-          }).catch(()=>{});
+            notifItems.innerHTML = items.map(it => `<a href="${it.url}" class="dropdown-item"><span class="badge badge-${it.type} mr-2">&nbsp;</span>${it.text}</a>`).join('') || '<span class="dropdown-item text-muted">No notifications</span>';
+            if (items.length) { notifCount.textContent = items.length; notifCount.style.display = 'inline-block'; } else { notifCount.style.display = 'none'; }
+          }).catch(() => { });
       }
       if (notifItems) { loadNotifs(); setInterval(loadNotifs, 60000); }
 
       // Floating Action Button
-     // Floating Action Button
-const fab = document.createElement('div');
-fab.innerHTML = `
+      // Floating Action Button
+      const fab = document.createElement('div');
+      fab.innerHTML = `
   <div id="fab" style="position:fixed; right:16px; bottom:16px; z-index:1061;">
     <div class="btn-group dropup">
       <button class="btn btn-primary btn-lg dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Quick actions">
@@ -1360,8 +1409,9 @@ fab.innerHTML = `
       </div>
     </div>
   </div>`;
-document.body.appendChild(fab.firstElementChild);
+      document.body.appendChild(fab.firstElementChild);
     })();
   </script>
 </body>
+
 </html>
