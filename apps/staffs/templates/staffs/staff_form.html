@@ -1,19 +1,17 @@
 {% extends 'base.html' %}
 
 {% block title %}
-  {% if object %}
-    Update {{ object }}
-  {% else %}
-    Add new Staff
-  {% endif %}
+{% if object %}
+Update {{ object }}
+{% else %}
+Add new Staff
+{% endif %}
 {% endblock title %}
 
 {% block content %}
 
 <!-- Test message for deployment verification -->
-<div class="alert alert-info">
-    🚀 This is a test message to confirm deployment without resetting the database!
-</div>
+
 
 <form action="" method="POST" enctype="multipart/form-data">
   {% csrf_token %}
@@ -21,9 +19,9 @@
   {% include 'corecode/form_snippet.html' %}
 
   {% if object %}
-    <input type="submit" class="btn btn-primary" value="Update Record">
+  <input type="submit" class="btn btn-primary" value="Update Record">
   {% else %}
-    <input type="submit" class="btn btn-primary" value="Add new Staff">
+  <input type="submit" class="btn btn-primary" value="Add new Staff">
   {% endif %}
 </form>
 {% endblock content %}
