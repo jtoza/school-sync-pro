@@ -386,7 +386,7 @@ def signup_view(request):
             user = form.save()
             login(request, user)
             messages.success(request, 'Account created successfully!')
-            return redirect('corecode:home')
+            return redirect('home')
         else:
             # Do not count as rate-limit attempt; just show form errors
             messages.error(request, 'Please correct the errors below.')
@@ -398,7 +398,7 @@ def signup_view(request):
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('corecode:dashboard')
+        return redirect('dashboard')
         
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
