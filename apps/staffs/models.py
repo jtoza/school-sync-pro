@@ -50,7 +50,7 @@ class Staff(models.Model):
         return f"{self.surname} {self.firstname} {self.other_name}"
 
     def get_absolute_url(self):
-        return reverse("staff-detail", kwargs={"pk": self.pk})
+        return reverse("staffs:staff-detail", kwargs={"pk": self.pk})
 
     def get_full_name(self):
         """Get full name of staff member"""
