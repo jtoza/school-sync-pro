@@ -44,6 +44,10 @@ class StudentCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         form.fields["pickup_authorized"].widget = widgets.Textarea(attrs={"rows": 2, "placeholder": "Comma-separated names"})
         return form
 
+    def get_success_url(self):
+        """Redirect to student list after successful creation"""
+        return reverse_lazy('students:student-list')
+
 
 class StudentUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Student
