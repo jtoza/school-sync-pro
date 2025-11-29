@@ -1,7 +1,13 @@
 
 # Created by https://www.gitignore.io/api/django,python,windows
 # Edit at https://www.gitignore.io/?templates=django,python,windows
-
+### Environment ###
+.env
+*.env
+.env.local
+.env.production
+.env.development
+.env.example
 ### Django ###
 *.log
 *.pot

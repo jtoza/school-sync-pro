@@ -74,7 +74,7 @@ class Student(models.Model):
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse("student-detail", kwargs={"pk": self.pk})
+        return reverse("students:student-detail", kwargs={"pk": self.pk})
 
     def get_full_name(self):
         """Return the full name of the student"""

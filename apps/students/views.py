@@ -68,7 +68,7 @@ class StudentUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
 
 class StudentDeleteView(LoginRequiredMixin, DeleteView):
     model = Student
-    success_url = reverse_lazy("student-list")
+    success_url = reverse_lazy("students:student-list")
 
 
 class StudentBulkUploadView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
