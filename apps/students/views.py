@@ -48,6 +48,14 @@ class StudentCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         """Redirect to student list after successful creation"""
         return reverse_lazy('students:student-list')
 
+    def form_valid(self, form):
+        """Override to ensure student is saved even if redirect fails"""
+        print("=== DEBUG: Starting to save student ===")
+        self.object = form.save()
+        print(f"=== DEBUG: Student saved with ID: {self.object.id} ===")
+        print(f"=== DEBUG: Student name: {self.object.get_full_name()} ===")
+        return super().form_valid(form)
+
 
 class StudentUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Student
@@ -69,6 +77,10 @@ class StudentUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         # form.fields['passport'].widget = widgets.FileInput()
         return form
 
+    def get_success_url(self):
+        """Redirect to student detail after update"""
+        return reverse_lazy('students:student-detail', kwargs={'pk': self.object.pk})
+
 
 class StudentDeleteView(LoginRequiredMixin, DeleteView):
     model = Student
@@ -79,7 +91,7 @@ class StudentBulkUploadView(LoginRequiredMixin, SuccessMessageMixin, CreateView)
     model = StudentBulkUpload
     template_name = "students/students_upload.html"
     fields = ["csv_file"]
-    success_url = "/student/list"
+    success_url = "/students/list/"
     success_message = "Successfully uploaded students"
 
 
