@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bulk Upload Results{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary: #16a34a;
+        --accent: #22c55e;
+    }
+
+    .upload-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(22, 163, 74, 0.3);
+    }
+
+    .upload-card {
+        background: white;
+        border-radius: 14px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .upload-zone {
+        border: 3px dashed #d1fae5;
+        border-radius: 14px;
+        padding: 3rem 2rem;
+        text-align: center;
+        background: #f0fdf4;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+
+    .upload-zone:hover {
+        border-color: var(--primary);
+        background: #dcfce7;
+    }
+
+    .upload-icon {
+        font-size: 4rem;
+        color: var(--primary);
+        margin-bottom: 1rem;
+    }
+
+    .file-input {
+        display: none;
+    }
+
+    .preview-table {
+        margin-top: 2rem;
+    }
+
+    .preview-table th {
+        background: linear-gradient(180deg, #ecfdf5, #d1fae5);
+        color: #065f46;
+        font-weight: 700;
+        padding: 1rem;
+    }
+
+    .preview-table td {
+        padding: 0.8rem 1rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .step-indicator {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+
+    .step {
+        display: flex;
+        align-items: center;
+        margin: 0 1rem;
+    }
+
+    .step-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        transition: all 0.3s;
+    }
+
+    .step-circle.active {
+        background: var(--primary);
+        color: white;
+    }
+
+    .step-label {
+        margin-left: 0.5rem;
+        font-weight: 600;
+        color: #64748b;
+    }
+
+    .step-label.active {
+        color: var(--primary);
+    }
+</style>
+
+<!-- Header -->
+<div class="upload-header">
+    <h1 class="mb-2"><i class="fas fa-cloud-upload-alt mr-2"></i>Bulk Upload Results</h1>
+    <p class="mb-0 opacity-90">Upload multiple student results at once using Excel or CSV</p>
+</div>
+
+<!-- Step Indicator -->
+<div class="step-indicator">
+    <div class="step">
+        <div class="step-circle {% if not preview_data %}active{% endif %}">1</div>
+        <div class="step-label {% if not preview_data %}active{% endif %}">Upload File</div>
+    </div>
+    <div class="mx-3" style="width: 60px; height: 2px; background: #e5e7eb; margin-top: 10px;"></div>
+    <div class="step">
+        <div class="step-circle {% if preview_data %}active{% endif %}">2</div>
+        <div class="step-label {% if preview_data %}active{% endif %}">Preview & Confirm</div>
+    </div>
+</div>
+
+<div class="upload-card">
+    {% if not preview_data %}
+    <!-- Step 1: Upload Form -->
+    <form method="post" enctype="multipart/form-data" id="uploadForm">
+        {% csrf_token %}
+
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <label class="font-weight-bold">{{ form.session.label }}</label>
+                {{ form.session }}
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="font-weight-bold">{{ form.term.label }}</label>
+                {{ form.term }}
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="font-weight-bold">{{ form.student_class.label }}</label>
+                {{ form.student_class }}
+            </div>
+        </div>
+
+        <div class="upload-zone" onclick="document.getElementById('id_file').click()">
+            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+            <h4>Click to Upload or Drag & Drop</h4>
+            <p class="text-muted mb-3">Excel (.xlsx, .xls) or CSV files accepted (Max 5MB)</p>
+            {{ form.file }}
+            <div id="fileName" class="text-primary font-weight-bold mt-3"></div>
+        </div>
+
+        {{ form.file.errors }}
+
+        <div class="alert alert-info mt-4">
+            <i class="fas fa-info-circle mr-2"></i>
+            <strong>File Format:</strong> Your file should have columns:
+            <code>Registration Number</code>, <code>Subject</code>, <code>CA Score</code>, <code>Exam Score</code>
+            <br>
+            <a href="{% url 'bulk-template' %}" class="btn btn-sm btn-outline-primary mt-2">
+                <i class="fas fa-download mr-1"></i>Download Template
+            </a>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" name="preview" class="btn btn-primary btn-lg px-5">
+                <i class="fas fa-eye mr-2"></i>Preview Data
+            </button>
+        </div>
+    </form>
+
+    {% else %}
+    <!-- Step 2: Preview Data -->
+    <h4 class="mb-4"><i class="fas fa-table text-primary mr-2"></i>Data Preview</h4>
+
+    <div class="alert alert-success">
+        <i class="fas fa-check-circle mr-2"></i>
+        Found <strong>{{ preview_data|length }}</strong> rows to upload
+    </div>
+
+    <div class="preview-table table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Registration Number</th>
+                    <th>Subject</th>
+                    <th>CA Score</th>
+                    <th>Exam Score</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in preview_data|slice:":20" %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ row.registration_number }}</td>
+                    <td>{{ row.subject }}</td>
+                    <td>{{ row.ca_score }}</td>
+                    <td>{{ row.exam_score }}</td>
+                    <td class="font-weight-bold">{{ row.ca_score|add:row.exam_score }}</td>
+                </tr>
+                {% endfor %}
+                {% if preview_data|length > 20 %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">
+                        ... and {{ preview_data|length|add:"-20" }} more rows
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <div class="text-center mt-4">
+            <a href="{% url 'bulk-upload-results' %}" class="btn btn-secondary btn-lg px-4 mr-2">
+                <i class="fas fa-arrow-left mr-2"></i>Cancel
+            </a>
+            <button type="submit" name="confirm" class="btn btn-success btn-lg px-5">
+                <i class="fas fa-check mr-2"></i>Confirm & Upload
+            </button>
+        </div>
+    </form>
+    {% endif %}
+</div>
+
+<script>
+    // Show selected file name
+    document.getElementById('id_file').addEventListener('change', function (e) {
+        const fileName = e.target.files[0]?.name;
+        if (fileName) {
+            document.getElementById('fileName').textContent = `Selected: ${fileName}`;
+        }
+    });
+</script>
+
+{% endblock %}

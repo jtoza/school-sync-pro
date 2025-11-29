@@ -65,3 +65,19 @@ class Result(models.Model):
 
     def grade(self):
         return score_grade(self.total_score())
+    
+    def grade_points(self):
+        """Return grade points for this result (CBC system)."""
+        from .utils import grade_to_points
+        return grade_to_points(self.grade())
+    
+    @staticmethod
+    def get_student_gpa(student, session, term):
+        """Calculate GPA for a student in a given session and term."""
+        from .utils import calculate_gpa
+        results = Result.objects.filter(
+            student=student,
+            session=session,
+            term=term
+        )
+        return calculate_gpa(results)

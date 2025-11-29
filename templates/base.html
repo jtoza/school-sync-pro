@@ -741,13 +741,13 @@
         </li>
         {% else %}
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'login' %}">
+          <a class="nav-link" href="{% url 'corecode:login' %}">
             <i class="fas fa-sign-in-alt"></i>
             <span class="d-none d-sm-inline">Login</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'signup' %}">
+          <a class="nav-link" href="{% url 'corecode:signup' %}">
             <i class="fas fa-user-plus"></i>
             <span class="d-none d-sm-inline">Sign Up</span>
           </a>
@@ -832,6 +832,18 @@
               <a href="{% url 'student-performance' %}" class="nav-link">
                 <i class="nav-icon fas fa-chart-line"></i>
                 <p>Performance Trend</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'analytics-dashboard' %}" class="nav-link">
+                <i class="nav-icon fas fa-chart-pie"></i>
+                <p>Analytics Dashboard</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'bulk-upload-results' %}" class="nav-link">
+                <i class="nav-icon fas fa-cloud-upload-alt"></i>
+                <p>Bulk Upload</p>
               </a>
             </li>
             <li class="nav-item">

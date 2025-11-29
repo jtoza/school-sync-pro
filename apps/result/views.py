@@ -327,6 +327,12 @@ def report_card(request, student_id):
         fee_balance += due
 
     fee_balance = round(fee_balance, 2)
+    
+    # Calculate GPA and Position
+    from .utils import calculate_gpa, get_gpa_class, get_student_position
+    gpa = calculate_gpa(results) if results.exists() else 0.0
+    gpa_class = get_gpa_class(gpa)
+    position_data = get_student_position(student, session, term)
 
     context = {
         'student': student,
@@ -339,6 +345,9 @@ def report_card(request, student_id):
         'teacher_comment': teacher_comment,
         'headteacher_comment': headteacher_comment,
         'fee_balance': fee_balance,
+        'gpa': gpa,
+        'gpa_class': gpa_class,
+        'position_data': position_data,
     }
     return render(request, 'result/report_card.html', context)
 

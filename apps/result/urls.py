@@ -11,6 +11,11 @@ from .views import (
     class_report_cards_pdf,
     results_access,
 )
+from .views_analytics import (
+    analytics_dashboard,
+    bulk_upload_results,
+    download_bulk_template,
+)
 
 urlpatterns = [
     path("create/", create_result, name="create-result"),
@@ -22,4 +27,8 @@ urlpatterns = [
     path("report-card/<int:student_id>/pdf/", report_card_pdf, name="report-card-pdf"),
     path("class-sheet/<int:class_id>/", class_report_sheet, name="class-report-sheet"),
     path("class-report/<int:class_id>/pdf/", class_report_cards_pdf, name="class-report-pdf"),
+    # New analytics and bulk upload URLs
+    path("analytics/", analytics_dashboard, name="analytics-dashboard"),
+    path("bulk-upload/", bulk_upload_results, name="bulk-upload-results"),
+    path("bulk-upload/template/", download_bulk_template, name="bulk-template"),
 ]
