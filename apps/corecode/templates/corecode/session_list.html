@@ -8,85 +8,86 @@ Academic Sessions
 
 
 {% block breadcrumb %}
-  <a class="btn btn-primary" href="#" data-toggle="modal" data-target="#modal1">
-    <i class="fa fa-plus"></i>
-    Add new session
-  </a>
+<a class="btn btn-primary" href="#" data-toggle="modal" data-target="#modal1">
+  <i class="fa fa-plus"></i>
+  Add new session
+</a>
 {% endblock breadcrumb %}
-  
+
 
 {% block content %}
-  <div class="row">
-    <div class="col-sm-12">
+<div class="row">
+  <div class="col-sm-12">
 
-        <table class="table table-bordered">
-          <tbody>
-            {% for object in object_list %}
-            <tr>
-              <td>{{ object }}</td>
-              <td>
-                {% if object.current == True %}
-                  Current <i class="fa fa-check"></i>
-                {% endif %}
-              </td>
-             <td><a href="{% url 'session-update' object.id %}"><i
-      class="fa fa-edit"></i></a> <a
-    href="{% url 'session-delete' object.id %}"><i
-      class="fa fa-trash-alt"></i></a></td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+    <table class="table table-bordered">
+      <tbody>
+        {% for object in object_list %}
+        <tr>
+          <td>{{ object }}</td>
+          <td>
+            {% if object.current == True %}
+            Current <i class="fa fa-check"></i>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{% url 'corecode:session-update' object.pk %}"><i class="fa fa-edit"></i></a>
+            <a href="{% url 'corecode:session-delete' object.pk %}"><i class="fa fa-trash-alt"></i></a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
+  </div>
+</div>
+
+
+<div class="modal fade" id="modal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
+  data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="{% url 'corecode:session-create' %}" method="POST" id="sessionForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add new session</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+          {% csrf_token %}
+
+          {% for field in form %}
+          <div class="form-group">
+            {{field.label_tag}}
+            {{ field|add_class:"form-control" }}
+            {{field.errors}}
+          </div>
+          {% endfor %}
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
     </div>
   </div>
+</div>
 
-
-  <div class="modal fade" id="modal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form action="{% url 'session-create' %}" method="POST" id="sessionForm"></form>
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Add new session</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            
-              {% csrf_token %}
-
-              {% for field in form %}
-                  <div class="form-group">
-                    {{field.label_tag}}
-                    {{ field|add_class:"form-control" }}
-                    {{field.errors}}
-                  </div>
-              {% endfor %}
-            
-          </div>
-
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Save</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    $(document).ready(function() {
-      $('#modal1').modal({show: false});
-      $('#modal1').on('hidden.bs.modal', function () {
-        $('#sessionForm')[0].reset();
-        $('#sessionForm').find('.is-invalid').removeClass('is-invalid');
-        $('#sessionForm').find('.invalid-feedback').remove();
-      });
-      $('#sessionForm').on('submit', function(e) {
-        $('#modal1').modal('hide');
-      });
+<script>
+  $(document).ready(function () {
+    $('#modal1').modal({ show: false });
+    $('#modal1').on('hidden.bs.modal', function () {
+      $('#sessionForm')[0].reset();
+      $('#sessionForm').find('.is-invalid').removeClass('is-invalid');
+      $('#sessionForm').find('.invalid-feedback').remove();
     });
-  </script>
+    $('#sessionForm').on('submit', function (e) {
+      $('#modal1').modal('hide');
+    });
+  });
+</script>
 
 {% endblock content %}
