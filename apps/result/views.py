@@ -634,3 +634,101 @@ def class_report_sheet(request, class_id):
         'rows': rows,
     }
     return render(request, 'result/class_report_sheet.html', context)
+
+
+# SMS Result Notification Views
+@login_required
+def send_result_sms_view(request):
+    """Display form for sending result SMS"""
+    from apps.corecode.models import AcademicSession, AcademicTerm
+    
+    sessions = AcademicSession.objects.all()
+    terms = AcademicTerm.objects.all()
+    classes = StudentClass.objects.all()
+    
+    context = {
+        'sessions': sessions,
+        'terms': terms,
+        'classes': classes,
+        'current_session': request.current_session,
+        'current_term': request.current_term,
+    }
+    return render(request, 'result/send_sms.html', context)
+
+
+@login_required
+def send_result_sms_action(request):
+    """Process SMS sending for selected students"""
+    from apps.corecode.models import AcademicSession, AcademicTerm
+    from .sms import send_bulk_result_sms
+    
+    if request.method != 'POST':
+        return redirect('send-result-sms')
+    
+    session_id = request.POST.get('session')
+    term_id = request.POST.get('term')
+    class_id = request.POST.get('student_class')
+    student_ids = request.POST.getlist('students')
+    
+    if not session_id or not term_id:
+        messages.error(request, 'Please select session and term')
+        return redirect('send-result-sms')
+    
+    session = get_object_or_404(AcademicSession, pk=session_id)
+    term = get_object_or_404(AcademicTerm, pk=term_id)
+    
+    # Get students
+    if student_ids:
+        students = Student.objects.filter(pk__in=student_ids)
+    elif class_id:
+        students = Student.objects.filter(current_class_id=class_id, current_status='active')
+    else:
+        messages.error(request, 'Please select students or a class')
+        return redirect('send-result-sms')
+    
+    if not students.exists():
+        messages.error(request, 'No students found')
+        return redirect('send-result-sms')
+    
+    # Send SMS
+    result = send_bulk_result_sms(students, session, term)
+    
+    if result['success']:
+        messages.success(
+            request,
+            f"SMS sent successfully to {result['sent']} student(s). "
+            f"{result['failed']} failed."
+        )
+    else:
+        messages.error(request, f"Failed to send SMS. {result['failed']} failed.")
+    
+    # Show details
+    for detail in result['details']:
+        if not detail['success']:
+            messages.warning(
+                request,
+                f"{detail['student']}: {detail['error']}"
+            )
+    
+    return redirect('send-result-sms')
+
+
+@login_required
+def send_individual_result_sms(request, pk):
+    """Send SMS for a single student's result"""
+    from .sms import send_result_sms
+    
+    result_obj = get_object_or_404(Result, pk=pk)
+    student = result_obj.student
+    session = result_obj.session
+    term = result_obj.term
+    
+    # Send SMS
+    result = send_result_sms(student, session, term)
+    
+    if result['success']:
+        messages.success(request, f"SMS sent to {student.get_short_name()}'s parent")
+    else:
+        messages.error(request, f"Failed to send SMS: {result['message']}")
+    
+    return redirect(request.META.get('HTTP_REFERER', 'result-list'))

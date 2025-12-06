@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Send Result SMS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h3 class="card-title">
+                        <i class="fas fa-sms"></i> Send Result SMS to Parents
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'send-result-sms-action' %}" id="smsForm">
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="session">Academic Session *</label>
+                                    <select name="session" id="session" class="form-control" required>
+                                        <option value="">Select Session</option>
+                                        {% for session in sessions %}
+                                        <option value="{{ session.id }}" {% if session.id == current_session.id %}selected{% endif %}>
+                                            {{ session.name }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="term">Academic Term *</label>
+                                    <select name="term" id="term" class="form-control" required>
+                                        <option value="">Select Term</option>
+                                        {% for term in terms %}
+                                        <option value="{{ term.id }}" {% if term.id == current_term.id %}selected{% endif %}>
+                                            {{ term.name }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="student_class">Class (Optional)</label>
+                                    <select name="student_class" id="student_class" class="form-control">
+                                        <option value="">All Classes</option>
+                                        {% for class in classes %}
+                                        <option value="{{ class.id }}">{{ class.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <small class="form-text text-muted">Leave empty to send to all students</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <div class="alert alert-info">
+                                    <h5><i class="fas fa-info-circle"></i> SMS Message Format</h5>
+                                    <div class="bg-white p-3 rounded border">
+                                        <pre class="mb-0" style="font-family: monospace; font-size: 12px;">Green Bells Academy
+Term 1 Results 2024
+
+Student: JOHN DOE
+Math: 85 (A)
+English: 78 (B+)
+Science: 92 (A+)
+
+Total: 255/300
+Average: 85%
+Grade: A
+Position: 5/40
+
+Well done! Keep it up.</pre>
+                                    </div>
+                                    <small class="text-muted mt-2 d-block">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        Only students with valid phone numbers will receive SMS.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <strong>Important:</strong> Each SMS costs approximately KES 1. 
+                                    You will be asked to confirm before sending.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <button type="submit" class="btn btn-success btn-lg" id="sendButton">
+                                    <i class="fas fa-paper-plane"></i> Continue to Select Students
+                                </button>
+                                <a href="{% url 'view-results' %}" class="btn btn-secondary btn-lg">
+                                    <i class="fas fa-times"></i> Cancel
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const sendButton = document.getElementById('sendButton');
+        const form = document.getElementById('smsForm');
+
+        // Form validation
+        form.addEventListener('submit', function (e) {
+            const sessionId = document.getElementById('session').value;
+            const termId = document.getElementById('term').value;
+
+            if (!sessionId || !termId) {
+                e.preventDefault();
+                alert('Please select both session and term');
+                return false;
+            }
+
+            // Show confirmation
+            const confirmed = confirm(
+                'You will now select which students to send results to.\n' +
+                'Make sure you have sufficient balance in your Africa\'s Talking account.'
+            );
+
+            if (!confirmed) {
+                e.preventDefault();
+                return false;
+            }
+
+            // Disable button and show loading
+            sendButton.disabled = true;
+            sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        });
+    });
+</script>
+{% endblock %}

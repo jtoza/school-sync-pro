@@ -1,0 +1,557 @@
+{% load humanize %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>M-Pesa Payment - Green Bells Academy</title>
+    <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css' %}">
+    <style>
+        :root {
+            --primary: #16a34a;
+            --primary-dark: #15803d;
+            --accent: #22c55e;
+            --accent-soft: #dcfce7;
+            --bg: #f0fdf4;
+            --danger: #dc2626;
+            --light-gray: #f8fafc;
+            --border-gray: #e2e8f0;
+            --text-secondary: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.5;
+            color: #1e293b;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100%;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .payment-container {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(5, 150, 105, 0.15), 0 10px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 25px 70px rgba(5, 150, 105, 0.2), 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 32px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            animation: float 20s linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(-30px, -30px) rotate(360deg); }
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-weight: 800;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .mpesa-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .card-body {
+            padding: 40px;
+        }
+
+        .alert {
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            font-weight: 500;
+            animation: slideIn 0.4s ease-out;
+            border: 2px solid transparent;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            border-color: #6ee7b7;
+            color: #065f46;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            border-color: #fca5a5;
+            color: #991b1b;
+        }
+
+        .alert i {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .info-box {
+            background: var(--light-gray);
+            border: 2px solid var(--border-gray);
+            border-radius: 18px;
+            padding: 28px;
+            margin-bottom: 32px;
+            transition: all 0.3s ease;
+        }
+
+        .info-box:hover {
+            border-color: var(--accent);
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 15px;
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .info-value {
+            color: var(--primary-dark);
+            font-weight: 700;
+            font-size: 16px;
+            text-align: right;
+            flex: 2;
+            word-break: break-word;
+            padding-left: 12px;
+        }
+
+        .amount-highlight {
+            font-size: 28px;
+            color: var(--primary);
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 12px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            font-size: 20px;
+            z-index: 2;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 18px 18px 18px 52px;
+            border: 2px solid var(--border-gray);
+            border-radius: 14px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            background: var(--light-gray);
+            color: #1e293b;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.15);
+        }
+
+        .help-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-left: 4px;
+        }
+
+        .btn-pay {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 18px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 12px 30px rgba(34, 197, 94, 0.3);
+            margin-top: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-pay::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.7s ease;
+        }
+
+        .btn-pay:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 40px rgba(34, 197, 94, 0.4);
+        }
+
+        .btn-pay:hover::before {
+            left: 100%;
+        }
+
+        .btn-pay:active {
+            transform: translateY(0);
+        }
+
+        .btn-pay i {
+            font-size: 20px;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-gray);
+        }
+
+        .back-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            padding: 12px 20px;
+            border-radius: 10px;
+            background: var(--light-gray);
+        }
+
+        .back-link a:hover {
+            color: var(--primary-dark);
+            gap: 14px;
+            background: var(--accent-soft);
+            transform: translateX(-4px);
+        }
+
+        .payment-note {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 2px solid #fbbf24;
+            border-radius: 14px;
+            padding: 18px;
+            margin-top: 24px;
+            text-align: center;
+            font-size: 14px;
+            color: #92400e;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        @media (max-width: 576px) {
+            .card-header {
+                padding: 24px;
+            }
+            
+            .card-header h2 {
+                font-size: 24px;
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .mpesa-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+            
+            .card-body {
+                padding: 24px;
+            }
+            
+            .info-box {
+                padding: 20px;
+            }
+            
+            .info-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                margin-bottom: 16px;
+                padding-bottom: 16px;
+            }
+            
+            .info-label, .info-value {
+                text-align: left;
+                width: 100%;
+            }
+            
+            .amount-highlight {
+                font-size: 24px;
+            }
+            
+            input[type="text"] {
+                padding: 16px 16px 16px 48px;
+                font-size: 15px;
+            }
+            
+            .btn-pay {
+                padding: 18px;
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            body {
+                padding: 12px;
+            }
+            
+            .card {
+                border-radius: 20px;
+            }
+            
+            .card-body {
+                padding: 20px;
+            }
+            
+            .info-box {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="payment-container">
+        <div class="card">
+            <div class="card-header">
+                <h2>
+                    <div class="mpesa-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    M-Pesa Payment
+                </h2>
+            </div>
+            <div class="card-body">
+                {% if success %}
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    <div>{{ success }}</div>
+                </div>
+                {% endif %}
+
+                {% if error %}
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <div>{{ error }}</div>
+                </div>
+                {% endif %}
+
+                <div class="info-box">
+                    <div class="info-row">
+                        <span class="info-label">Student Name:</span>
+                        <span class="info-value">{{ invoice.student.firstname }} {{ invoice.student.surname }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Invoice Number:</span>
+                        <span class="info-value">#{{ invoice.invoice_number }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Amount Due:</span>
+                        <span class="info-value amount-highlight">
+                            {% if invoice.balance %}
+                                KES {{ invoice.balance|floatformat:2|intcomma }}
+                            {% else %}
+                                KES 0.00
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="phone_number">
+                            <i class="fas fa-phone"></i> M-Pesa Phone Number
+                        </label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-mobile-alt input-icon"></i>
+                            <input type="text" id="phone_number" name="phone_number"
+                                placeholder="0712345678 or 254712345678" 
+                                required 
+                                pattern="^(254|0)[17]\d{8}$"
+                                title="Enter a valid Safaricom phone number">
+                        </div>
+                        <div class="help-text">
+                            <i class="fas fa-info-circle"></i>
+                            Enter your Safaricom number starting with 07 or 254
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-pay">
+                        <i class="fas fa-paper-plane"></i>
+                        Send Payment Request
+                    </button>
+                </form>
+
+                <div class="payment-note">
+                    <i class="fas fa-shield-alt"></i>
+                    Secure payment powered by Lipana M-Pesa
+                </div>
+
+                <div class="back-link">
+                    <a href="javascript:history.back()">
+                        <i class="fas fa-arrow-left"></i>
+                        Go Back
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Add subtle animation to form input
+        document.addEventListener('DOMContentLoaded', function() {
+            const phoneInput = document.getElementById('phone_number');
+            if (phoneInput) {
+                phoneInput.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'scale(1.02)';
+                });
+                
+                phoneInput.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'scale(1)';
+                });
+            }
+            
+            // Format phone number as user types
+            phoneInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.startsWith('0') && value.length > 1) {
+                    value = '254' + value.substring(1);
+                }
+                e.target.value = value;
+            });
+        });
+    </script>
+</body>
+
+</html>

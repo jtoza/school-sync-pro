@@ -29,6 +29,9 @@
     <hr>
     <div>
       <h4>Expected Balance: {{ object.balance | intcomma }}</h4>
+      {% if object.balance > 0 %}
+      <a href="{% url 'mpesa-payment' object.id %}" class="btn btn-success mt-2">Pay with M-Pesa</a>
+      {% endif %}
     </div>
   </div>
   <div class="col-sm-8">

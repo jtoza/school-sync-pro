@@ -10,6 +10,9 @@ from .views import (
     report_card_pdf,
     class_report_cards_pdf,
     results_access,
+    send_result_sms_view,
+    send_result_sms_action,
+    send_individual_result_sms,
 )
 from .views_analytics import (
     analytics_dashboard,
@@ -27,8 +30,12 @@ urlpatterns = [
     path("report-card/<int:student_id>/pdf/", report_card_pdf, name="report-card-pdf"),
     path("class-sheet/<int:class_id>/", class_report_sheet, name="class-report-sheet"),
     path("class-report/<int:class_id>/pdf/", class_report_cards_pdf, name="class-report-pdf"),
-    # New analytics and bulk upload URLs
+    # Analytics and bulk upload URLs
     path("analytics/", analytics_dashboard, name="analytics-dashboard"),
     path("bulk-upload/", bulk_upload_results, name="bulk-upload-results"),
     path("bulk-upload/template/", download_bulk_template, name="bulk-template"),
+    # SMS notification URLs
+    path("send-sms/", send_result_sms_view, name="send-result-sms"),
+    path("send-sms/action/", send_result_sms_action, name="send-result-sms-action"),
+    path("result/<int:pk>/send-sms/", send_individual_result_sms, name="send-individual-sms"),
 ]

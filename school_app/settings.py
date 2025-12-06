@@ -203,3 +203,15 @@ EXPORT_FORMATS = ['excel', 'pdf']
 # Email defaults
 DEFAULT_FROM_EMAIL = 'no-reply@yourschool.com'
 BACKUP_EMAIL_TO = ['youraddress@example.com']
+
+# Lipana.dev Configuration
+LIPANA_PRODUCTION_KEY = os.getenv('LIPANA_PRODUCTION_KEY')
+LIPANA_SECRET_KEY = os.getenv('LIPANA_SECRET_KEY')
+LIPANA_ACCESS_TOKEN_URL = "https://lipana.dev/api/v1/auth/token/"
+LIPANA_STK_PUSH_URL = "https://lipana.dev/api/v1/mpesa/stk/push/"
+
+# Africa's Talking SMS Configuration
+AFRICASTALKING_USERNAME = os.getenv('AFRICASTALKING_USERNAME', 'sandbox')
+AFRICASTALKING_API_KEY = os.getenv('AFRICASTALKING_API_KEY', '')
+AFRICASTALKING_SENDER_ID = os.getenv('AFRICASTALKING_SENDER_ID', 'GREEN_BELLS')
+

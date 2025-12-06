@@ -33,7 +33,6 @@ class IndexView(LoginRequiredMixin, TemplateView):
     template_name = "index.html"
 
     def get_context_data(self, **kwargs):
-
         context = super().get_context_data(**kwargs)
         # Live dashboard stats
         try:
@@ -95,7 +94,7 @@ class SessionCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = AcademicSession
     form_class = AcademicSessionForm
     template_name = "corecode/mgt_form.html"
-    success_url = reverse_lazy("sessions")
+    success_url = reverse_lazy("corecode:sessions")  # FIXED: Added namespace
     success_message = "New session successfully added"
 
     def get_context_data(self, **kwargs):
@@ -107,7 +106,7 @@ class SessionCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 class SessionUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = AcademicSession
     form_class = AcademicSessionForm
-    success_url = reverse_lazy("sessions")
+    success_url = reverse_lazy("corecode:sessions")  # FIXED: Added namespace
     success_message = "Session successfully updated."
     template_name = "corecode/mgt_form.html"
 
@@ -121,13 +120,13 @@ class SessionUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
             )
             if not terms:
                 messages.warning(self.request, "You must set a session to current.")
-                return redirect("session-list")
+                return redirect("corecode:session-list")
         return super().form_valid(form)
 
 
 class SessionDeleteView(LoginRequiredMixin, DeleteView):
     model = AcademicSession
-    success_url = reverse_lazy("sessions")
+    success_url = reverse_lazy("corecode:sessions")  # FIXED: Added namespace
     template_name = "corecode/core_confirm_delete.html"
     success_message = "The session {} has been deleted with all its attached content"
 
@@ -135,7 +134,7 @@ class SessionDeleteView(LoginRequiredMixin, DeleteView):
         obj = self.get_object()
         if obj.current == True:
             messages.warning(request, "Cannot delete session as it is set to current")
-            return redirect("sessions")
+            return redirect("corecode:sessions")
         messages.success(self.request, self.success_message.format(obj.name))
         return super(SessionDeleteView, self).delete(request, *args, **kwargs)
 
@@ -154,14 +153,14 @@ class TermCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = AcademicTerm
     form_class = AcademicTermForm
     template_name = "corecode/mgt_form.html"
-    success_url = reverse_lazy("terms")
+    success_url = reverse_lazy("corecode:terms")  # FIXED: Added namespace
     success_message = "New term successfully added"
 
 
 class TermUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = AcademicTerm
     form_class = AcademicTermForm
-    success_url = reverse_lazy("terms")
+    success_url = reverse_lazy("corecode:terms")  # FIXED: Added namespace
     success_message = "Term successfully updated."
     template_name = "corecode/mgt_form.html"
 
@@ -175,13 +174,13 @@ class TermUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
             )
             if not terms:
                 messages.warning(self.request, "You must set a term to current.")
-                return redirect("terms")
+                return redirect("corecode:terms")
         return super().form_valid(form)
 
 
 class TermDeleteView(LoginRequiredMixin, DeleteView):
     model = AcademicTerm
-    success_url = reverse_lazy("terms")
+    success_url = reverse_lazy("corecode:terms")  # FIXED: Added namespace
     template_name = "corecode/core_confirm_delete.html"
     success_message = "The term {} has been deleted with all its attached content"
 
@@ -189,7 +188,7 @@ class TermDeleteView(LoginRequiredMixin, DeleteView):
         obj = self.get_object()
         if obj.current == True:
             messages.warning(request, "Cannot delete term as it is set to current")
-            return redirect("terms")
+            return redirect("corecode:terms")
         messages.success(self.request, self.success_message.format(obj.name))
         return super(TermDeleteView, self).delete(request, *args, **kwargs)
 
@@ -204,13 +203,11 @@ class ClassListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
         return context
 
 
-# In your views.py file, replace the existing ClassCreateView with this:
-
 class ClassCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = StudentClass
     form_class = StudentClassForm
     template_name = "corecode/mgt_form.html"
-    success_url = reverse_lazy("classes")
+    success_url = reverse_lazy("corecode:class-list")  # FIXED: Added namespace
     success_message = "New class successfully added"
 
     def form_valid(self, form):
@@ -247,14 +244,14 @@ class ClassCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 class ClassUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = StudentClass
     fields = ["name"]
-    success_url = reverse_lazy("classes")
+    success_url = reverse_lazy("corecode:class-list")  # FIXED: Added namespace
     success_message = "class successfully updated."
     template_name = "corecode/mgt_form.html"
 
 
 class ClassDeleteView(LoginRequiredMixin, DeleteView):
     model = StudentClass
-    success_url = reverse_lazy("classes")
+    success_url = reverse_lazy("corecode:class-list")  # FIXED: Added namespace
     template_name = "corecode/core_confirm_delete.html"
     success_message = "The class {} has been deleted with all its attached content"
 
@@ -279,21 +276,21 @@ class SubjectCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Subject
     form_class = SubjectForm
     template_name = "corecode/mgt_form.html"
-    success_url = reverse_lazy("subjects")
+    success_url = reverse_lazy("corecode:subjects")  # FIXED: Added namespace
     success_message = "New subject successfully added"
 
 
 class SubjectUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Subject
     fields = ["name"]
-    success_url = reverse_lazy("subjects")
+    success_url = reverse_lazy("corecode:subjects")  # FIXED: Added namespace
     success_message = "Subject successfully updated."
     template_name = "corecode/mgt_form.html"
 
 
 class SubjectDeleteView(LoginRequiredMixin, DeleteView):
     model = Subject
-    success_url = reverse_lazy("subjects")
+    success_url = reverse_lazy("corecode:subjects")  # FIXED: Added namespace
     template_name = "corecode/core_confirm_delete.html"
     success_message = "The subject {} has been deleted with all its attached content"
 
@@ -417,6 +414,7 @@ def login_view(request):
     else:
         form = AuthenticationForm()
     return render(request, 'registration/login.html', {'form': form})
+
 
 def landing_view(request):
     if request.user.is_authenticated:
