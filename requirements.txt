@@ -20,4 +20,3 @@ pandas
 openpyxl
 psycopg2-binary
 africastalking==1.2.6
-
