@@ -103,20 +103,23 @@ WSGI_APPLICATION = "school_app.wsgi.application"
 # -------------------------------
 # DATABASE CONFIGURATION
 # -------------------------------
-# Use SQLite for local development by default
-DEFAULT_LOCAL_DB = f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}"
-
-# Use DATABASE_URL if provided (Railway or any production host)
-DATABASE_URL = os.environ.get("DATABASE_URL", DEFAULT_LOCAL_DB)
-
-# Parse database URL with dj_database_url
-DATABASES = {
-    "default": dj_database_url.config(
-        default=DATABASE_URL,
-        conn_max_age=600,
-        ssl_require=not DEBUG,  # SSL required in production
-    )
-}
+# Force SQLite for local development (when DEBUG is True)
+if DEBUG:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        }
+    }
+else:
+    # In production, use DATABASE_URL (e.g., from Railway/Render)
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=os.environ.get("DATABASE_URL"),
+            conn_max_age=600,
+            ssl_require=True,  # SSL required in production
+        )
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

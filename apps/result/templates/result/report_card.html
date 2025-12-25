@@ -26,8 +26,16 @@
       <div class="metric">
         <div class="metric-label"><i class="fas fa-trophy mr-1"></i>Class Position</div>
         <div class="metric-value">
-          {{ position_data.position }}{% if position_data.position == 1 %}st{% elif position_data.position == 2 %}nd{%
-          elif position_data.position == 3 %}rd{% else %}th{% endif %}
+          {% with pos=position_data.position %}
+            {{ pos }}
+            {% if pos|add:0 >= 11 and pos|add:0 <= 13 %}
+              th
+            {% else %}
+              {% with last=pos|stringformat:"i"|slice:"-1" %}
+                {% if last == "1" %}st{% elif last == "2" %}nd{% elif last == "3" %}rd{% else %}th{% endif %}
+              {% endwith %}
+            {% endif %}
+          {% endwith %}
         </div>
         <div class="position-info">out of {{ position_data.total_students }} students</div>
       </div>

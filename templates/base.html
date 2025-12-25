@@ -799,6 +799,50 @@
               </a>
             </li>
 
+            <!-- Attendance Section -->
+            <li class="nav-header">Attendance</li>
+            <li class="nav-item has-treeview">
+              <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-check-square"></i>
+                <p>
+                  Attendance
+                  <i class="fas fa-angle-left right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="{% url 'attendance:daily_dashboard' %}" class="nav-link">
+                    <i class="nav-icon fas fa-tachometer-alt"></i>
+                    <p>Dashboard</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'attendance:register_list' %}" class="nav-link">
+                    <i class="nav-icon fas fa-list"></i>
+                    <p>Registers</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'attendance:register_create' %}" class="nav-link">
+                    <i class="nav-icon fas fa-plus-circle"></i>
+                    <p>New Register</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'attendance:history' %}" class="nav-link">
+                    <i class="nav-icon fas fa-history"></i>
+                    <p>History</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'staffs:mark-attendance' %}" class="nav-link">
+                    <i class="nav-icon fas fa-user-check"></i>
+                    <p>Take Staff Attendance</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+
             <!-- Finance Section -->
             <li class="nav-header">Finance</li>
             <li class="nav-item">

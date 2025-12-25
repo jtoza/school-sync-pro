@@ -1,6 +1,6 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -12,13 +12,14 @@ import csv
 
 from apps.corecode.models import StudentClass, AcademicTerm, AcademicSession
 from apps.students.models import Student
+from apps.staffs.models import Staff, TeacherAttendance
+from django.core.paginator import Paginator
 
 from .forms import AttendanceRegisterForm, AttendanceEntryForm, BulkRegisterForm, DailyAttendanceConfigForm
 from .models import AttendanceRegister, AttendanceEntry, AttendanceSummary, DailyAttendanceConfig
 
 
-class AttendanceRegisterListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
-    permission_required = 'attendance.view_attendanceregister'
+class AttendanceRegisterListView(LoginRequiredMixin, ListView):
     model = AttendanceRegister
     template_name = 'attendance/register_list.html'
     paginate_by = 20
@@ -47,8 +48,7 @@ class AttendanceRegisterListView(LoginRequiredMixin, PermissionRequiredMixin, Li
         return context
 
 
-class AttendanceRegisterCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
-    permission_required = 'attendance.add_attendanceregister'
+class AttendanceRegisterCreateView(LoginRequiredMixin, CreateView):
     model = AttendanceRegister
     form_class = AttendanceRegisterForm
     template_name = 'attendance/register_form.html'
@@ -73,8 +73,7 @@ class AttendanceRegisterCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
         return super().form_valid(form)
 
 
-class AttendanceRegisterDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
-    permission_required = 'attendance.view_attendanceregister'
+class AttendanceRegisterDetailView(LoginRequiredMixin, DetailView):
     model = AttendanceRegister
     template_name = 'attendance/register_detail.html'
 
@@ -91,8 +90,7 @@ class AttendanceRegisterDetailView(LoginRequiredMixin, PermissionRequiredMixin, 
         return context
 
 
-class AttendanceRegisterUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
-    permission_required = 'attendance.change_attendanceregister'
+class AttendanceRegisterUpdateView(LoginRequiredMixin, UpdateView):
     model = AttendanceRegister
     form_class = AttendanceRegisterForm
     template_name = 'attendance/register_form.html'
@@ -103,8 +101,7 @@ class AttendanceRegisterUpdateView(LoginRequiredMixin, PermissionRequiredMixin, 
         return super().form_valid(form)
 
 
-class AttendanceRegisterDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
-    permission_required = 'attendance.delete_attendanceregister'
+class AttendanceRegisterDeleteView(LoginRequiredMixin, DeleteView):
     model = AttendanceRegister
     template_name = 'attendance/register_confirm_delete.html'
     success_url = reverse_lazy('attendance:register_list')
@@ -114,8 +111,7 @@ class AttendanceRegisterDeleteView(LoginRequiredMixin, PermissionRequiredMixin, 
         return super().delete(request, *args, **kwargs)
 
 
-class BulkRegisterCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = 'attendance.can_bulk_create'
+class BulkRegisterCreateView(LoginRequiredMixin, View):
     template_name = 'attendance/bulk_register_create.html'
 
     def get(self, request):
@@ -166,7 +162,6 @@ class BulkRegisterCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
 
 @login_required
-@permission_required('attendance.change_attendanceentry', raise_exception=True)
 def take_attendance(request, pk):
     register = get_object_or_404(AttendanceRegister, pk=pk)
     
@@ -212,7 +207,6 @@ def take_attendance(request, pk):
 
 
 @login_required
-@permission_required('attendance.can_lock_register', raise_exception=True)
 def lock_register(request, pk):
     register = get_object_or_404(AttendanceRegister, pk=pk)
     register.is_locked = True
@@ -222,7 +216,6 @@ def lock_register(request, pk):
 
 
 @login_required
-@permission_required('attendance.can_lock_register', raise_exception=True)
 def unlock_register(request, pk):
     register = get_object_or_404(AttendanceRegister, pk=pk)
     register.is_locked = False
@@ -231,8 +224,7 @@ def unlock_register(request, pk):
     return redirect('attendance:register_detail', pk=register.pk)
 
 
-class AttendanceReportView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = 'attendance.view_attendanceregister'
+class AttendanceReportView(LoginRequiredMixin, View):
     template_name = 'attendance/attendance_reports.html'
 
     def get(self, request):
@@ -327,5 +319,66 @@ class DailyAttendanceDashboard(LoginRequiredMixin, View):
             'total_classes': total_classes,
             'registers_today': registers_today,
             'pending_today': pending_today,
+        }
+        return render(request, self.template_name, context)
+
+
+class AttendanceHistoryView(LoginRequiredMixin, View):
+    template_name = 'attendance/history.html'
+
+    def get(self, request):
+        # Teacher filters
+        teacher_id = request.GET.get('teacher')
+        t_month = request.GET.get('t_month')
+        t_status = request.GET.get('t_status')
+
+        teacher_qs = TeacherAttendance.objects.select_related('teacher').all().order_by('-date', 'teacher__surname')
+        if teacher_id:
+            teacher_qs = teacher_qs.filter(teacher_id=teacher_id)
+        if t_month:
+            teacher_qs = teacher_qs.filter(date__month=t_month)
+        if t_status:
+            teacher_qs = teacher_qs.filter(status=t_status)
+
+        t_paginator = Paginator(teacher_qs, 20)
+        t_page = request.GET.get('t_page')
+        t_page_obj = t_paginator.get_page(t_page)
+
+        # Student filters
+        s_class = request.GET.get('s_class')
+        s_date_from = request.GET.get('s_date_from')
+        s_date_to = request.GET.get('s_date_to')
+        s_locked = request.GET.get('s_locked')  # 'locked', 'open' or ''
+
+        register_qs = AttendanceRegister.objects.select_related('student_class', 'term', 'session').all().order_by('-date', 'student_class__name')
+        if s_class:
+            register_qs = register_qs.filter(student_class_id=s_class)
+        if s_date_from:
+            register_qs = register_qs.filter(date__gte=s_date_from)
+        if s_date_to:
+            register_qs = register_qs.filter(date__lte=s_date_to)
+        if s_locked == 'locked':
+            register_qs = register_qs.filter(is_locked=True)
+        elif s_locked == 'open':
+            register_qs = register_qs.filter(is_locked=False)
+
+        s_paginator = Paginator(register_qs, 20)
+        s_page = request.GET.get('s_page')
+        s_page_obj = s_paginator.get_page(s_page)
+
+        context = {
+            't_page_obj': t_page_obj,
+            's_page_obj': s_page_obj,
+            'teachers': Staff.objects.filter(current_status='active'),
+            'classes': StudentClass.objects.all(),
+            'filters': {
+                'teacher': teacher_id,
+                't_month': t_month,
+                't_status': t_status,
+                's_class': s_class,
+                's_date_from': s_date_from,
+                's_date_to': s_date_to,
+                's_locked': s_locked,
+            }
         }
         return render(request, self.template_name, context)

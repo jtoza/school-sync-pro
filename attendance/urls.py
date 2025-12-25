@@ -17,4 +17,5 @@ urlpatterns = [
     path('reports/', views.AttendanceReportView.as_view(), name='attendance_reports'),
     path('api/summary-data/', views.attendance_summary_data, name='attendance_summary_data'),
     path('dashboard/', views.DailyAttendanceDashboard.as_view(), name='daily_dashboard'),
+    path('history/', views.AttendanceHistoryView.as_view(), name='history'),
 ]

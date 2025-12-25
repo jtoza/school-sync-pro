@@ -37,7 +37,7 @@
         </thead>
         <tbody>
           {% for student in object_list %}
-          <tr class='clickable-row' data-href="{% url 'students:student-detail' student.id %}"></tr>
+          <tr class='clickable-row' data-href="{% url 'students:student-detail' student.id %}">
             <td class="text-center">{{ forloop.counter}}</td>
             <td>
               <div class="d-flex align-items-center">
@@ -49,7 +49,11 @@
                   </div>
                 {% endif %}
                 <div class="student-info-mobile">
-                  <div class="font-weight-bold">{{ student.surname }} {{ student.firstname|first }}.</div>
+                  <div class="font-weight-bold">
+                    <a href="{% url 'students:student-detail' student.id %}" class="text-body" style="text-decoration:none;">
+                      {{ student.surname }} {{ student.firstname }}{% if student.other_name %} {{ student.other_name }}{% endif %}
+                    </a>
+                  </div>
                   <small class="text-muted d-block d-md-none">{{ student.registration_number }}</small>
                   <small class="text-muted d-block d-sm-none">{{ student.current_class }}</small>
                 </div>
