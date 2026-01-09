@@ -21,3 +21,4 @@ openpyxl
 psycopg2-binary
 africastalking==1.2.6
 lipana==1.0.1
+channels==4.0.0
