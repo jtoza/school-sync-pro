@@ -7,6 +7,7 @@ from django.template.loader import get_template
 from io import BytesIO
 from django.http import HttpResponse
 from django.conf import settings
+from django.template.loader import render_to_string
 import os
 import logging
 
@@ -19,6 +20,7 @@ from apps.finance.models import Invoice, Receipt
 from attendance.models import AttendanceEntry, AttendanceRegister
 from .forms import CreateResults, EditResults
 from .models import Result
+from .utils_pdf import generate_pdf_from_html_content
 
 
 @login_required
@@ -355,43 +357,22 @@ def report_card(request, student_id):
 @login_required
 def render_to_pdf(request, template_src, context_dict={}):
     """
-    Render HTML template to PDF using Playwright (Windows-friendly).
+    Render HTML template to PDF using our wrapper.
     Falls back to xhtml2pdf if Playwright is not available.
     """
-    template = get_template(template_src)
-    html_content = template.render(context=context_dict, request=request)
-    
-    # Try Playwright first (best for Windows, no system dependencies)
+    html = render_to_string(template_src, context_dict)
+    output_path = f"/tmp/temp_report.pdf"
+
     try:
-        from playwright.sync_api import sync_playwright
-        
-        result = BytesIO()
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            page = browser.new_page()
-            
-            # Build absolute base URL for resolving static and media files
-            base_url = request.build_absolute_uri('/')
-            
-            # Set content with base URL for resolving relative paths
-            page.set_content(html_content)
-            
-            # Generate PDF
-            pdf_bytes = page.pdf(
-                format='A4',
-                margin={'top': '16mm', 'right': '14mm', 'bottom': '16mm', 'left': '14mm'},
-                print_background=True
-            )
-            
-            result.write(pdf_bytes)
-            browser.close()
-        
-        result.seek(0)
-        return HttpResponse(result.getvalue(), content_type='application/pdf')
-    
-    except ImportError:
-        # Playwright not installed, fallback to xhtml2pdf
-        logger.warning('Playwright not available, falling back to xhtml2pdf')
+        # Generate PDF using Playwright wrapper
+        generate_pdf_from_html_content(html, output_path)
+
+        with open(output_path, "rb") as f:
+            return HttpResponse(f.read(), content_type="application/pdf")
+
+    except Exception as e:
+        # Fallback to xhtml2pdf if Playwright fails
+        logger.warning(f'Playwright PDF generation failed: {str(e)}')
         try:
             from xhtml2pdf import pisa
             from django.contrib.staticfiles import finders
@@ -438,7 +419,7 @@ def render_to_pdf(request, template_src, context_dict={}):
             
             result = BytesIO()
             pdf = pisa.pisaDocument(
-                BytesIO(html_content.encode('UTF-8')), 
+                BytesIO(html.encode('UTF-8')), 
                 result, 
                 encoding='UTF-8', 
                 link_callback=link_callback
