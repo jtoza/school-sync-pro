@@ -23,7 +23,7 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 # Allowed hosts
 ALLOWED_HOSTS = os.getenv(
     'ALLOWED_HOSTS',
-    'localhost,127.0.0.1,edusync-5jgu.onrender.com,school-management-framework.onrender.com,school-sync-pro-production.up.railway.app,192.168.100.12,strengthen-faces-del-newcastle.trycloudflare.com'
+    'localhost,127.0.0.1,edusync-5jgu.onrender.com,school-management-framework.onrender.com,school-sync-pro-production.up.railway.app,192.168.100.12,strengthen-faces-del-newcastle.trycloudflare.com,school-sync-pro.onrender.com'
 ).split(',')
 
 # Application definition
@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'student_portfolio',
     'backup_manager',
     'apps.homework',
+    'chatroom',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -189,6 +191,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://school-management-framework.onrender.com",
     "https://edusync-5jgu.onrender.com",
     "https://school-sync-pro-production.up.railway.app",
+    "https://school-sync-pro.onrender.com"
 ]
 
 # Backup configuration
@@ -213,6 +216,15 @@ LIPANA_SECRET_KEY = os.getenv('LIPANA_SECRET_KEY')
 LIPANA_ACCESS_TOKEN_URL = "https://lipana.dev/api/v1/auth/token/"
 LIPANA_STK_PUSH_URL = "https://lipana.dev/api/v1/mpesa/stk/push/"
 
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 # Africa's Talking SMS Configuration
 AFRICASTALKING_USERNAME = os.getenv('AFRICASTALKING_USERNAME', 'sandbox')
 AFRICASTALKING_API_KEY = os.getenv('AFRICASTALKING_API_KEY', '')

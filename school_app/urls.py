@@ -58,6 +58,7 @@ urlpatterns = [
     path('portfolio/', include('student_portfolio.urls')),
     path('backup/', include('backup_manager.urls')),
     path('homework/', include('apps.homework.urls')),
+    path('chat/', include('chatroom.urls', namespace='chatroom')),
 ]
 
 if settings.DEBUG:
