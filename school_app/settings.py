@@ -4,6 +4,7 @@ Optimized for Railway PostgreSQL + Render hosting.
 """
 
 import os
+import sys
 from dotenv import load_dotenv
 import dj_database_url
 
@@ -14,19 +15,19 @@ load_dotenv()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Security
-SECRET_KEY = os.getenv('SECRET_KEY', 'unsafe-default-key-change-in-production')
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-this-in-production')
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-# Allowed hosts
-ALLOWED_HOSTS = os.getenv(
-    'ALLOWED_HOSTS',
-    'localhost,127.0.0.1,.onrender.com'
-).split(',')
+# Allowed hosts - FIXED
+allowed_hosts_str = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,.onrender.com')
+ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',') if host.strip()]
 
 # Render external hostname support
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+if RENDER_EXTERNAL_HOSTNAME and RENDER_EXTERNAL_HOSTNAME.strip():
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME.strip())
+
+print(f"🌐 ALLOWED_HOSTS: {ALLOWED_HOSTS}")
 
 # Application definition
 INSTALLED_APPS = [
@@ -95,48 +96,81 @@ WSGI_APPLICATION = "school_app.wsgi.application"
 def get_database_config():
     """
     Railway PostgreSQL configuration
-    Use DATABASE_PUBLIC_URL for external connections (Render)
     """
     db_url = os.getenv('DATABASE_URL')
     
-    if db_url:
-        print(f"🚂 Connecting to Railway PostgreSQL at shortline.proxy.rlwy.net:48274")
+    if db_url and db_url.strip():
+        print(f"🚂 DATABASE_URL found! Connecting to Railway PostgreSQL...")
         
-        # Parse database URL
-        db_config = dj_database_url.parse(
-            db_url,
-            conn_max_age=600,
-            conn_health_checks=True,
-            ssl_require=True,
-        )
-        
-        # Ensure PostgreSQL backend
-        db_config['ENGINE'] = 'django.db.backends.postgresql'
-        
-        # Railway PostgreSQL optimizations
-        db_config.setdefault('OPTIONS', {})
-        
-        # SSL and connection settings for Railway
-        db_config['OPTIONS'].update({
-            'sslmode': 'require',
-            'connect_timeout': 15,
-            'keepalives': 1,
-            'keepalives_idle': 30,
-            'keepalives_interval': 10,
-            'keepalives_count': 5,
-        })
-        
-        return {'default': db_config}
+        try:
+            # Parse database URL
+            db_config = dj_database_url.parse(
+                db_url.strip(),
+                conn_max_age=600,
+                conn_health_checks=True,
+                ssl_require=True,
+            )
+            
+            # Ensure PostgreSQL backend
+            db_config['ENGINE'] = 'django.db.backends.postgresql'
+            
+            # Add SSL requirement
+            db_config.setdefault('OPTIONS', {})
+            db_config['OPTIONS']['sslmode'] = 'require'
+            
+            # Show connection info (without password)
+            safe_url = db_url.replace(db_url.split('@')[0].split(':')[2], '***')
+            print(f"✅ Configured for: {safe_url}")
+            
+            return {'default': db_config}
+            
+        except Exception as e:
+            print(f"❌ Error parsing DATABASE_URL: {e}")
+            print("📁 Falling back to SQLite")
     else:
-        print("📁 Using SQLite for local development")
-        return {
-            "default": {
-                "ENGINE": "django.db.backends.sqlite3",
-                "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
-            }
+        print("⚠️  DATABASE_URL not found or empty")
+    
+    # Fallback to SQLite
+    print("📁 Using SQLite for local development")
+    return {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
         }
+    }
 
 DATABASES = get_database_config()
+
+# ============================================
+# CSRF CONFIGURATION - FIXED FOR DJANGO 4.0+
+# ============================================
+csrf_origins_str = os.getenv('CSRF_TRUSTED_ORIGINS', '')
+CSRF_TRUSTED_ORIGINS = []
+
+if csrf_origins_str and csrf_origins_str.strip():
+    origins = [origin.strip() for origin in csrf_origins_str.split(',') if origin.strip()]
+    # Filter out invalid origins (must start with http:// or https://)
+    valid_origins = []
+    for origin in origins:
+        if origin.startswith('http://') or origin.startswith('https://'):
+            valid_origins.append(origin)
+        else:
+            print(f"⚠️  Skipping invalid CSRF origin (must start with http:// or https://): '{origin}'")
+    CSRF_TRUSTED_ORIGINS = valid_origins
+
+# Add default Render/Railway origins
+CSRF_TRUSTED_ORIGINS.extend([
+    "https://*.onrender.com",
+    "https://*.railway.app",
+])
+
+# Remove duplicates
+CSRF_TRUSTED_ORIGINS = list(set(CSRF_TRUSTED_ORIGINS))
+print(f"🔒 CSRF Trusted Origins: {CSRF_TRUSTED_ORIGINS}")
+
+# ============================================
+# REST OF YOUR SETTINGS...
+# ============================================
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -172,12 +206,6 @@ SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 10800
 
-# CSRF Trusted Origins
-CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') + [
-    "https://*.onrender.com",
-    "https://*.railway.app",
-]
-
 # Security settings for production
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
@@ -194,7 +222,7 @@ if not DEBUG:
 
 # Channels configuration (WebSockets)
 REDIS_URL = os.getenv('REDIS_URL')
-if REDIS_URL:
+if REDIS_URL and REDIS_URL.strip():
     CHANNEL_LAYERS = {
         'default': {
             'BACKEND': 'channels_redis.core.RedisChannelLayer',
@@ -259,29 +287,11 @@ LOGGING = {
             "level": "INFO",
             "propagate": True,
         },
-        "django.db.backends": {
-            "handlers": ["console"],
-            "level": "ERROR",
-            "propagate": False,
-        },
     },
 }
 
 # Data upload limits
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 
-# Test database connection on startup
-def test_db_connection():
-    from django.db import connection
-    try:
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT 1")
-            print("✅ Railway PostgreSQL connection successful!")
-    except Exception as e:
-        print(f"❌ Database connection failed: {e}")
-
-# Test on production startup
-if not DEBUG:
-    test_db_connection()
-
-print(f"🚀 Django configured for Render + Railway PostgreSQL")
+# Remove the database test that causes the warning
+print(f"🚀 Django configured. DEBUG={DEBUG}")
