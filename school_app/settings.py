@@ -1,30 +1,32 @@
 """
 Django settings for school_app project.
-
-Production-ready configuration for Railway, Render, or local development.
+Optimized for Railway PostgreSQL + Render hosting.
 """
 
 import os
 from dotenv import load_dotenv
 import dj_database_url
 
-# Load environment variables from .env if present
+# Load environment variables
 load_dotenv()
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+# Build paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', 'unsafe-default-secret')
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+# Security
+SECRET_KEY = os.getenv('SECRET_KEY', 'unsafe-default-key-change-in-production')
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 # Allowed hosts
 ALLOWED_HOSTS = os.getenv(
     'ALLOWED_HOSTS',
-    'localhost,127.0.0.1,edusync-5jgu.onrender.com,school-management-framework.onrender.com,school-sync-pro-production.up.railway.app,192.168.100.12,strengthen-faces-del-newcastle.trycloudflare.com,school-sync-pro.onrender.com'
+    'localhost,127.0.0.1,.onrender.com'
 ).split(',')
+
+# Render external hostname support
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # Application definition
 INSTALLED_APPS = [
@@ -66,21 +68,6 @@ MIDDLEWARE = [
     "apps.corecode.middleware.SiteWideConfigs",
 ]
 
-# Security headers
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-SESSION_COOKIE_HTTPONLY = True
-CSRF_COOKIE_HTTPONLY = False
-X_FRAME_OPTIONS = 'SAMEORIGIN'
-
-# Content Security Policy (CSP)
-CSP_DEFAULT_SRC = ("'self'",)
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", 'https://fonts.googleapis.com')
-CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'")
-CSP_FONT_SRC = ("'self'", 'https://fonts.gstatic.com', 'data:')
-CSP_IMG_SRC = ("'self'", 'data:')
-CSP_CONNECT_SRC = ("'self'",)
-
 ROOT_URLCONF = "school_app.urls"
 
 TEMPLATES = [
@@ -102,26 +89,54 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "school_app.wsgi.application"
 
-# -------------------------------
-# DATABASE CONFIGURATION
-# -------------------------------
-# Force SQLite for local development (when DEBUG is True)
-if DEBUG:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
-        }
-    }
-else:
-    # In production, use DATABASE_URL (e.g., from Railway/Render)
-    DATABASES = {
-        "default": dj_database_url.config(
-            default=os.environ.get("DATABASE_URL"),
+# ============================================
+# DATABASE CONFIGURATION - RAILWAY POSTGRESQL
+# ============================================
+def get_database_config():
+    """
+    Railway PostgreSQL configuration
+    Use DATABASE_PUBLIC_URL for external connections (Render)
+    """
+    db_url = os.getenv('DATABASE_URL')
+    
+    if db_url:
+        print(f"🚂 Connecting to Railway PostgreSQL at shortline.proxy.rlwy.net:48274")
+        
+        # Parse database URL
+        db_config = dj_database_url.parse(
+            db_url,
             conn_max_age=600,
-            ssl_require=True,  # SSL required in production
+            conn_health_checks=True,
+            ssl_require=True,
         )
-    }
+        
+        # Ensure PostgreSQL backend
+        db_config['ENGINE'] = 'django.db.backends.postgresql'
+        
+        # Railway PostgreSQL optimizations
+        db_config.setdefault('OPTIONS', {})
+        
+        # SSL and connection settings for Railway
+        db_config['OPTIONS'].update({
+            'sslmode': 'require',
+            'connect_timeout': 15,
+            'keepalives': 1,
+            'keepalives_idle': 30,
+            'keepalives_interval': 10,
+            'keepalives_count': 5,
+        })
+        
+        return {'default': db_config}
+    else:
+        print("📁 Using SQLite for local development")
+        return {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+            }
+        }
+
+DATABASES = get_database_config()
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -138,95 +153,135 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
-
+# Static files
 STATIC_URL = "/static/"
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+# Media files
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
 
+# Authentication
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
+# Session settings
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_COOKIE_AGE = 10800  # 3 hours
+SESSION_COOKIE_AGE = 10800
+
+# CSRF Trusted Origins
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') + [
+    "https://*.onrender.com",
+    "https://*.railway.app",
+]
+
+# Security settings for production
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    
+    # Render proxy support
+    USE_X_FORWARDED_HOST = True
+    USE_X_FORWARDED_PORT = True
+
+# Channels configuration (WebSockets)
+REDIS_URL = os.getenv('REDIS_URL')
+if REDIS_URL:
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                "hosts": [REDIS_URL],
+            },
+        },
+    }
+else:
+    # Local development fallback
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels.layers.InMemoryChannelLayer'
+        }
+    }
+
+# Email configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.getenv('EMAIL_HOST', '')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() == 'true'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER', 'no-reply@schoolapp.com')
+
+# Payment gateway
+LIPANA_PRODUCTION_KEY = os.getenv('LIPANA_PRODUCTION_KEY', '')
+LIPANA_SECRET_KEY = os.getenv('LIPANA_SECRET_KEY', '')
+LIPANA_ACCESS_TOKEN_URL = "https://lipana.dev/api/v1/auth/token/"
+LIPANA_STK_PUSH_URL = "https://lipana.dev/api/v1/mpesa/stk/push/"
+
+# SMS configuration
+AFRICASTALKING_USERNAME = os.getenv('AFRICASTALKING_USERNAME', '')
+AFRICASTALKING_API_KEY = os.getenv('AFRICASTALKING_API_KEY', '')
+AFRICASTALKING_SENDER_ID = os.getenv('AFRICASTALKING_SENDER_ID', '')
+
+# Crispy Forms
+CRISPY_TEMPLATE_PACK = "bootstrap4"
+
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 # Logging
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "verbose": {"format": "{levelname} {asctime} {message}", "style": "{"},
+        "simple": {
+            "format": "{levelname} {asctime} {module} {message}",
+            "style": "{",
+        },
     },
     "handlers": {
-        "file": {
+        "console": {
             "level": "INFO",
-            "class": "logging.handlers.TimedRotatingFileHandler",
-            "when": "W6",
-            "interval": 4,
-            "backupCount": 3,
-            "encoding": "utf8",
-            "filename": os.path.join(BASE_DIR, "debug.log"),
-            "formatter": "verbose",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
         },
     },
     "loggers": {
-        "django": {"handlers": ["file"], "level": "INFO", "propagate": True,},
-    },
-}
-
-DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
-
-# Crispy Forms
-CRISPY_TEMPLATE_PACK = "bootstrap4"
-
-# CSRF Trusted Origins
-CSRF_TRUSTED_ORIGINS = [
-    "https://strengthen-faces-del-newcastle.trycloudflare.com",
-    "https://school-management-framework.onrender.com",
-    "https://edusync-5jgu.onrender.com",
-    "https://school-sync-pro-production.up.railway.app",
-    "https://school-sync-pro.onrender.com"
-]
-
-# Backup configuration
-BACKUP_CONFIG = {
-    'ENABLED': True,
-    'BACKUP_DIR': 'backups/',
-    'EXPORT_DIR': 'exports/',
-    'RETENTION_DAYS': 30,
-    'CLOUD_STORAGE': False,
-}
-
-# Export formats
-EXPORT_FORMATS = ['excel', 'pdf']
-
-# Email defaults
-DEFAULT_FROM_EMAIL = 'no-reply@yourschool.com'
-BACKUP_EMAIL_TO = ['youraddress@example.com']
-
-# Lipana.dev Configuration
-LIPANA_PRODUCTION_KEY = os.getenv('LIPANA_PRODUCTION_KEY')
-LIPANA_SECRET_KEY = os.getenv('LIPANA_SECRET_KEY')
-LIPANA_ACCESS_TOKEN_URL = "https://lipana.dev/api/v1/auth/token/"
-LIPANA_STK_PUSH_URL = "https://lipana.dev/api/v1/mpesa/stk/push/"
-
-
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "django.db.backends": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
         },
     },
 }
-# Africa's Talking SMS Configuration
-AFRICASTALKING_USERNAME = os.getenv('AFRICASTALKING_USERNAME', 'sandbox')
-AFRICASTALKING_API_KEY = os.getenv('AFRICASTALKING_API_KEY', '')
-AFRICASTALKING_SENDER_ID = os.getenv('AFRICASTALKING_SENDER_ID', 'GREEN_BELLS')
 
+# Data upload limits
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
+
+# Test database connection on startup
+def test_db_connection():
+    from django.db import connection
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            print("✅ Railway PostgreSQL connection successful!")
+    except Exception as e:
+        print(f"❌ Database connection failed: {e}")
+
+# Test on production startup
+if not DEBUG:
+    test_db_connection()
+
+print(f"🚀 Django configured for Render + Railway PostgreSQL")

@@ -8,6 +8,7 @@ from django.http import HttpResponse, FileResponse
 from django.http import HttpResponse, FileResponse
 import os
 from apps.corecode import views
+from apps.corecode.views_test import test_database
 
 # Custom redirect view to handle the accounts/login issue
 def redirect_to_login(request):
@@ -59,6 +60,8 @@ urlpatterns = [
     path('backup/', include('backup_manager.urls')),
     path('homework/', include('apps.homework.urls')),
     path('chat/', include('chatroom.urls', namespace='chatroom')),
+    path('test-db/', test_database, name='test_db'),
+
 ]
 
 if settings.DEBUG:
