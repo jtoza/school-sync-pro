@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import DetailView, ListView, View
+from django.views.generic import View
 from django.template.loader import get_template
 from io import BytesIO
 from django.http import HttpResponse
@@ -150,6 +150,8 @@ def create_result(request):
                                         current_class=stu.current_class,
                                         subject=subject,
                                         student=stu,
+                                        test_score=0,  # Explicitly set initial score to 0
+                                        exam_score=0,  # Explicitly set initial score to 0
                                     )
                                 )
 
@@ -172,7 +174,7 @@ def create_result(request):
                 {"students": studentlist, "form": form, "count": len(id_list)},
             )
         else:
-            messages.warning(request, "You didnt select any student.")
+            messages.warning(request, "You didn't select any student.")
     return render(request, "result/create_result.html", {"students": students})
 
 
@@ -245,26 +247,25 @@ class ResultListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         results = Result.objects.filter(
             session=request.current_session, term=request.current_term
-        )
+        ).select_related('student', 'subject')
         bulk = {}
 
         for result in results:
-            test_total = 0
-            exam_total = 0
-            subjects = []
-            for subject in results:
-                if subject.student == result.student:
-                    subjects.append(subject)
-                    test_total += subject.test_score
-                    exam_total += subject.exam_score
-
-            bulk[result.student.id] = {
-                "student": result.student,
-                "subjects": subjects,
-                "test_total": test_total,
-                "exam_total": exam_total,
-                "total_total": test_total + exam_total,
-            }
+            if result.student.id not in bulk:
+                # Initialize student entry
+                bulk[result.student.id] = {
+                    "student": result.student,
+                    "subjects": [],
+                    "test_total": 0,
+                    "exam_total": 0,
+                    "total_total": 0,
+                }
+            
+            # Add this subject result
+            bulk[result.student.id]["subjects"].append(result)
+            bulk[result.student.id]["test_total"] += (result.test_score or 0)
+            bulk[result.student.id]["exam_total"] += (result.exam_score or 0)
+            bulk[result.student.id]["total_total"] += result.total_score()
 
         context = {"results": bulk}
         return render(request, "result/all_results.html", context)
