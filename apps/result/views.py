@@ -2,7 +2,11 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render
+<<<<<<< HEAD
 from django.views.generic import DetailView, ListView, View
+=======
+from django.views.generic import View
+>>>>>>> b00086b8e144822c2ac905dccb242c0f0965c7ec
 from django.template.loader import get_template
 from io import BytesIO
 from django.http import HttpResponse
@@ -73,6 +77,7 @@ def results_access(request):
 
 @login_required
 def student_performance(request):
+<<<<<<< HEAD
     """
     Show student's performance trend across session/term with insights.
     Returns labels, totals series, and analytics like best/worst term, streak and overall average.
@@ -100,11 +105,25 @@ def student_performance(request):
             from django.db.models import Avg, F, FloatField, ExpressionWrapper
 
             # Build ordered unique (session, term) keys based on available results
+=======
+    student = None
+    labels = []
+    totals = []
+    reg = request.GET.get("reg")
+    if reg:
+        student = Student.objects.filter(registration_number=reg).first()
+        if student:
+            # Aggregate average total per (session, term)
+>>>>>>> b00086b8e144822c2ac905dccb242c0f0965c7ec
             data = (
                 Result.objects.filter(student=student)
                 .values_list("session__name", "term__name")
                 .order_by("session__name", "term__name")
             )
+<<<<<<< HEAD
+=======
+            # Build a stable unique ordered list
+>>>>>>> b00086b8e144822c2ac905dccb242c0f0965c7ec
             seen = set()
             ordered_keys = []
             for s, t in data:
@@ -112,6 +131,7 @@ def student_performance(request):
                 if key not in seen:
                     seen.add(key)
                     ordered_keys.append((s, t))
+<<<<<<< HEAD
 
             if ordered_keys:
                 # Compute CA avg, Exam avg and Total avg per (session, term) without nested aggregates
@@ -202,6 +222,21 @@ def student_performance(request):
         "insights": insights,
         "reg": reg,
     }
+=======
+            from django.db.models import Avg, F, FloatField, ExpressionWrapper
+            qs = (
+                Result.objects.filter(student=student)
+                .values("session__name", "term__name")
+                .annotate(total=ExpressionWrapper(F("test_score") + F("exam_score"), output_field=FloatField()))
+                .values("session__name", "term__name")
+                .annotate(avg_total=Avg("total"))
+                .order_by("session__name", "term__name")
+            )
+            agg = {(row["session__name"], row["term__name"]): row["avg_total"] for row in qs}
+            labels = [f"{s} {t}" for s, t in ordered_keys]
+            totals = [round(agg.get((s, t), 0), 2) for s, t in ordered_keys]
+    context = {"student": student, "labels": labels, "totals": totals}
+>>>>>>> b00086b8e144822c2ac905dccb242c0f0965c7ec
     return render(request, "result/student_performance.html", context)
 
 
@@ -245,6 +280,11 @@ def create_result(request):
                                         current_class=stu.current_class,
                                         subject=subject,
                                         student=stu,
+<<<<<<< HEAD
+=======
+                                        test_score=0,  # Explicitly set initial score to 0
+                                        exam_score=0,  # Explicitly set initial score to 0
+>>>>>>> b00086b8e144822c2ac905dccb242c0f0965c7ec
                                     )
                                 )
 
@@ -267,13 +307,18 @@ def create_result(request):
                 {"students": studentlist, "form": form, "count": len(id_list)},
             )
         else:
+<<<<<<< HEAD
             messages.warning(request, "You didnt select any student.")
+=======
+            messages.warning(request, "You didn't select any student.")
+>>>>>>> b00086b8e144822c2ac905dccb242c0f0965c7ec
     return render(request, "result/create_result.html", {"students": students})
 
 
 @login_required
 def edit_results(request):
     if request.method == "POST":
+<<<<<<< HEAD
         # Rebuild the same queryset used when rendering the formset
         selected_student_ids = request.session.get('selected_students', [])
         selected_subject_ids = request.session.get('selected_subjects', [])
@@ -295,15 +340,27 @@ def edit_results(request):
 
         # Bind POST to the exact queryset so submitted forms map correctly
         formset = EditResults(request.POST, queryset=results)
+=======
+        # Get the formset from POST data
+        formset = EditResults(request.POST)
+>>>>>>> b00086b8e144822c2ac905dccb242c0f0965c7ec
         if formset.is_valid():
             formset.save()
             messages.success(request, "Results successfully updated")
             
             # Clear session data after successful save
+<<<<<<< HEAD
             for key in ('selected_students', 'selected_subjects', 'results_session', 'results_term'):
                 if key in request.session:
                     del request.session[key]
             
+=======
+            if 'selected_students' in request.session:
+                del request.session['selected_students']
+            if 'selected_subjects' in request.session:
+                del request.session['selected_subjects']
+                
+>>>>>>> b00086b8e144822c2ac905dccb242c0f0965c7ec
             return redirect("edit-results")
     else:
         # Get selected students from session
@@ -358,6 +415,7 @@ class ResultListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         results = Result.objects.filter(
             session=request.current_session, term=request.current_term
+<<<<<<< HEAD
         )
         bulk = {}
 
@@ -378,6 +436,27 @@ class ResultListView(LoginRequiredMixin, View):
                 "exam_total": exam_total,
                 "total_total": test_total + exam_total,
             }
+=======
+        ).select_related('student', 'subject')
+        bulk = {}
+
+        for result in results:
+            if result.student.id not in bulk:
+                # Initialize student entry
+                bulk[result.student.id] = {
+                    "student": result.student,
+                    "subjects": [],
+                    "test_total": 0,
+                    "exam_total": 0,
+                    "total_total": 0,
+                }
+            
+            # Add this subject result
+            bulk[result.student.id]["subjects"].append(result)
+            bulk[result.student.id]["test_total"] += (result.test_score or 0)
+            bulk[result.student.id]["exam_total"] += (result.exam_score or 0)
+            bulk[result.student.id]["total_total"] += result.total_score()
+>>>>>>> b00086b8e144822c2ac905dccb242c0f0965c7ec
 
         context = {"results": bulk}
         return render(request, "result/all_results.html", context)

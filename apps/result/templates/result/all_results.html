@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+<<<<<<< HEAD
 {% load static %}
 
 {% block title %}All Results{% endblock %}
@@ -33,10 +34,31 @@
               <th class="text-end">Exam</th>
               <th class="text-end">Total</th>
               <th class="text-center">Grade</th>
+=======
+
+{% block fullcard %}
+
+  {% for key, result in results.items %}
+    <div class="card">
+      <div class="card-header">
+        {{result.student}}
+      </div>
+      <div class="card-body">
+        <table class="table table-bordered table-sm">
+          <thead class="thead-light">
+            <tr>
+              <th></th>
+              <th>Subject</th>
+              <th>Test Score</th>
+              <th>Exam Score</th>
+              <th>Total Score</th>
+              <th>Grade</th>
+>>>>>>> b00086b8e144822c2ac905dccb242c0f0965c7ec
             </tr>
           </thead>
           <tbody>
             {% for subject in result.subjects %}
+<<<<<<< HEAD
             <tr>
               <td class="text-muted">{{ forloop.counter }}</td>
               <td>{{ subject.subject }}</td>
@@ -67,10 +89,29 @@
               <td class="text-end fw-semibold">{{ result.test_total }}</td>
               <td class="text-end fw-semibold">{{ result.exam_total }}</td>
               <td class="text-end fw-semibold">{{ result.total_total }}</td>
+=======
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ subject.subject }}</td>
+                <td>{{ subject.test_score }}</td>
+                <td>{{ subject.exam_score }}</td>
+                <td>{{ subject.total_score }}</td>
+                <td>{{ subject.grade }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2"></td>
+              <td>{{ result.test_total }}</td>
+              <td>{{ result.exam_total }}</td>
+              <td>{{ result.total_total }}</td>
+>>>>>>> b00086b8e144822c2ac905dccb242c0f0965c7ec
               <td></td>
             </tr>
           </tfoot>
         </table>
+<<<<<<< HEAD
       </div>
     </div>
   </div>
@@ -88,3 +129,14 @@
   .border-warning-subtle { border-color: rgba(255, 193, 7, .35) !important; }
 </style>
 {% endblock %}
+=======
+
+
+
+
+      </div>
+    </div>
+  {% endfor %}
+
+{% endblock fullcard %}
+>>>>>>> b00086b8e144822c2ac905dccb242c0f0965c7ec
