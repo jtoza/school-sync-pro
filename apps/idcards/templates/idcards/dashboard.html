@@ -1,0 +1,462 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+ID Card Management
+{% endblock title %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body py-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="card-title mb-1">
+                                <i class="fas fa-id-card me-3"></i>ID Card Management
+                            </h2>
+                            <p class="card-text opacity-75 mb-0">Generate and manage student identification cards</p>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-light text-primary fs-6 p-2">GREEN BELLS ACADEMY</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Students
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_students }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                ID Cards Generated
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ idcards_generated }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-id-card fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Expired Cards
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ expired_cards }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Coverage
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {% if total_students > 0 %}
+                                    {{ coverage_percentage }}%
+                                {% else %}
+                                    0%
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-percentage fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title mb-0 text-primary">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <a href="{% url 'idcards:bulk-generate' %}" class="btn btn-primary btn-lg w-100 h-100 py-3 action-btn">
+                                <i class="fas fa-layer-group fa-2x mb-2"></i><br>
+                                Bulk Generate<br>
+                                <small class="action-subtitle">All Students</small>
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <a href="{% url 'idcards:generate-idcard-search' %}" class="btn btn-success btn-lg w-100 h-100 py-3 action-btn">
+                                <i class="fas fa-search fa-2x mb-2"></i><br>
+                                Search & Generate<br>
+                                <small class="action-subtitle">By Registration</small>
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <a href="{% url 'idcards:bulk-generate-teachers' %}" class="btn btn-danger btn-lg w-100 h-100 py-3 action-btn">
+                                <i class="fas fa-chalkboard-teacher fa-2x mb-2"></i><br>
+                                Teacher IDs<br>
+                                <small class="action-subtitle">Staff Cards</small>
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <a href="{% url 'idcards:idcard-list' %}" class="btn btn-info btn-lg w-100 h-100 py-3 action-btn">
+                                <i class="fas fa-list fa-2x mb-2"></i><br>
+                                View All Cards<br>
+                                <small class="action-subtitle">Manage ID Cards</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ID Card Search Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-gradient-info text-white py-3">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-id-card-alt me-2"></i>Quick ID Card Generator
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-lg-8 mb-3 mb-lg-0">
+                            <p class="mb-2 text-dark">
+                                <strong>Generate ID Card by Registration Number</strong>
+                            </p>
+                            <p class="text-muted small mb-0">
+                                Enter a student's registration number to quickly generate their ID card
+                            </p>
+                        </div>
+                        <div class="col-lg-4">
+                            <form method="get" action="{% url 'idcards:generate-idcard-search' %}" class="d-flex">
+                                <div class="input-group">
+                                    <input type="text" 
+                                           name="registration_number" 
+                                           class="form-control" 
+                                           placeholder="Enter registration number" 
+                                           required
+                                           aria-label="Registration number">
+                                    <button class="btn btn-success" type="submit">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity & Quick Guide -->
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title mb-0 text-primary">
+                        <i class="fas fa-history me-2"></i>Recent Activity
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_activity %}
+                    <div class="list-group list-group-flush">
+                        {% for activity in recent_activity %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <h6 class="mb-1">{{ activity.title }}</h6>
+                                <p class="mb-1 text-muted small">{{ activity.description }}</p>
+                                <small class="text-muted">{{ activity.timestamp|timesince }} ago</small>
+                            </div>
+                            <span class="badge bg-{{ activity.badge_color }} rounded-pill">{{ activity.status }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-id-card fa-4x text-muted mb-3"></i>
+                        <h5 class="text-muted">No recent activity</h5>
+                        <p class="text-muted">ID card generation activity will appear here</p>
+                        <a href="{% url 'idcards:bulk-generate' %}" class="btn btn-primary mt-2">
+                            <i class="fas fa-play me-2"></i>Get Started
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title mb-0 text-primary">
+                        <i class="fas fa-info-circle me-2"></i>Quick Guide
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="text-success">
+                            <i class="fas fa-layer-group me-2"></i>Bulk Generation
+                        </h6>
+                        <p class="small text-muted">Generate ID cards for all active students at once. Perfect for start of term.</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-info">
+                            <i class="fas fa-search me-2"></i>Search & Generate
+                        </h6>
+                        <p class="small text-muted">Quickly find students by registration number and generate individual ID cards.</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-warning">
+                            <i class="fas fa-palette me-2"></i>Custom Templates
+                        </h6>
+                        <p class="small text-muted">Customize the design, layout, and branding of your ID cards.</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-danger">
+                            <i class="fas fa-print me-2"></i>Print Ready
+                        </h6>
+                        <p class="small text-muted">All cards are optimized for standard ID card printers and PDF export.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="card shadow mt-4">
+                <div class="card-header bg-light py-3">
+                    <h5 class="card-title mb-0 text-primary">
+                        <i class="fas fa-chart-bar me-2"></i>Quick Stats
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <div class="text-primary fw-bold fs-4">{{ total_students }}</div>
+                            <small class="text-muted">Total Students</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="text-success fw-bold fs-4">{{ idcards_generated }}</div>
+                            <small class="text-muted">Cards Generated</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-warning fw-bold fs-4">{{ expired_cards }}</div>
+                            <small class="text-muted">Expired Cards</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-info fw-bold fs-4">
+                                {% if total_students > 0 %}
+                                    {{ coverage_percentage }}%
+                                {% else %}
+                                    0%
+                                {% endif %}
+                            </div>
+                            <small class="text-muted">Coverage</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border: none;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 2rem 0 rgba(58, 59, 69, 0.2) !important;
+}
+
+.btn-lg {
+    border-radius: 0.75rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 140px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-3px);
+}
+
+.action-subtitle {
+    opacity: 0.9;
+    font-size: 0.85rem;
+}
+
+.border-left-primary { border-left: 0.375rem solid #4e73df !important; }
+.border-left-success { border-left: 0.375rem solid #1cc88a !important; }
+.border-left-warning { border-left: 0.375rem solid #f6c23e !important; }
+.border-left-info { border-left: 0.375rem solid #36b9cc !important; }
+
+.shadow {
+    box-shadow: 0 0.25rem 1.5rem 0 rgba(58, 59, 69, 0.15) !important;
+}
+
+.bg-gradient-info {
+    background: linear-gradient(135deg, #36b9cc 0%, #2c9faf 100%) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .btn-lg {
+        padding: 1rem 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .action-btn i.fa-2x {
+        font-size: 1.5rem !important;
+    }
+    
+    .h5 {
+        font-size: 1.1rem;
+    }
+    
+    .container-fluid {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}
+
+@media (max-width: 576px) {
+    .card-header {
+        padding: 0.75rem;
+    }
+    
+    .card-title {
+        font-size: 1rem;
+    }
+    
+    .btn-lg {
+        font-size: 0.8rem;
+        padding: 0.8rem 0.5rem;
+    }
+    
+    .action-subtitle {
+        font-size: 0.75rem;
+    }
+    
+    .stat-card .h5 {
+        font-size: 1.25rem;
+    }
+}
+
+/* Animation for cards */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+/* Stagger animation for cards */
+.card:nth-child(1) { animation-delay: 0.1s; }
+.card:nth-child(2) { animation-delay: 0.2s; }
+.card:nth-child(3) { animation-delay: 0.3s; }
+.card:nth-child(4) { animation-delay: 0.4s; }
+</style>
+
+<script>
+// Add click animation to buttons
+document.addEventListener('DOMContentLoaded', function() {
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            // Add ripple effect
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.classList.add('ripple');
+            
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+    
+    // Auto-focus on search input if present
+    const searchInput = document.querySelector('input[name="registration_number"]');
+    if (searchInput) {
+        searchInput.focus();
+    }
+});
+</script>
+{% endblock content %}

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">{{ title|default:"Post Homework" }}</h3>
+            </div>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>Class</label>
+                        {{ form.student_class }}
+                    </div>
+                    <div class="form-group">
+                        <label>Subject</label>
+                        {{ form.subject }}
+                    </div>
+                    <div class="form-group">
+                        <label>Title</label>
+                        {{ form.title }}
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        {{ form.description }}
+                    </div>
+                    <div class="form-group">
+                        <label>Questions</label>
+                        <small class="form-text text-muted">Enter the homework questions that students need to
+                            answer</small>
+                        {{ form.questions }}
+                    </div>
+                    <div class="form-group">
+                        <label>Due Date</label>
+                        {{ form.due_date }}
+                    </div>
+                    <div class="form-group">
+                        <label>Attachment (Optional)</label>
+                        <small class="form-text text-muted">Upload supplementary materials if needed</small>
+                        {{ form.attachment }}
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">Post Homework</button>
+                    <a href="{% url 'homework_list' %}" class="btn btn-default float-right">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

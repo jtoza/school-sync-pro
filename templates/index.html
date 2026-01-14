@@ -1,0 +1,890 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - {{ school_name|default:"GREEN BELLS ACADEMY" }}{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <!-- Welcome Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="welcome-card card bg-gradient-primary text-white">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h3 class="welcome-title mb-2">
+                                <i class="fas fa-graduation-cap mr-2"></i>
+                                Welcome to {{ school_name|default:"GREEN BELLS ACADEMY" }} Dashboard
+                            </h3>
+                            <p class="welcome-subtitle mb-0">
+                                {% now "l, F j, Y" %} • {% now "g:i A" %}
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-md-right">
+                            <div class="weather-widget">
+                                <i class="fas fa-sun fa-2x mr-2"></i>
+                                <div class="d-inline-block">
+                                    <div class="weather-temp">28°C</div>
+                                    <small>Sunny</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-6 col-md-3 mb-3">
+            <div class="stat-card card">
+                <div class="card-body">
+                    <div class="stat-icon students">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h4 class="stat-number">{{ dashboard.student_count|default:0 }}</h4>
+                        <p class="stat-label">Total Students</p>
+                        <div class="stat-trend up">
+                            <i class="fas fa-arrow-up"></i> 12% this month
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 mb-3">
+            <div class="stat-card card">
+                <div class="card-body">
+                    <div class="stat-icon teachers">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h4 class="stat-number">{{ dashboard.staff_active|default:0 }}</h4>
+                        <p class="stat-label">Teaching Staff (Active)</p>
+                        <div class="stat-trend up">
+                            <i class="fas fa-arrow-up"></i> 2 new
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 mb-3">
+            <div class="stat-card card">
+                <div class="card-body">
+                    <div class="stat-icon classes">
+                        <i class="fas fa-school"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h4 class="stat-number">{{ dashboard.class_count|default:0 }}</h4>
+                        <p class="stat-label">Active Classes</p>
+                        <div class="stat-trend neutral">
+                            <i class="fas fa-minus"></i> No change
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 mb-3">
+            <div class="stat-card card">
+                <div class="card-body">
+                    <div class="stat-icon revenue">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h4 class="stat-number">₦{{ dashboard.revenue_month|default:0 }}</h4>
+                        <p class="stat-label">This Month</p>
+                        <div class="stat-trend up">
+                            <i class="fas fa-arrow-up"></i> 8% growth
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="row">
+        <!-- Left Column -->
+        <div class="col-lg-8">
+            <!-- Attendance Overview -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-clipboard-check text-primary mr-2"></i>
+                        Today's Attendance Overview
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="attendance-stat present">
+                                <div class="stat-circle">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <h4>89%</h4>
+                                <small>Present</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="attendance-stat absent">
+                                <div class="stat-circle">
+                                    <i class="fas fa-times"></i>
+                                </div>
+                                <h4>8%</h4>
+                                <small>Absent</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="attendance-stat late">
+                                <div class="stat-circle">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <h4>3%</h4>
+                                <small>Late</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bell text-warning mr-2"></i>
+                        Recent Activities
+                    </h5>
+                    <span class="badge badge-primary">12 New</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="activity-feed">
+                        <div class="activity-item">
+                            <div class="activity-icon new-student">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="activity-content">
+                                <p class="mb-1"><strong>New student registered</strong> </p>
+                                <small class="text-muted"></small>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon payment">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                            <div class="activity-content">
+                                <p class="mb-1"><strong>Fee payment to be payed through</strong> </p>
+                                <small class="text-muted"></small>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon assignment">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="activity-content">
+                                <p class="mb-1"><strong>New assignment posted</strong>feauture coming soon</p>
+                                <small class="text-muted"></small>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon event">
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                            <div class="activity-content">
+                                <p class="mb-1"><strong>Upcoming event</strong>feauture coming soon</p>
+                                <small class="text-muted"></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-lg-4">
+            <!-- Quick Actions -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bolt text-success mr-2"></i>
+                        Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="quick-actions">
+                        <a href="/students/create/" class="quick-action-btn">
+                            <div class="action-icon">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <span>Add Student</span>
+                        </a>
+                        <a href="{% url 'attendance:register_create' %}" class="quick-action-btn">
+                            <div class="action-icon">
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                            <span>Take Attendance</span>
+                        </a>
+                        <a href="{% url 'invoice-list' %}" class="quick-action-btn">
+                            <div class="action-icon">
+                                <i class="fas fa-file-invoice"></i>
+                            </div>
+                            <span>Create Invoice</span>
+                        </a>
+                        <a href="{% url 'create-result' %}" class="quick-action-btn">
+                            <div class="action-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <span>Enter Results</span>
+                        </a>
+                        <a href="/notices/send/" class="quick-action-btn">
+                            <div class="action-icon">
+                                <i class="fas fa-bullhorn"></i>
+                            </div>
+                            <span>Send Notice</span>
+                        </a>
+                        <a href="#" class="quick-action-btn">
+                            <div class="action-icon">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <span>Settings</span>
+                        </a>
+                        <a href="{% url 'student_portfolio:portfolio_list' %}" class="quick-action-btn">
+                            <div class="action-icon">
+                                <i class="fas fa-folder-open"></i>
+                            </div>
+                            <span>Portfolio</span>
+                        </a>
+                        <a href="{% url 'backup_dashboard' %}" class="quick-action-btn">
+                            <div class="action-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <span>Backup Center</span>
+                        </a>
+                        <button type="button" class="quick-action-btn" onclick="triggerCreateBackup()">
+                            <div class="action-icon">
+                                <i class="fas fa-save"></i>
+                            </div>
+                            <span>Create Backup</span>
+                        </button>
+                        <button type="button" class="quick-action-btn" onclick="triggerExportAll()">
+                            <div class="action-icon">
+                                <i class="fas fa-file-export"></i>
+                            </div>
+                            <span>Export All</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Events -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-calendar-alt text-info mr-2"></i>
+                        Upcoming Events
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="events-list">
+                        <div class="event-item">
+                            <div class="event-date">
+                                <span class="event-day">15</span>
+                                <span class="event-month">DEC</span>
+                            </div>
+                            <div class="event-details">
+                                <h6 class="event-title">End of Term Exams</h6>
+                                <small class="text-muted">All classes • 9:00 AM</small>
+                            </div>
+                        </div>
+                        <div class="event-item">
+                            <div class="event-date">
+                                <span class="event-day">20</span>
+                                <span class="event-month">DEC</span>
+                            </div>
+                            <div class="event-details">
+                                <h6 class="event-title">Christmas Celebration</h6>
+                                <small class="text-muted">School Hall • 10:00 AM</small>
+                            </div>
+                        </div>
+                        <div class="event-item">
+                            <div class="event-date">
+                                <span class="event-day">22</span>
+                                <span class="event-month">DEC</span>
+                            </div>
+                            <div class="event-details">
+                                <h6 class="event-title">Term Break Begins</h6>
+                                <small class="text-muted">All students</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Stats -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-bar text-primary mr-2"></i>
+                        Performance Overview
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="performance-chart">
+                        <!-- Simple CSS chart bars -->
+                        <div class="chart-bar">
+                            <div class="chart-label">Mathematics</div>
+                            <div class="chart-progress">
+                                <div class="chart-fill" style="width: 85%"></div>
+                            </div>
+                            <div class="chart-value">85%</div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="chart-label">English</div>
+                            <div class="chart-progress">
+                                <div class="chart-fill" style="width: 78%"></div>
+                            </div>
+                            <div class="chart-value">78%</div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="chart-label">Science</div>
+                            <div class="chart-progress">
+                                <div class="chart-fill" style="width: 92%"></div>
+                            </div>
+                            <div class="chart-value">92%</div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="chart-label">Social Studies</div>
+                            <div class="chart-progress">
+                                <div class="chart-fill" style="width: 70%"></div>
+                            </div>
+                            <div class="chart-value">70%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-trophy text-warning mr-2"></i>
+                        Top Students this year
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="top-students">
+                        <div class="student-rank">
+                            <div class="rank-badge">1</div>
+                            <div class="student-info">
+                                <strong>Keziah ochieng</strong>
+                                <small>Grade 8A • 96.5%</small>
+                            </div>
+                            <span class="rank-score">A+</span>
+                        </div>
+                        <div class="student-rank">
+                            <div class="rank-badge">2</div>
+                            <div class="student-info">
+                                <strong>Amelia Christine</strong>
+                                <small>Grade 6B • 94.2%</small>
+                            </div>
+                            <span class="rank-score">A+</span>
+                        </div>
+                        <div class="student-rank">
+                            <div class="rank-badge">3</div>
+                            <div class="student-info">
+                                <strong>Elizabeth Wanjiru</strong>
+                                <small>Grade 5A • 92.8%</small>
+                            </div>
+                            <span class="rank-score">A</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Welcome Card */
+.welcome-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border: none;
+    border-radius: 15px;
+}
+
+.welcome-title {
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.welcome-subtitle {
+    opacity: 0.9;
+}
+
+.weather-widget {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255,255,255,0.2);
+    padding: 10px 15px;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+}
+
+.weather-temp {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+/* Stat Cards */
+.stat-card {
+    border: none;
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.stat-card .card-body {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.stat-icon.students { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.stat-icon.teachers { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.stat-icon.classes { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.stat-icon.revenue { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; }
+
+.stat-number {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    color: #2c3e50;
+}
+
+.stat-label {
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.stat-trend {
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.stat-trend.up { color: #28a745; }
+.stat-trend.down { color: #dc3545; }
+.stat-trend.neutral { color: #6c757d; }
+
+/* Attendance Stats */
+.attendance-stat {
+    padding: 1rem;
+}
+
+.stat-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: white;
+    font-size: 1.25rem;
+}
+
+.attendance-stat.present .stat-circle { background: #28a745; }
+.attendance-stat.absent .stat-circle { background: #dc3545; }
+.attendance-stat.late .stat-circle { background: #ffc107; color: #000; }
+
+.attendance-stat h4 {
+    margin-bottom: 0.25rem;
+    font-weight: 700;
+}
+
+/* Activity Feed */
+.activity-feed {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #f8f9fa;
+    transition: background-color 0.2s ease;
+}
+
+.activity-item:hover {
+    background-color: #f8f9fa;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: white;
+    flex-shrink: 0;
+}
+
+.activity-icon.new-student { background: #17a2b8; }
+.activity-icon.payment { background: #28a745; }
+.activity-icon.assignment { background: #ffc107; color: #000; }
+.activity-icon.event { background: #6f42c1; }
+
+.activity-content {
+    flex: 1;
+}
+
+/* Quick Actions */
+.quick-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.quick-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 0.5rem;
+    border: 2px solid #f8f9fa;
+    border-radius: 10px;
+    text-align: center;
+    text-decoration: none;
+    color: #495057;
+    transition: all 0.3s ease;
+}
+
+.quick-action-btn:hover {
+    border-color: #007bff;
+    background-color: #f8f9ff;
+    color: #007bff;
+    text-decoration: none;
+    transform: translateY(-2px);
+}
+
+.action-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Events */
+.events-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.event-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.event-item:last-child {
+    border-bottom: none;
+}
+
+.event-date {
+    text-align: center;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 0.5rem;
+    margin-right: 15px;
+    min-width: 60px;
+}
+
+.event-day {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.event-month {
+    display: block;
+    font-size: 0.75rem;
+    color: #6c757d;
+    text-transform: uppercase;
+}
+
+.event-title {
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+}
+
+/* Performance Chart */
+.chart-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.chart-label {
+    width: 120px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.chart-progress {
+    flex: 1;
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    margin: 0 15px;
+    overflow: hidden;
+}
+
+.chart-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #007bff, #0056b3);
+    border-radius: 4px;
+    transition: width 1s ease;
+}
+
+.chart-value {
+    width: 40px;
+    text-align: right;
+    font-weight: 600;
+    color: #495057;
+}
+
+/* Top Students */
+.student-rank {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.student-rank:last-child {
+    border-bottom: none;
+}
+
+.rank-badge {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #ffc107;
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.rank-badge:nth-child(1) { background: #ffc107; }
+.rank-badge:nth-child(2) { background: #6c757d; color: white; }
+.rank-badge:nth-child(3) { background: #cd7f32; color: white; }
+
+.student-info {
+    flex: 1;
+}
+
+.rank-score {
+    font-weight: bold;
+    color: #28a745;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .welcome-title {
+        font-size: 1.25rem;
+    }
+    
+    .stat-card .card-body {
+        padding: 1rem;
+    }
+    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+    }
+    
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+    
+    .chart-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .chart-progress {
+        width: 100%;
+        margin: 5px 0;
+    }
+}
+
+/* Scrollbar Styling */
+.activity-feed::-webkit-scrollbar,
+.events-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.activity-feed::-webkit-scrollbar-track,
+.events-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.activity-feed::-webkit-scrollbar-thumb,
+.events-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 2px;
+}
+
+.activity-feed::-webkit-scrollbar-thumb:hover,
+.events-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+</style>
+
+<script>
+// Simple animations for dashboard elements
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate stat numbers
+    const statNumbers = document.querySelectorAll('.stat-number');
+    statNumbers.forEach(stat => {
+        const finalValue = stat.textContent;
+        stat.textContent = '0';
+        
+        let current = 0;
+        const increment = parseInt(finalValue.replace(/[^\d]/g, '')) / 50;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= parseInt(finalValue.replace(/[^\d]/g, ''))) {
+                stat.textContent = finalValue;
+                clearInterval(timer);
+            } else {
+                if (finalValue.includes('₦')) {
+                    stat.textContent = '₦' + Math.floor(current).toLocaleString();
+                } else if (finalValue.includes('%')) {
+                    stat.textContent = Math.floor(current) + '%';
+                } else {
+                    stat.textContent = Math.floor(current).toLocaleString();
+                }
+            }
+        }, 50);
+    });
+    
+    // Add loading animation to chart bars
+    setTimeout(() => {
+        const chartFills = document.querySelectorAll('.chart-fill');
+        chartFills.forEach(fill => {
+            const width = fill.style.width;
+            fill.style.width = '0%';
+            setTimeout(() => {
+                fill.style.width = width;
+            }, 500);
+        });
+    }, 1000);
+});
+// Backup and Export actions
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 2000; min-width: 320px;';
+    toast.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 4000);
+}
+
+async function triggerCreateBackup() {
+    try {
+        showToast('Creating backup...', 'info');
+        const resp = await fetch('{% url "create_backup" %}', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCookie('csrftoken') }
+        });
+        const data = await resp.json();
+        if (data.status === 'success') {
+            showToast('Backup created successfully', 'success');
+        } else {
+            showToast('Backup failed: ' + (data.message || 'Unknown error'), 'danger');
+        }
+    } catch (e) {
+        showToast('Backup failed: ' + e.message, 'danger');
+    }
+}
+
+async function triggerExportAll() {
+    try {
+        showToast('Exporting all data...', 'info');
+        const resp = await fetch('{% url "export_all_data" %}');
+        const data = await resp.json();
+        if (data.status === 'success') {
+            showToast('Export complete: ' + data.export_path, 'success');
+        } else {
+            showToast('Export failed: ' + (data.message || 'Unknown error'), 'danger');
+        }
+    } catch (e) {
+        showToast('Export failed: ' + e.message, 'danger');
+    }
+}
+</script>
+{% endblock %}

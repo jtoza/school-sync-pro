@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Student{% endblock title %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-sm-10 col-md-6">
+    <div class="card">
+      <div class="card-header bg-danger text-white text-center">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-exclamation-triangle mr-2"></i>
+          Confirm Deletion
+        </h5>
+      </div>
+      <div class="card-body text-center py-4">
+        <div class="mb-4">
+          <i class="fas fa-user-slash fa-3x text-danger mb-3"></i>
+          <h6 class="text-danger">Delete Student Record?</h6>
+          <p class="mb-2"><strong>"{{ object }}"</strong></p>
+          <p class="text-muted small">
+            <i class="fas fa-info-circle mr-1"></i>
+            All associated data will be permanently deleted.
+          </p>
+        </div>
+
+        <form action="" method="POST" class="d-grid gap-2">
+          {% csrf_token %}
+          <div class="d-flex flex-column flex-sm-row gap-2">
+            <a href="{% url 'student-detail' object.id %}" class="btn btn-outline-secondary flex-fill">
+              <i class="fas fa-times mr-1"></i> Cancel
+            </a>
+            <button type="submit" class="btn btn-danger flex-fill">
+              <i class="fas fa-trash mr-1"></i> Delete
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.card {
+  border: 2px solid #dc3545;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  border: none;
+  font-weight: 500;
+}
+
+/* Mobile optimizations */
+@media (max-width: 576px) {
+  .card-body {
+    padding: 1.5rem 1rem;
+  }
+  
+  .btn {
+    padding: 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .flex-fill {
+    min-width: 120px;
+  }
+}
+
+/* Ensure touch-friendly buttons */
+.btn {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>
+{% endblock content %}

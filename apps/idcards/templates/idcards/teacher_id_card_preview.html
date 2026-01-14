@@ -1,0 +1,276 @@
+[file name]: teacher_id_card_preview.html
+[file content begin]
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Teacher ID Card - {{ teacher.firstname }} {{ teacher.surname }}{% endblock title %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-success text-white">
+                <div class="card-body py-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="card-title mb-1">
+                                <i class="fas fa-chalkboard-teacher me-3"></i>Teacher ID Card
+                            </h2>
+                            <p class="card-text opacity-75 mb-0">Preview and download teacher identification card</p>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-light text-success fs-6 p-2">GREEN BELLS ACADEMY</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0 text-success">
+                        <i class="fas fa-id-card me-2"></i>ID Card Preview - {{ teacher.firstname }} {{ teacher.surname }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- ID Card Design -->
+                    <div class="id-card-container">
+                        <div class="id-card teacher-id-card">
+                            <div class="id-watermark">OFFICIAL ID CARD</div>
+                            
+                            <div class="id-card-header">
+                                <div class="school-logo">GB</div>
+                                <h4 class="mb-0">GREEN BELLS ACADEMY</h4>
+                                <small>STAFF IDENTIFICATION CARD</small>
+                            </div>
+                            
+                            <div class="id-card-body">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <div class="id-photo">
+                                            {% if teacher.image %}
+                                                <img src="{{ teacher.image.url }}" alt="{{ teacher.firstname }}" class="img-fluid photo-img">
+                                            {% else %}
+                                                <div class="no-photo">
+                                                    <i class="fas fa-user fa-2x"></i>
+                                                    <span>No Photo</span>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-8">
+                                        <div class="id-details">
+                                            <div class="detail-row">
+                                                <strong>Name:</strong> {{ teacher.firstname }} {{ teacher.surname }}
+                                            </div>
+                                            {% if teacher.other_name %}
+                                            <div class="detail-row">
+                                                <strong>Other Name:</strong> {{ teacher.other_name }}
+                                            </div>
+                                            {% endif %}
+                                            <div class="detail-row">
+                                                <strong>Gender:</strong> {{ teacher.get_gender_display }}
+                                            </div>
+                                            <div class="detail-row">
+                                                <strong>Position:</strong> 
+                                                <span class="badge bg-success">{{ teacher.get_current_status_display }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="id-card-footer">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <small><strong>Issued:</strong> {{ today }}</small>
+                                    </div>
+                                    <div class="col-6 text-end">
+                                        <small><strong>Expires:</strong> {{ id_card.expiry_date }}</small>
+                                    </div>
+                                </div>
+                                <div class="text-center mt-2">
+                                    <small class="text-muted">{{ school_motto }}</small>
+                                </div>
+                            </div>
+                            
+                            <div class="id-number">
+                                ID: {{ id_card.id_number }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="row mt-4">
+                        <div class="col-md-4 mb-2">
+                            <a href="{% url 'idcards:download-teacher-idcard-pdf' teacher.id %}" 
+                               class="btn btn-success w-100">
+                                <i class="fas fa-download me-2"></i>Download PDF
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <a href="{% url 'idcards:teacher-idcard-list' %}" 
+                               class="btn btn-outline-success w-100">
+                                <i class="fas fa-list me-2"></i>View All IDs
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            {% if not id_card.is_active or id_card.expiry_date < today %}
+                            <a href="{% url 'idcards:renew-teacher-idcard' teacher.id %}" 
+                               class="btn btn-warning w-100">
+                                <i class="fas fa-sync-alt me-2"></i>Renew Card
+                            </a>
+                            {% else %}
+                            <a href="{% url 'idcards:bulk-generate-teachers' %}" 
+                               class="btn btn-outline-primary w-100">
+                                <i class="fas fa-layer-group me-2"></i>Generate More
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.id-card-container {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.teacher-id-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.teacher-id-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #2e7d32, #4caf50, #81c784);
+    z-index: 1;
+}
+
+.id-card-header {
+    padding: 15px;
+    text-align: center;
+    background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+    color: white;
+    position: relative;
+}
+
+.id-card-header h4 {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+    letter-spacing: 0.5px;
+}
+
+.school-logo {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    width: 30px;
+    height: 30px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.id-card-body {
+    padding: 20px;
+    background: #fafafa;
+}
+
+.id-photo {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 8px;
+    text-align: center;
+    background: white;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.photo-img {
+    border-radius: 5px;
+    max-height: 125px;
+    max-width: 100%;
+    object-fit: cover;
+}
+
+.no-photo {
+    padding: 20px 10px;
+    color: #757575;
+}
+
+.no-photo i {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.id-details {
+    font-size: 0.95rem;
+}
+
+.detail-row {
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+}
+
+.detail-row strong {
+    width: 80px;
+    display: inline-block;
+    color: #555;
+}
+
+.id-card-footer {
+    padding: 12px 15px;
+    background: #f5f5f5;
+    border-top: 1px solid #e0e0e0;
+    font-size: 0.85rem;
+}
+
+.id-number {
+    position: absolute;
+    bottom: 12px;
+    right: 15px;
+    font-size: 0.8rem;
+    color: #2e7d32;
+    font-weight: bold;
+}
+
+.id-watermark {
+    position: absolute;
+    bottom: 60px;
+    right: 10px;
+    font-size: 0.7rem;
+    color: rgba(46, 125, 50, 0.15);
+    transform: rotate(-45deg);
+    font-weight: bold;
+    z-index: 0;
+}
+</style>
+{% endblock content %}
+[file content end]

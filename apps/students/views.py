@@ -1,0 +1,119 @@
+import csv
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from django.forms import widgets
+from django.http import HttpResponse
+from django.urls import reverse_lazy
+from django.views.generic import DetailView, ListView, View
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
+
+from apps.finance.models import Invoice
+
+from .models import Student, StudentBulkUpload
+
+
+class StudentListView(LoginRequiredMixin, ListView):
+    model = Student
+    template_name = "students/student_list.html"
+
+
+class StudentDetailView(LoginRequiredMixin, DetailView):
+    model = Student
+    template_name = "students/student_detail.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(StudentDetailView, self).get_context_data(**kwargs)
+        context["payments"] = Invoice.objects.filter(student=self.object)
+        return context
+
+
+class StudentCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+    model = Student
+    fields = "__all__"
+    success_message = "New student successfully added."
+
+    def get_form(self):
+        """add date picker in forms"""
+        form = super(StudentCreateView, self).get_form()
+        form.fields["date_of_birth"].widget = widgets.DateInput(attrs={"type": "date"})
+        form.fields["address"].widget = widgets.Textarea(attrs={"rows": 2})
+        form.fields["others"].widget = widgets.Textarea(attrs={"rows": 2})
+        form.fields["medical_notes"].widget = widgets.Textarea(attrs={"rows": 2})
+        form.fields["allergies"].widget = widgets.Textarea(attrs={"rows": 2})
+        form.fields["pickup_authorized"].widget = widgets.Textarea(attrs={"rows": 2, "placeholder": "Comma-separated names"})
+        return form
+
+    def get_success_url(self):
+        """Redirect to student list after successful creation"""
+        return reverse_lazy('students:student-list')
+
+    def form_valid(self, form):
+        """Override to ensure student is saved even if redirect fails"""
+        print("=== DEBUG: Starting to save student ===")
+        self.object = form.save()
+        print(f"=== DEBUG: Student saved with ID: {self.object.id} ===")
+        print(f"=== DEBUG: Student name: {self.object.get_full_name()} ===")
+        return super().form_valid(form)
+
+
+class StudentUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    model = Student
+    fields = "__all__"
+    success_message = "Record successfully updated."
+
+    def get_form(self):
+        """add date picker in forms"""
+        form = super(StudentUpdateView, self).get_form()
+        form.fields["date_of_birth"].widget = widgets.DateInput(attrs={"type": "date"})
+        form.fields["date_of_admission"].widget = widgets.DateInput(
+            attrs={"type": "date"}
+        )
+        form.fields["address"].widget = widgets.Textarea(attrs={"rows": 2})
+        form.fields["others"].widget = widgets.Textarea(attrs={"rows": 2})
+        form.fields["medical_notes"].widget = widgets.Textarea(attrs={"rows": 2})
+        form.fields["allergies"].widget = widgets.Textarea(attrs={"rows": 2})
+        form.fields["pickup_authorized"].widget = widgets.Textarea(attrs={"rows": 2, "placeholder": "Comma-separated names"})
+        # form.fields['passport'].widget = widgets.FileInput()
+        return form
+
+    def get_success_url(self):
+        """Redirect to student detail after update"""
+        return reverse_lazy('students:student-detail', kwargs={'pk': self.object.pk})
+
+
+class StudentDeleteView(LoginRequiredMixin, DeleteView):
+    model = Student
+    success_url = reverse_lazy("students:student-list")
+
+
+class StudentBulkUploadView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+    model = StudentBulkUpload
+    template_name = "students/students_upload.html"
+    fields = ["csv_file"]
+    success_url = "/students/list/"
+    success_message = "Successfully uploaded students"
+
+
+class DownloadCSVViewdownloadcsv(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = 'attachment; filename="student_template.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow(
+            [
+                "registration_number",
+                "surname",
+                "firstname",
+                "other_names",
+                "gender",
+                "parent_number",
+                "address",
+                "current_class",
+            ]
+        )
+
+        return response
+    
+    

@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ student_class.name }} - Class Details{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <!-- Class Info Card -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Class Information
+                </h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="class-avatar mb-3">
+                    <i class="fas fa-users fa-4x text-primary"></i>
+                </div>
+                <h4>{{ student_class.name }}</h4>
+                <p class="text-muted">{{ student_class.description|default:"Class" }}</p>
+                
+                <div class="class-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-user-graduate text-primary"></i>
+                        <strong>{{ student_count }}</strong> Students
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-bolt mr-2"></i>
+                    Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'students:student-create' %}?class={{ student_class.id }}" class="btn btn-primary">
+                        <i class="fas fa-user-plus mr-1"></i> Add Student to Class
+                    </a>
+                    
+                    <!-- Check if attendance app exists before showing attendance button -->
+                    {% url 'attendance:register_create' as attendance_url %}
+                    {% if attendance_url %}
+                    <a href="{{ attendance_url }}?class={{ student_class.id }}" class="btn btn-success">
+                        <i class="fas fa-clipboard-check mr-1"></i> Take Attendance
+                    </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'create-result' %}?class={{ student_class.id }}" class="btn btn-warning"></a>
+                        <i class="fas fa-chart-line mr-1"></i> Enter Results
+                    </a>
+                    <a href="{% url 'students:student-list' %}?class={{ student_class.id }}" class="btn btn-info">
+                        <i class="fas fa-list mr-1"></i> View All Students
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <!-- Daily Class Summary -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chalkboard mr-2"></i>
+                    Class Summary
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="summary-item">
+                            <div class="summary-number text-primary">{{ student_count }}</div>
+                            <div class="summary-label">Total Students</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="summary-item">
+                            <div class="summary-number text-success">{{ student_class.subject_set.count }}</div>
+                            <div class="summary-label">Subjects</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="summary-item">
+                            <div class="summary-number text-info">{% now "d" %}</div>
+                            <div class="summary-label">Day {% now "jS" %}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Students List -->
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-user-graduate mr-2"></i>
+                    Students in this Class
+                </h5>
+                <span class="badge badge-light">{{ students.count }} students</span>
+            </div>
+            <div class="card-body p-0">
+                {% if students %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Registration No.</th>
+                                <th>Gender</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students %}
+                            <tr>
+                                <td>
+                                    <strong>{{ student.surname }} {{ student.firstname }}</strong>
+                                    {% if student.other_name %}
+                                    <br><small class="text-muted">{{ student.other_name }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>{{ student.registration_number }}</td>
+                                <td>{{ student.get_gender_display }}</td>
+                                <td>
+                                    {% if student.current_status == 'active' %}
+                                    <span class="badge badge-success">Active</span>
+                                    {% else %}
+                                    <span class="badge badge-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{% url 'students:student-detail' student.id %}" class="btn btn-sm btn-outline-primary" title="View Student">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'students:student-update' student.id %}" class="btn btn-sm btn-outline-secondary" title="Edit Student">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-user-slash fa-3x text-muted mb-3"></i>
+                    <h5>No Students in this Class</h5>
+                    <p class="text-muted">There are no students assigned to this class yet.</p>
+                    <a href="{% url 'students:student-create' %}?class={{ student_class.id }}" class="btn btn-primary">
+                        <i class="fas fa-user-plus mr-1"></i> Add First Student
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.class-avatar {
+    color: #007bff;
+}
+
+.stat-item {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.stat-item:last-child {
+    border-bottom: none;
+}
+
+.summary-item {
+    padding: 1rem 0;
+}
+
+.summary-number {
+    font-size: 2rem;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.summary-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+}
+
+.btn {
+    font-size: 0.9rem;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.btn-group .btn {
+    margin-right: 0.25rem;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+</style>
+{% endblock %}

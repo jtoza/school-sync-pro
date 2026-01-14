@@ -1,0 +1,354 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ID Card - {{ student.surname }} {{ student.firstname }} {{ student.other_name }}</title>
+    <style>
+        @page {
+            size: 3.5in 2.25in;
+            margin: 0.02in;
+            padding: 0;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: white;
+            width: 3.46in;
+            height: 2.21in;
+            position: relative;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            color: #2c3e50;
+        }
+        
+        .id-card {
+            width: 3.46in;
+            height: 2.21in;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #bdc3c7;
+            box-sizing: border-box;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border-radius: 10px;
+        }
+
+        /* Header */
+        .id-header {
+            background: linear-gradient(135deg, #155724 0%, #28a745 50%, #155724 100%);
+            padding: 6px 10px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 34px;
+            position: relative;
+            z-index: 2;
+            border-bottom: 2px solid #0f4a1c;
+        }
+
+        .school-brand {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .school-logo {
+            width: 24px;
+            height: 24px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .school-info {
+            line-height: 1.1;
+        }
+        
+        .school-name {
+            font-size: 11px;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: 0.3px;
+        }
+        
+        .school-motto {
+            font-size: 6px;
+            opacity: 0.95;
+            margin: 0;
+            font-weight: 500;
+        }
+        
+        .id-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 7px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        
+        /* Body - Adjusted for footer space */
+        .id-body {
+            padding: 8px 10px;
+            display: flex;
+            gap: 10px;
+            height: 112px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .photo-section {
+            flex-shrink: 0;
+            text-align: center;
+        }
+        
+        .photo-container {
+            width: 70px;
+            height: 80px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 5px;
+            background: white;
+            position: relative;
+        }
+        
+        .student-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .photo-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            font-size: 18px;
+            color: #6c757d;
+        }
+        
+        .id-number {
+            text-align: center;
+            padding: 3px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border: 0.5px solid #dee2e6;
+        }
+        
+        .id-label {
+            font-size: 5.5px;
+            color: #6c757d;
+            text-transform: uppercase;
+            display: block;
+            font-weight: 700;
+        }
+        
+        .id-value {
+            font-size: 8px;
+            font-weight: 900;
+            color: #155724;
+            display: block;
+        }
+        
+        .student-details {
+            flex: 1;
+            font-size: 8px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 6px;
+            padding: 6px;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3px;
+            padding-bottom: 2px;
+            border-bottom: 0.5px solid rgba(0,0,0,0.08);
+        }
+        
+        .detail-label {
+            color: #6c757d;
+            font-weight: 600;
+            flex: 1;
+            font-size: 7px;
+            text-transform: uppercase;
+        }
+        
+        .detail-value {
+            color: #2c3e50;
+            font-weight: 700;
+            flex: 2;
+            text-align: right;
+            font-size: 7.5px;
+        }
+        
+        /* Footer - COMPACT VERSION */
+        .id-footer {
+            padding: 3px 10px;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 22px;
+            border-top: 1px solid #e9ecef;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .barcode-section {
+            flex: 1;
+        }
+        
+        .barcode-placeholder {
+            text-align: center;
+        }
+        
+        .barcode-lines {
+            height: 12px; /* Much shorter */
+            background: repeating-linear-gradient(
+                90deg,
+                #000,
+                #000 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            margin-bottom: 1px;
+            border-radius: 1px;
+        }
+        
+        .barcode-number {
+            font-family: 'Courier New', monospace;
+            font-size: 5px;
+            letter-spacing: 0.8px;
+            font-weight: 700;
+        }
+        
+        .signature-section {
+            text-align: center;
+        }
+        
+        .signature-line {
+            width: 50px;
+            height: 0.5px;
+            background: #6c757d;
+            margin: 0 auto 1px;
+        }
+        
+        .signature-label {
+            font-size: 5px;
+            color: #6c757d;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* Security Features */
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 18px;
+            font-weight: 900;
+            color: rgba(21, 87, 36, 0.03);
+            white-space: nowrap;
+            z-index: 1;
+        }
+        
+        .validity-stamp {
+            position: absolute;
+            bottom: 3px;
+            right: 3px;
+            font-size: 5px;
+            color: #28a745;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="id-card">
+        <!-- Header -->
+        <div class="id-header">
+            <div class="school-brand">
+                <div class="school-logo">
+                    <span>GBA</span>
+                </div>
+                <div class="school-info">
+                    <h1 class="school-name">GREEN BELLS ACADEMY</h1>
+                    <p class="school-motto">IN PURSUIT OF EXCELLENCE</p>
+                </div>
+            </div>
+            <div class="id-badge">STUDENT ID</div>
+        </div>
+        
+        <!-- Body -->
+        <div class="id-body">
+            <div class="photo-section">
+                <div class="photo-container">
+                    {% if student.passport %}
+                        {% with base_url=request.scheme|add:"://"|add:request.get_host %}
+                        <img src="{{ base_url }}{{ student.passport.url }}" alt="Student Photo" class="student-photo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        {% endwith %}
+                    {% endif %}
+                    <div class="photo-placeholder" {% if student.passport %}style="display:none;"{% endif %}>
+                        <span>👤</span>
+                    </div>
+                </div>
+                <div class="id-number">
+                    <span class="id-label">ID Number</span>
+                    <span class="id-value">{{ id_card.id_number }}</span>
+                </div>
+            </div>
+            
+            <div class="student-details">
+                <div class="detail-row">
+                    <span class="detail-label">Full Name:</span>
+                    <span class="detail-value">{{ student.get_full_name|upper }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Class:</span>
+                    <span class="detail-value">{{ student.current_class|upper }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Gender:</span>
+                    <span class="detail-value">{{ student.gender|upper }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Valid Until:</span>
+                    <span class="detail-value">{{ id_card.expiry_date|date:"M d, Y"|upper }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer - Now with compact barcode -->
+        <div class="id-footer">
+            <div class="barcode-section">
+                <div class="barcode-placeholder">
+                    <div class="barcode-lines"></div>
+                    <div class="barcode-number">{{ id_card.id_number }}</div>
+                </div>
+            </div>
+            <div class="signature-section">
+                <div class="signature-line"></div>
+                <div class="signature-label">Principal</div>
+            </div>
+        </div>
+        
+        <!-- Security Features -->
+        <div class="watermark">GREEN BELLS</div>
+        <div class="validity-stamp">VALID</div>
+    </div>
+</body>
+</html>

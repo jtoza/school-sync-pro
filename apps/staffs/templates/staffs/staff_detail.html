@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content-header %}
+{% endblock content-header %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-4">
+    <div class="card card-primary card-outline">
+      <div class="card-body box-profile">
+        <div class="text-center">
+          {% if object.image %}
+          <img class="profile-user-img img-fluid img-circle" src="{{ object.image.url }}"
+            alt="{{ object.firstname }} profile picture" style="width: 150px; height: 150px; object-fit: cover;">
+          {% else %}
+          <div
+            class="profile-user-img img-fluid img-circle bg-light d-inline-flex align-items-center justify-content-center"
+            style="width: 150px; height: 150px;">
+            <i class="fas fa-user fa-4x text-muted"></i>
+          </div>
+          {% endif %}
+        </div>
+
+        <h3 class="profile-username text-center">{{ object }}</h3>
+        <p class="text-muted text-center">{{ object.get_gender_display }}</p>
+
+        <ul class="list-group list-group-unbordered mb-3">
+          <li class="list-group-item">
+            <b>Status</b>
+            <a class="float-right">
+              {% if object.current_status == 'active' %}
+              <span class="badge badge-success">{{ object.get_current_status_display}}</span>
+              {% else %}
+              <span class="badge badge-danger">{{ object.get_current_status_display}}</span>
+              {% endif %}
+            </a>
+          </li>
+          <li class="list-group-item">
+            <b>Date of Birth</b> <a class="float-right">{{ object.date_of_birth }}</a>
+          </li>
+          <li class="list-group-item">
+            <b>Mobile</b> <a class="float-right">{{ object.mobile_number }}</a>
+          </li>
+        </ul>
+
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'staffs:staff-update' object.id %}" class="btn btn-primary btn-block mr-1"><b>Edit</b></a>
+          <a href="{% url 'staffs:staff-delete' object.id %}" class="btn btn-danger btn-block mt-0"><b>Delete</b></a>
+        </div>
+      </div>
+      <!-- /.card-body -->
+    </div>
+  </div>
+
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">About Staff</h3>
+      </div>
+      <div class="card-body">
+        <strong><i class="fas fa-map-marker-alt mr-1"></i> Address</strong>
+        <p class="text-muted">
+          {{ object.address }}
+        </p>
+        <hr>
+
+        <strong><i class="far fa-file-alt mr-1"></i> Comments/Others</strong>
+        <p class="text-muted">
+          {{ object.others|default:"No additional information." }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

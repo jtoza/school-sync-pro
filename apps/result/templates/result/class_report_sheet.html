@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Class Report Sheet{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <div>
+      <h5 class="mb-1">Class Report Sheet</h5>
+      <div class="text-muted small">
+        <span class="me-2"><i class="fas fa-chalkboard"></i> {{ student_class }}</span>
+        <span class="me-2">| <i class="far fa-calendar-alt ms-1"></i> {{ term }} {{ session }}</span>
+        <span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-2">Active students only</span>
+      </div>
+    </div>
+    <div class="d-flex gap-2 no-print">
+      <button onclick="window.print()" class="btn btn-outline-secondary btn-sm"><i class="fas fa-print me-1"></i>Print</button>
+    </div>
+  </div>
+
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover table-striped align-middle mb-0">
+        <thead class="table-light sticky-top">
+          <tr>
+            <th style="width:48px">#</th>
+            <th>Student</th>
+            <th class="text-center">Present</th>
+            <th class="text-center">Absent</th>
+            <th class="text-center">Late</th>
+            <th class="text-end">Average Total</th>
+            <th class="text-center">Badge</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+          <tr>
+            <td class="text-muted">{{ forloop.counter }}</td>
+            <td>
+              <div class="fw-semibold">{{ row.student.get_full_name|default:row.student }}</div>
+              <div class="small text-muted">Reg: {{ row.student.registration_number }}</div>
+            </td>
+            <td class="text-center">
+              <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle">{{ row.attendance.present }}</span>
+            </td>
+            <td class="text-center">
+              <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle">{{ row.attendance.absent }}</span>
+            </td>
+            <td class="text-center">
+              <span class="badge rounded-pill bg-warning-subtle text-warning border border-warning-subtle">{{ row.attendance.late }}</span>
+            </td>
+            <td class="text-end">
+              <div class="d-flex flex-column align-items-end">
+                <div class="fw-semibold">{{ row.average_total }}</div>
+                <div class="progress" style="width:140px;height:6px;">
+                  {% with pct=row.average_total|default:0 %}
+                  <div class="progress-bar bg-primary" role="progressbar" style="width: {{ pct }}%" aria-valuenow="{{ pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+                  {% endwith %}
+                </div>
+              </div>
+            </td>
+            <td class="text-center">
+              {% with avg=row.average_total|default:0 %}
+                {% if avg >= 75 %}
+                  <span class="badge bg-success">Excellent</span>
+                {% elif avg >= 60 %}
+                  <span class="badge bg-primary">Good</span>
+                {% elif avg >= 50 %}
+                  <span class="badge bg-warning text-dark">Average</span>
+                {% elif avg > 0 %}
+                  <span class="badge bg-danger">Needs Support</span>
+                {% else %}
+                  <span class="badge bg-secondary">No Data</span>
+                {% endif %}
+              {% endwith %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center p-4 text-muted">No data found for this class and term.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% if rows %}
+  <div class="card-footer d-flex flex-wrap justify-content-between align-items-center gap-2">
+    {% with 
+      total_present=0 total_absent=0 total_late=0 total_avg=0 %}
+      {% for r in rows %}
+        {% with total_present=total_present|add:r.attendance.present %}{% endwith %}
+        {% with total_absent=total_absent|add:r.attendance.absent %}{% endwith %}
+        {% with total_late=total_late|add:r.attendance.late %}{% endwith %}
+        {% with total_avg=total_avg|add:r.average_total %}{% endwith %}
+      {% endfor %}
+      <div class="small text-muted">
+        <span class="me-3">Students: <strong>{{ rows|length }}</strong></span>
+        <span class="me-3">Present (sum): <strong>{{ total_present }}</strong></span>
+        <span class="me-3">Absent (sum): <strong>{{ total_absent }}</strong></span>
+        <span class="me-3">Late (sum): <strong>{{ total_late }}</strong></span>
+        <span class="me-3">Class Avg: <strong>{% if rows %}{{ total_avg|divisibleby:1|yesno:"0,0" %}{% endif %}{% widthratio total_avg rows|length 1 %}</strong></span>
+      </div>
+    {% endwith %}
+    <div class="no-print small text-muted">Tip: Use the Print button above for a clean printout.</div>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+  .bg-success-subtle { background-color: rgba(25, 135, 84, .12) !important; }
+  .bg-danger-subtle { background-color: rgba(220, 53, 69, .12) !important; }
+  .bg-warning-subtle { background-color: rgba(255, 193, 7, .15) !important; }
+  .bg-primary-subtle { background-color: rgba(13, 110, 253, .12) !important; }
+  .border-success-subtle { border-color: rgba(25, 135, 84, .35) !important; }
+  .border-danger-subtle { border-color: rgba(220, 53, 69, .35) !important; }
+  .border-warning-subtle { border-color: rgba(255, 193, 7, .35) !important; }
+  .border-primary-subtle { border-color: rgba(13, 110, 253, .35) !important; }
+
+  @media print {
+    .no-print { display: none !important; }
+    .card { border: none; }
+    .card-header, .card-footer { border: none; }
+    .table { font-size: 12px; }
+    .sticky-top { position: static !important; }
+  }
+</style>
+{% endblock %}

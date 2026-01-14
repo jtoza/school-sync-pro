@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ object.firstname }} {{ object.surname }} - Student Profile{% endblock title %}
+
+{% block content-header %}
+<div class="card-header p-0 border-0">
+  <div class="position-relative rounded overflow-hidden" style="background: linear-gradient(135deg,#3b82f6,#0ea5e9);">
+    <div class="row no-gutters align-items-end">
+      <div class="col-12 col-md-auto text-center p-3 p-md-4">
+        <div class="position-relative d-inline-block">
+          {% if object.passport %}
+          <img src="{{ object.passport.url }}" class="rounded-circle shadow profile-avatar" alt="Student Photo">
+          {% else %}
+          <img src="{% static 'dist/img/avatar.png' %}" class="rounded-circle shadow profile-avatar" alt="Default Avatar">
+          {% endif %}
+          <span class="status-dot {% if object.current_status == 'active' %}bg-success{% else %}bg-secondary{% endif %}"></span>
+        </div>
+      </div>
+      <div class="col-12 col-md p-3 p-md-4 text-white">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+          <div class="mb-3 mb-md-0">
+            <h4 class="mb-0 font-weight-bold">{{ object.firstname }} {{ object.surname }}</h4>
+            {% if object.other_name %}
+            <div class="text-white-50 small">{{ object.other_name }}</div>
+            {% endif %}
+            <div class="mt-2">
+              <span class="badge badge-light text-primary mr-1"><i class="fas fa-id-card mr-1"></i>{{ object.registration_number }}</span>
+              <span class="badge badge-light mr-1"><i class="fas fa-chalkboard-teacher mr-1"></i>{{ object.current_class }}</span>
+              <span class="badge {% if object.current_status == 'active' %}badge-success{% else %}badge-danger{% endif %}">
+                {{ object.get_current_status_display }}
+              </span>
+            </div>
+          </div>
+          <div class="btn-group">
+            <a href="#" class="btn btn-light btn-sm" title="Print Profile"><i class="fas fa-print"></i></a>
+            <a href="{% url 'students:student-update' object.id %}" class="btn btn-light btn-sm" title="Edit"><i class="fas fa-edit"></i></a>
+            <a href="{% url 'students:student-delete' object.id %}" class="btn btn-light btn-sm" title="Delete"><i class="fas fa-trash"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content-header %}
+
+{% block content %}
+<div class="row">
+  <!-- Left column: At-a-glance -->
+  <div class="col-12 col-lg-4 mb-3">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white border-0">
+        <h6 class="mb-0 text-uppercase text-muted small">Overview</h6>
+      </div>
+      <div class="card-body">
+        <ul class="list-unstyled mb-0">
+          <li class="media align-items-center mb-3">
+            <span class="media-icon bg-light text-primary mr-3"><i class="fas fa-venus-mars"></i></span>
+            <div class="media-body">
+              <div class="text-muted small">Gender</div>
+              <div class="font-weight-600">{{ object.get_gender_display }}</div>
+            </div>
+          </li>
+          <li class="media align-items-center mb-3">
+            <span class="media-icon bg-light text-primary mr-3"><i class="fas fa-birthday-cake"></i></span>
+            <div class="media-body">
+              <div class="text-muted small">Date of Birth</div>
+              <div class="font-weight-600">{{ object.date_of_birth|default:"-" }}</div>
+            </div>
+          </li>
+          <li class="media align-items-center mb-3">
+            <span class="media-icon bg-light text-primary mr-3"><i class="fas fa-home"></i></span>
+            <div class="media-body">
+              <div class="text-muted small">Address</div>
+              <div class="font-weight-600">{{ object.address|default:"Not specified"|truncatewords:16 }}</div>
+            </div>
+          </li>
+          <li class="media align-items-center mb-3">
+            <span class="media-icon bg-light text-primary mr-3"><i class="fas fa-notes-medical"></i></span>
+            <div class="media-body">
+              <div class="text-muted small">Medical Notes</div>
+              <div class="font-weight-600">{{ object.medical_notes|default:"None"|truncatewords:16 }}</div>
+            </div>
+          </li>
+        </ul>
+        <hr>
+        <div>
+          {% if object.house %}
+          <span class="chip chip-primary mr-1"><i class="fas fa-campground mr-1"></i>{{ object.house }}</span>
+          {% endif %}
+          {% if object.transport_opt_in %}
+          <span class="chip chip-info mr-1"><i class="fas fa-bus mr-1"></i>Transport</span>
+          {% endif %}
+          {% if object.lunch_opt_in %}
+          <span class="chip chip-success"><i class="fas fa-utensils mr-1"></i>Lunch</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mt-3">
+      <div class="card-header bg-white border-0">
+        <h6 class="mb-0 text-uppercase text-muted small">Guardian</h6>
+      </div>
+      <div class="card-body">
+        <div class="d-flex align-items-start mb-2">
+          <span class="media-icon bg-light text-primary mr-3"><i class="fas fa-user-shield"></i></span>
+          <div>
+            <div class="font-weight-600">{{ object.guardian_name|default:"-" }}</div>
+            <div class="text-muted small">{{ object.relationship|default:"Guardian" }}</div>
+          </div>
+        </div>
+        <div class="d-flex align-items-center mb-2">
+          <i class="fas fa-phone-alt text-primary mr-2"></i>
+          <span class="font-weight-600">{{ object.guardian_phone|default:"-" }}</span>
+        </div>
+        <div class="d-flex align-items-center">
+          <i class="fas fa-mobile-alt text-primary mr-2"></i>
+          <span class="text-muted small">Parent Mobile: {{ object.parent_mobile_number|default:"-" }}</span>
+        </div>
+        <div class="d-flex align-items-center mt-2">
+          <i class="fas fa-ambulance text-primary mr-2"></i>
+          <span class="text-muted small">Emergency: {{ object.emergency_contact|default:"-" }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right column: Academics + Payments -->
+  <div class="col-12 col-lg-8">
+    <div class="card shadow-sm mb-3">
+      <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 text-uppercase text-muted small">Academic Information</h6>
+        <span class="badge badge-primary">{{ object.current_class }}</span>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-6 col-md-4 mb-3">
+            <div class="tile">
+              <div class="tile-icon bg-primary text-white"><i class="fas fa-user-tag"></i></div>
+              <div class="tile-body">
+                <div class="text-muted small">Reg. No</div>
+                <div class="font-weight-600">{{ object.registration_number }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 mb-3">
+            <div class="tile">
+              <div class="tile-icon bg-info text-white"><i class="fas fa-venus-mars"></i></div>
+              <div class="tile-body">
+                <div class="text-muted small">Gender</div>
+                <div class="font-weight-600">{{ object.get_gender_display }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 mb-3">
+            <div class="tile">
+              <div class="tile-icon bg-success text-white"><i class="fas fa-traffic-light"></i></div>
+              <div class="tile-body">
+                <div class="text-muted small">Status</div>
+                <div class="font-weight-600">{{ object.get_current_status_display }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 text-uppercase text-muted small">Payment History</h6>
+        {% if payments %}
+        <span class="small text-muted">{{ payments|length }} record{{ payments|length|pluralize }}</span>
+        {% endif %}
+      </div>
+      <div class="card-body p-0">
+        {% if payments %}
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="thead-light">
+              <tr>
+                <th>Session/Term</th>
+                <th class="text-right">Payable</th>
+                <th class="text-right">Paid</th>
+                <th class="text-right">Balance</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for payment in payments %}
+              <tr class="clickable-row" data-href="{% url 'invoice-detail' payment.id %}">
+                <td>
+                  <div class="font-weight-600">{{ payment.session }}</div>
+                  <div class="text-muted small">{{ payment.term }}</div>
+                </td>
+                <td class="text-right">₦{{ payment.total_amount_payable }}</td>
+                <td class="text-right text-success">₦{{ payment.total_amount_paid }}</td>
+                <td class="text-right">
+                  <span class="{% if payment.balance > 0 %}text-danger{% else %}text-success{% endif %}">₦{{ payment.balance }}</span>
+                </td>
+                <td>
+                  {% if payment.balance == 0 %}
+                  <span class="badge badge-success">Paid</span>
+                  {% elif payment.balance == payment.total_amount_payable %}
+                  <span class="badge badge-danger">Due</span>
+                  {% else %}
+                  <span class="badge badge-warning">Partial</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+          <i class="fas fa-receipt fa-2x text-muted mb-2"></i>
+          <p class="text-muted mb-0">No payment records available</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .profile-avatar { width: 96px; height: 96px; object-fit: cover; border: 3px solid rgba(255,255,255,0.9); }
+  .status-dot { position: absolute; bottom: 6px; right: 6px; width: 14px; height: 14px; border: 2px solid #fff; border-radius: 50%; display: inline-block; }
+  .media-icon { width: 36px; height: 36px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; }
+  .font-weight-600 { font-weight: 600; }
+  .chip { display: inline-flex; align-items: center; padding: 0.35rem 0.5rem; border-radius: 16px; font-size: 0.75rem; background: #f1f5f9; }
+  .chip-primary { background: #e0ecff; color: #1d4ed8; }
+  .chip-info { background: #e0f2fe; color: #0369a1; }
+  .chip-success { background: #dcfce7; color: #166534; }
+  .tile { display: flex; align-items: center; }
+  .tile-icon { width: 36px; height: 36px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; margin-right: .75rem; }
+  .clickable-row { cursor: pointer; }
+  .clickable-row:hover { background: #f8fafc; }
+  @media (max-width: 576px){ .profile-avatar { width: 80px; height: 80px; } }
+</style>
+{% endblock content %}

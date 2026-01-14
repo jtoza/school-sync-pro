@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}All Results{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <h5 class="mb-0">Results ({{ results|length }})</h5>
+  <div class="text-muted small">Session: {{ request.current_session }} · Term: {{ request.current_term }}</div>
+</div>
+
+{% if results %}
+  {% for key, result in results.items %}
+  <div class="card shadow-sm mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <div>
+        <div class="fw-semibold">{{ result.student }}</div>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-info-subtle text-info border border-info-subtle">CA Total: {{ result.test_total }}</span>
+        <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Exam Total: {{ result.exam_total }}</span>
+        <span class="badge bg-primary">Overall: {{ result.total_total }}</span>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th style="width:48px">#</th>
+              <th>Subject</th>
+              <th class="text-end">Test</th>
+              <th class="text-end">Exam</th>
+              <th class="text-end">Total</th>
+              <th class="text-center">Grade</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for subject in result.subjects %}
+            <tr>
+              <td class="text-muted">{{ forloop.counter }}</td>
+              <td>{{ subject.subject }}</td>
+              <td class="text-end">{{ subject.test_score }}</td>
+              <td class="text-end">{{ subject.exam_score }}</td>
+              <td class="text-end">{{ subject.total_score }}</td>
+              <td class="text-center">
+                {% with g=subject.grade %}
+                  {% if g in 'A A+' %}
+                    <span class="badge bg-success">{{ g }}</span>
+                  {% elif g in 'B B+' %}
+                    <span class="badge bg-primary">{{ g }}</span>
+                  {% elif g in 'C C+' %}
+                    <span class="badge bg-warning text-dark">{{ g }}</span>
+                  {% elif g %}
+                    <span class="badge bg-danger">{{ g }}</span>
+                  {% else %}
+                    <span class="badge bg-secondary">-</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr class="table-light">
+              <td colspan="2" class="text-end fw-semibold">Totals:</td>
+              <td class="text-end fw-semibold">{{ result.test_total }}</td>
+              <td class="text-end fw-semibold">{{ result.exam_total }}</td>
+              <td class="text-end fw-semibold">{{ result.total_total }}</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <div class="card">
+    <div class="card-body text-center text-muted">No results to display.</div>
+  </div>
+{% endif %}
+
+<style>
+  .bg-info-subtle { background-color: rgba(13, 202, 240, .12) !important; }
+  .bg-warning-subtle { background-color: rgba(255, 193, 7, .15) !important; }
+  .border-info-subtle { border-color: rgba(13, 202, 240, .35) !important; }
+  .border-warning-subtle { border-color: rgba(255, 193, 7, .35) !important; }
+</style>
+{% endblock %}

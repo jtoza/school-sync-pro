@@ -1,0 +1,269 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
+<div class="card reportcard">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <div>
+      <h5 class="mb-0">Report Card</h5>
+      <small>{{ student }} — {{ current_class }} | {{ term }} {{ session }}</small>
+    </div>
+    <div class="btn-group btn-group-sm">
+      <a href="{% url 'report-card-pdf' student.id %}" class="btn btn-primary"><i
+          class="fas fa-file-pdf mr-1"></i>Download PDF</a>
+      <button onclick="window.print()" class="btn btn-secondary"><i class="fas fa-print mr-1"></i>Print</button>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    <!-- Performance Metrics Banner -->
+    {% if gpa > 0 or position_data %}
+    <div class="performance-banner">
+      <div class="metric">
+        <div class="metric-label"><i class="fas fa-graduation-cap mr-1"></i>GPA</div>
+        <div class="metric-value">{{ gpa|floatformat:2 }}</div>
+        <div class="gpa-badge gpa-{{ gpa_class|lower|cut:' ' }}">{{ gpa_class }}</div>
+      </div>
+      {% if position_data %}
+      <div class="metric">
+        <div class="metric-label"><i class="fas fa-trophy mr-1"></i>Class Position</div>
+        <div class="metric-value">
+          {% with pos=position_data.position %}
+            {{ pos }}
+            {% if pos|add:0 >= 11 and pos|add:0 <= 13 %}
+              th
+            {% else %}
+              {% with last=pos|stringformat:"i"|slice:"-1" %}
+                {% if last == "1" %}st{% elif last == "2" %}nd{% elif last == "3" %}rd{% else %}th{% endif %}
+              {% endwith %}
+            {% endif %}
+          {% endwith %}
+        </div>
+        <div class="position-info">out of {{ position_data.total_students }} students</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label"><i class="fas fa-chart-line mr-1"></i>Average</div>
+        <div class="metric-value">{{ position_data.avg_score }}%</div>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <table class="table table-sm mb-0" <thead>
+      <tr>
+        <th>Subject</th>
+        <th>CA (40)</th>
+        <th>Exam (60)</th>
+        <th>Total</th>
+        <th>Grade</th>
+      </tr>
+      </thead>
+      <tbody>
+        {% for r in results %}
+        <tr>
+          <td>{{ r.subject }}</td>
+          <td>{{ r.test_score }}</td>
+          <td>{{ r.exam_score }}</td>
+          <td>{{ r.total_score }}</td>
+          <td>{{ r.grade }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" class="text-center p-3">No results found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="3" class="text-right">Average</th>
+          <th>{{ average_total|floatformat:2 }}</th>
+          <th></th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  <div class="card-footer">
+    <div class="row">
+      <div class="col-md-6">
+        <h6>Attendance Summary</h6>
+        <p class="mb-1">Present: <strong>{{ attendance.present }}</strong></p>
+        <p class="mb-1">Absent: <strong>{{ attendance.absent }}</strong></p>
+        <p class="mb-1">Late: <strong>{{ attendance.late }}</strong></p>
+        <p class="mb-1">Attendance: <strong>{{ attendance.percent|default:0 }}%</strong></p>
+      </div>
+      <div class="col-md-6">
+        <h6>Comments & Fees</h6>
+        <p class="mb-1"><strong>Teacher:</strong> {{ teacher_comment|default:'—' }}</p>
+        <p class="mb-1"><strong>Headteacher:</strong> {{ headteacher_comment|default:'—' }}</p>
+        <p class="mb-0"><strong>Outstanding Balance:</strong> {{ fee_balance|floatformat:2 }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  .reportcard {
+    max-width: 900px;
+    margin: 0 auto;
+    border-radius: 10px;
+  }
+
+  .reportcard .card-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 2px solid #e9ecef;
+  }
+
+  .reportcard .card-body {
+    padding: 0;
+  }
+
+  .reportcard table {
+    table-layout: fixed;
+  }
+
+  .reportcard thead th {
+    background: #f8f9fc;
+    font-weight: 600;
+    font-size: 0.92rem;
+  }
+
+  .reportcard tbody td,
+  .reportcard thead th {
+    padding: .65rem .75rem;
+  }
+
+  .reportcard tbody tr:nth-child(odd) {
+    background: #fcfdff;
+  }
+
+  .reportcard tfoot th,
+  .reportcard tfoot td {
+    background: #f8f9fc;
+  }
+
+  .reportcard .card-footer {
+    background: #fff;
+    padding: 1rem 1.25rem;
+  }
+
+  .reportcard h6 {
+    font-weight: 600;
+  }
+
+  .performance-banner {
+    display: flex;
+    justify-content: space-around;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border-bottom: 2px solid #bbf7d0;
+  }
+
+  .metric {
+    text-align: center;
+  }
+
+  .metric-label {
+    font-size: 0.85rem;
+    color: #065f46;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+  }
+
+  .metric-value {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #16a34a;
+    margin-bottom: 0.3rem;
+  }
+
+  .gpa-badge {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  .gpa-excellent {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+  }
+
+  .gpa-verygood {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+  }
+
+  .gpa-good {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+  }
+
+  .gpa-fair {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+  }
+
+  .gpa-needsimprovement {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+  }
+
+  .position-info {
+    font-size: 0.8rem;
+    color: #64748b;
+  }
+
+  @media print {
+
+    .main-header,
+    .main-sidebar,
+    .card-header .btn,
+    .control-sidebar,
+    .nav-sidebar {
+      display: none !important;
+    }
+
+    .content-wrapper {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    .reportcard {
+      box-shadow: none !important;
+      border: none !important;
+      max-width: 100%;
+    }
+
+    .reportcard .card-header {
+      padding-bottom: .5rem;
+      border-bottom: 2px solid #000;
+    }
+
+    .reportcard tbody td,
+    .reportcard thead th {
+      padding: .5rem .6rem;
+      font-size: 11pt;
+    }
+
+    .reportcard thead th {
+      background: #f0f0f0 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .reportcard .card-footer {
+      padding-top: .75rem;
+    }
+
+    .performance-banner {
+      background: #f0f0f0 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    body {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  }
+</style>
+{% endblock %}

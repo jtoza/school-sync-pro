@@ -1,0 +1,768 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+ID Card Preview - {{ student }}
+{% endblock title %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-gradient-primary text-white shadow-lg">
+                <div class="card-body py-4">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                        <div class="text-center text-md-start mb-3 mb-md-0">
+                            <h2 class="card-title mb-1 fw-bold">
+                                <i class="fas fa-id-card me-2"></i>ID Card Preview
+                            </h2>
+                            <p class="card-text opacity-75 mb-0 fs-6">
+                                {{ student.get_full_name }} - {{ student.current_class }}
+                            </p>
+                        </div>
+                        <div class="btn-group flex-wrap justify-content-center">
+                            <a href="{% url 'idcards:download-idcard' student.id %}" class="btn btn-light btn-sm m-1">
+                                <i class="fas fa-download me-1"></i>Download PDF
+                            </a>
+                            <a href="{% url 'students:student-detail' student.id %}" class="btn btn-outline-light btn-sm m-1">
+                                <i class="fas fa-user me-1"></i>Student Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8 col-xl-6">
+            <!-- ID Card Preview -->
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h5 class="card-title mb-0 text-primary fw-bold">
+                        <i class="fas fa-eye me-2"></i>Live Preview
+                    </h5>
+                </div>
+                <div class="card-body p-2 p-md-3">
+                    <div class="id-card-container">
+                        <div class="id-card" id="idCard">
+                            <!-- Header -->
+                            <div class="id-header">
+                                <div class="school-brand">
+                                    <div class="school-logo">
+                                        <i class="fas fa-school"></i>
+                                    </div>
+                                    <div class="school-info">
+                                        <h3 class="school-name">GREEN BELLS ACADEMY</h3>
+                                        <p class="school-motto">IN PURSUIT OF EXCELLENCE</p>
+                                    </div>
+                                </div>
+                                <div class="id-badge">
+                                    <span>STUDENT ID</span>
+                                </div>
+                            </div>
+
+                            <!-- Body -->
+                            <div class="id-body">
+                                <div class="student-photo-section">
+                                    <div class="photo-container">
+                                        {% if student.passport %}
+                                            <img src="{{ student.passport.url }}" alt="Student Photo" class="student-photo">
+                                        {% else %}
+                                            <div class="photo-placeholder">
+                                                <i class="fas fa-user-graduate"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="id-number">
+                                        <span class="id-label">ID Number</span>
+                                        <span class="id-value">{{ id_card.id_number }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="student-details">
+                                    <div class="detail-grid">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Full Name</span>
+                                            <span class="detail-value">{{ student.get_full_name }}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Class</span>
+                                            <span class="detail-value">{{ student.current_class }}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Gender</span>
+                                            <span class="detail-value">{{ student.gender }}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Valid Until</span>
+                                            <span class="detail-value">{{ id_card.expiry_date|date:"M d, Y" }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="id-footer">
+                                <div class="barcode-section">
+                                    <div class="barcode">
+                                        <div class="barcode-lines"></div>
+                                        <div class="barcode-number">{{ id_card.id_number }}</div>
+                                    </div>
+                                </div>
+                                <div class="signature-section">
+                                    <div class="signature-line"></div>
+                                    <span class="signature-label">Principal's Signature</span>
+                                </div>
+                            </div>
+
+                            <!-- Security Features -->
+                            <div class="security-features">
+                                <div class="watermark">GREEN BELLS</div>
+                                <div class="holo-strip"></div>
+                                <div class="security-pattern"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Information -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary mb-3 fw-bold">
+                        <i class="fas fa-info-circle me-2"></i>Card Information
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="info-item">
+                                <span class="info-label">Issue Date</span>
+                                <span class="info-value">{{ id_card.issue_date|date:"M d, Y" }}</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="info-item">
+                                <span class="info-label">Expiry Date</span>
+                                <span class="info-value {% if id_card.expiry_date < today %}text-danger{% else %}text-success{% endif %}">
+                                    {{ id_card.expiry_date|date:"M d, Y" }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="info-item">
+                                <span class="info-label">Status</span>
+                                <span class="badge {% if id_card.is_active %}bg-success{% else %}bg-danger{% endif %} rounded-pill">
+                                    {{ id_card.is_active|yesno:"Active,Inactive" }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="info-item">
+                                <span class="info-label">Template</span>
+                                <span class="info-value">{{ id_card.template_used }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions Sidebar -->
+        <div class="col-12 col-lg-4 col-xl-3 mt-4 mt-lg-0">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title mb-0 text-primary fw-bold">
+                        <i class="fas fa-cog me-2"></i>Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'idcards:download-idcard' student.id %}" class="btn btn-success btn-lg py-3">
+                            <i class="fas fa-file-pdf me-2"></i>Download PDF
+                        </a>
+                        <a href="{% url 'idcards:renew-idcard' student.id %}" class="btn btn-warning btn-lg py-3">
+                            <i class="fas fa-sync-alt me-2"></i>Renew Card
+                        </a>
+                        <a href="{% url 'students:student-list' %}" class="btn btn-outline-primary py-3">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Students
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title mb-0 text-primary fw-bold">
+                        <i class="fas fa-print me-2"></i>Printing Instructions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="instruction-list">
+                        <div class="instruction-item">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Use standard ID card paper (CR-80)</span>
+                        </div>
+                        <div class="instruction-item">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Print at 100% scale for accurate dimensions</span>
+                        </div>
+                        <div class="instruction-item">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Recommended: 300 DPI for best quality</span>
+                        </div>
+                        <div class="instruction-item">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Laminate after printing for durability</span>
+                        </div>
+                    </div>
+                    <div class="alert alert-info mt-3 mb-0 small">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>Tip:</strong> Print multiple cards per page using the bulk download feature.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+:root {
+    --primary-green: #155724;
+    --secondary-green: #28a745;
+    --accent-gold: #ffd700;
+    --dark-text: #2c3e50;
+    --light-text: #6c757d;
+    --border-color: #e9ecef;
+    --shadow-light: rgba(0,0,0,0.1);
+    --shadow-medium: rgba(0,0,0,0.15);
+}
+
+/* Header Gradient */
+.bg-gradient-primary {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%) !important;
+}
+
+/* ID Card Container */
+.id-card-container {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 500px;
+}
+
+/* ID Card Main Styles */
+.id-card {
+    width: 100%;
+    max-width: 380px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 12px 40px var(--shadow-medium);
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--border-color);
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+/* Header Section */
+.id-header {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+    padding: 1.5rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.id-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: rotate(45deg);
+}
+
+.school-brand {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    z-index: 2;
+}
+
+.school-logo {
+    width: 50px;
+    height: 50px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.school-logo i {
+    font-size: 1.5rem;
+    color: white;
+}
+
+.school-info {
+    flex: 1;
+}
+
+.school-name {
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    letter-spacing: 0.5px;
+}
+
+.school-motto {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    margin: 0;
+    font-weight: 500;
+}
+
+.id-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255,255,255,0.2);
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.id-badge span {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Body Section */
+.id-body {
+    padding: 2rem 1.5rem;
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
+.student-photo-section {
+    flex-shrink: 0;
+    text-align: center;
+}
+
+.photo-container {
+    width: 100px;
+    height: 120px;
+    border: 3px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 0.8rem;
+    background: white;
+    box-shadow: 0 4px 12px var(--shadow-light);
+}
+
+.student-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.photo-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.photo-placeholder i {
+    font-size: 2.5rem;
+    color: var(--light-text);
+}
+
+.id-number {
+    text-align: center;
+}
+
+.id-label {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--light-text);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.id-value {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--secondary-green);
+    letter-spacing: 0.5px;
+}
+
+.student-details {
+    flex: 1;
+}
+
+.detail-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.detail-label {
+    font-size: 0.75rem;
+    color: var(--light-text);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail-value {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--dark-text);
+}
+
+/* Footer Section */
+.id-footer {
+    padding: 1.2rem 1.5rem;
+    background: #f8f9fa;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-top: 1px solid var(--border-color);
+}
+
+.barcode {
+    text-align: center;
+}
+
+.barcode-lines {
+    height: 35px;
+    background: repeating-linear-gradient(
+        90deg,
+        #000,
+        #000 2px,
+        transparent 2px,
+        transparent 4px
+    );
+    margin-bottom: 0.4rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+.barcode-number {
+    font-family: 'Courier New', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    font-weight: 700;
+    color: var(--dark-text);
+}
+
+.signature-section {
+    text-align: center;
+}
+
+.signature-line {
+    width: 100px;
+    height: 1px;
+    background: var(--light-text);
+    margin: 0 auto 0.3rem;
+}
+
+.signature-label {
+    font-size: 0.65rem;
+    color: var(--light-text);
+    font-weight: 600;
+}
+
+/* Security Features */
+.security-features {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: rgba(40, 167, 69, 0.03);
+    white-space: nowrap;
+    letter-spacing: 2px;
+}
+
+.holo-strip {
+    position: absolute;
+    top: 25%;
+    right: -8px;
+    width: 16px;
+    height: 80px;
+    background: linear-gradient(45deg, 
+        rgba(255,0,0,0.2), 
+        rgba(0,255,0,0.2), 
+        rgba(0,0,255,0.2),
+        rgba(255,255,0,0.2)
+    );
+    transform: rotate(10deg);
+    border-radius: 3px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.security-pattern {
+    position: absolute;
+    bottom: 20%;
+    left: 10%;
+    width: 80%;
+    height: 20px;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 5px,
+        rgba(40, 167, 69, 0.05) 5px,
+        rgba(40, 167, 69, 0.05) 10px
+    );
+}
+
+/* Card Information Styles */
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.info-label {
+    font-size: 0.8rem;
+    color: var(--light-text);
+    font-weight: 600;
+}
+
+.info-value {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--dark-text);
+}
+
+/* Instruction List */
+.instruction-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.instruction-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .id-card-container {
+        padding: 1rem;
+        min-height: 400px;
+    }
+    
+    .id-card {
+        max-width: 320px;
+        border-radius: 12px;
+    }
+    
+    .id-header {
+        padding: 1.2rem;
+    }
+    
+    .school-brand {
+        gap: 0.8rem;
+    }
+    
+    .school-logo {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .school-logo i {
+        font-size: 1.2rem;
+    }
+    
+    .school-name {
+        font-size: 1.1rem;
+    }
+    
+    .school-motto {
+        font-size: 0.7rem;
+    }
+    
+    .id-body {
+        padding: 1.5rem 1.2rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 1.2rem;
+    }
+    
+    .photo-container {
+        width: 90px;
+        height: 110px;
+        margin: 0 auto 0.8rem;
+    }
+    
+    .student-details {
+        width: 100%;
+    }
+    
+    .detail-grid {
+        gap: 0.6rem;
+    }
+    
+    .id-footer {
+        padding: 1rem 1.2rem;
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+    }
+    
+    .signature-section {
+        order: -1;
+    }
+    
+    .watermark {
+        font-size: 2rem;
+    }
+    
+    .holo-strip {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .container-fluid {
+        padding: 0.5rem;
+    }
+    
+    .id-card {
+        max-width: 280px;
+    }
+    
+    .id-header {
+        padding: 1rem;
+    }
+    
+    .school-name {
+        font-size: 1rem;
+    }
+    
+    .id-body {
+        padding: 1.2rem 1rem;
+    }
+    
+    .photo-container {
+        width: 80px;
+        height: 100px;
+    }
+    
+    .photo-placeholder i {
+        font-size: 2rem;
+    }
+    
+    .btn-group .btn {
+        font-size: 0.8rem;
+        padding: 0.5rem 0.8rem;
+    }
+}
+
+/* Animation and Hover Effects */
+.id-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.id-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 50px var(--shadow-medium);
+}
+
+.photo-container {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.photo-container:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px var(--shadow-light);
+}
+
+/* Print Styles */
+@media print {
+    .btn-group, .card-header, .alert {
+        display: none !important;
+    }
+    
+    .id-card {
+        box-shadow: none !important;
+        border: 2px solid #000 !important;
+    }
+    
+    .id-card-container {
+        background: none !important;
+        padding: 0 !important;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add subtle animation to the ID card
+    const idCard = document.getElementById('idCard');
+    if (idCard) {
+        idCard.style.opacity = '0';
+        idCard.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            idCard.style.transition = 'all 0.6s ease';
+            idCard.style.opacity = '1';
+            idCard.style.transform = 'translateY(0)';
+        }, 200);
+    }
+    
+    // Add hover effect to action buttons
+    const actionButtons = document.querySelectorAll('.btn-lg');
+    actionButtons.forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.transition = 'all 0.2s ease';
+        });
+        
+        btn.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+{% endblock content %}

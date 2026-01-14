@@ -1,0 +1,533 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bulk Generate ID Cards{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card baby-card">
+                <div class="card-header baby-header text-white">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-layer-group me-2"></i>Bulk Generate ID Cards
+                        <span class="baby-badge">👶 Easy Peasy!</span>
+                    </h4>
+                </div>
+                <div class="card-body baby-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="alert baby-info">
+                                <h5><i class="fas fa-info-circle me-2"></i>About Bulk Generation</h5>
+                                <p class="mb-0">
+                                    This will generate ID cards for all active students in the system. 
+                                    The process may take a few moments depending on the number of students.
+                                </p>
+                            </div>
+
+                            <div class="card baby-option-card mb-4">
+                                <div class="card-header baby-option-header">
+                                    <h5 class="card-title mb-0">🎯 Generation Options</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold baby-label">Select Generation Scope:</label>
+                                            <div class="form-check mb-2 baby-radio">
+                                                <input class="form-check-input" type="radio" name="scope" id="all_students" value="all" checked>
+                                                <label class="form-check-label" for="all_students">
+                                                    <strong>🎪 All Active Students</strong> - Generate for all students in the system
+                                                </label>
+                                            </div>
+                                            <div class="form-check baby-radio">
+                                                <input class="form-check-input" type="radio" name="scope" id="by_class" value="class">
+                                                <label class="form-check-label" for="by_class">
+                                                    <strong>🏫 By Class</strong> - Generate for specific classes only
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-4 baby-class-select" id="classSelection" style="display: none;">
+                                            <label for="class_id" class="form-label baby-label">Select Class:</label>
+                                            <select name="class_id" id="class_id" class="form-select baby-select">
+                                                <option value="">-- Select a Class --</option>
+                                                {% for class in classes %}
+                                                <option value="{{ class.id }}">{{ class.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold baby-label">🎨 Output Format:</label>
+                                            <div class="form-check baby-checkbox">
+                                                <input class="form-check-input" type="checkbox" name="generate_pdf" id="generate_pdf" checked>
+                                                <label class="form-check-label" for="generate_pdf">
+                                                    📄 Generate PDF files for printing
+                                                </label>
+                                            </div>
+                                            <div class="form-check baby-checkbox">
+                                                <input class="form-check-input" type="checkbox" name="preview_only" id="preview_only">
+                                                <label class="form-check-label" for="preview_only">
+                                                    👀 Preview only (don't save to database)
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-grid gap-2 d-md-flex justify-content-md-end baby-buttons">
+                                            <a href="{% url 'idcards:idcard-dashboard' %}" class="btn btn-secondary me-md-2 baby-btn">
+                                                <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+                                            </a>
+                                            <button type="submit" class="btn btn-success baby-btn-primary">
+                                                <i class="fas fa-play me-1"></i> Start Bulk Generation 🚀
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card baby-stats-card">
+                                <div class="card-header baby-stats-header text-white">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-chart-bar me-2"></i>Quick Stats 📊
+                                    </h5>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="baby-stat-main mb-4">
+                                        <i class="fas fa-users baby-stat-icon"></i>
+                                        <h2 class="baby-stat-number">{{ total_students }}</h2>
+                                        <p class="baby-stat-label">Total Active Students</p>
+                                    </div>
+                                    
+                                    <div class="row baby-mini-stats">
+                                        <div class="col-6 mb-3">
+                                            <div class="baby-mini-stat success">
+                                                <small class="baby-mini-label">ID Cards Generated</small>
+                                                <div class="baby-mini-number">{{ generated_count }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <div class="baby-mini-stat warning">
+                                                <small class="baby-mini-label">Pending Generation</small>
+                                                <div class="baby-mini-number">{{ pending_count }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="baby-progress-container">
+                                        <div class="baby-progress" style="height: 25px;">
+                                            <div class="baby-progress-bar" role="progressbar" 
+                                                 style="width: {{ coverage_percentage }}%;" 
+                                                 aria-valuenow="{{ coverage_percentage }}" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100">
+                                                <span class="baby-progress-text">{{ coverage_percentage }}%</span>
+                                            </div>
+                                        </div>
+                                        <small class="baby-progress-label">System Coverage 🎯</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card baby-tips-card mt-4">
+                                <div class="card-header baby-tips-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-lightbulb me-2"></i>Tips & Tricks 💡
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled baby-tips-list">
+                                        <li class="baby-tip-item">
+                                            <i class="fas fa-check baby-tip-icon"></i>
+                                            Bulk generation is best for start-of-term setups
+                                        </li>
+                                        <li class="baby-tip-item">
+                                            <i class="fas fa-check baby-tip-icon"></i>
+                                            Use class-based generation for specific groups
+                                        </li>
+                                        <li class="baby-tip-item">
+                                            <i class="fas fa-check baby-tip-icon"></i>
+                                            Preview mode lets you check designs first
+                                        </li>
+                                        <li class="baby-tip-item">
+                                            <i class="fas fa-check baby-tip-icon"></i>
+                                            PDF files are optimized for standard ID card printers
+                                        </li>
+                                        <li class="baby-tip-item">
+                                            <i class="fas fa-check baby-tip-icon"></i>
+                                            Don't worry - you can always regenerate later! 😊
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Cute floating elements -->
+                            <div class="baby-floating baby-float-1">🎈</div>
+                            <div class="baby-floating baby-float-2">🧸</div>
+                            <div class="baby-floating baby-float-3">🌟</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const allStudentsRadio = document.getElementById('all_students');
+    const byClassRadio = document.getElementById('by_class');
+    const classSelection = document.getElementById('classSelection');
+
+    function toggleClassSelection() {
+        if (byClassRadio.checked) {
+            classSelection.style.display = 'block';
+            // Add bounce animation
+            classSelection.classList.add('baby-bounce');
+            setTimeout(() => {
+                classSelection.classList.remove('baby-bounce');
+            }, 1000);
+        } else {
+            classSelection.style.display = 'none';
+        }
+    }
+
+    allStudentsRadio.addEventListener('change', toggleClassSelection);
+    byClassRadio.addEventListener('change', toggleClassSelection);
+    
+    // Initial state
+    toggleClassSelection();
+
+    // Add fun hover effects
+    const buttons = document.querySelectorAll('.baby-btn, .baby-btn-primary');
+    buttons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.05)';
+        });
+        button.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+    });
+});
+</script>
+
+<style>
+/* Baby-themed colors */
+:root {
+    --baby-blue: #a8d8ea;
+    --baby-pink: #f8c8dc;
+    --baby-green: #c1e1c1;
+    --baby-yellow: #fdfd96;
+    --baby-purple: #d8bfd8;
+    --baby-orange: #ffdab9;
+}
+
+/* Main card styling */
+.baby-card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(168, 216, 234, 0.3);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.baby-header {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+    border-radius: 20px 20px 0 0 !important;
+    padding: 1.5rem;
+}
+
+.baby-badge {
+    background: rgba(255, 255, 255, 0.3);
+    padding: 0.3rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    margin-left: 1rem;
+}
+
+.baby-body {
+    padding: 2rem;
+    background: #fff;
+    border-radius: 0 0 20px 20px;
+}
+
+/* Alert styling */
+.baby-info {
+    background: linear-gradient(135deg, var(--baby-blue), var(--baby-purple));
+    border: none;
+    border-radius: 15px;
+    color: #333;
+    border-left: 5px solid #ff9a9e;
+}
+
+/* Option cards */
+.baby-option-card {
+    border: 2px dashed var(--baby-blue);
+    border-radius: 15px;
+    background: #fff;
+}
+
+.baby-option-header {
+    background: linear-gradient(135deg, var(--baby-green), var(--baby-blue));
+    border-radius: 13px 13px 0 0 !important;
+    color: #333;
+    border: none;
+}
+
+.baby-label {
+    color: #ff6b88;
+    font-size: 1.1rem;
+}
+
+/* Form elements */
+.baby-radio .form-check-input:checked {
+    background-color: #ff9a9e;
+    border-color: #ff9a9e;
+}
+
+.baby-checkbox .form-check-input:checked {
+    background-color: #a8d8ea;
+    border-color: #a8d8ea;
+}
+
+.baby-select {
+    border: 2px solid var(--baby-blue);
+    border-radius: 10px;
+    padding: 0.75rem;
+}
+
+.baby-select:focus {
+    border-color: #ff9a9e;
+    box-shadow: 0 0 0 0.2rem rgba(255, 154, 158, 0.25);
+}
+
+/* Buttons */
+.baby-buttons {
+    margin-top: 2rem;
+}
+
+.baby-btn {
+    border-radius: 50px;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #6c757d;
+    transition: all 0.3s ease;
+}
+
+.baby-btn-primary {
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    border: none;
+    border-radius: 50px;
+    padding: 0.75rem 2rem;
+    color: #fff;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.baby-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 154, 158, 0.4);
+}
+
+/* Stats card */
+.baby-stats-card {
+    border: 2px solid var(--baby-yellow);
+    border-radius: 15px;
+    background: #fff;
+}
+
+.baby-stats-header {
+    background: linear-gradient(135deg, var(--baby-yellow), var(--baby-orange));
+    border-radius: 13px 13px 0 0 !important;
+    color: #333;
+}
+
+.baby-stat-main {
+    padding: 1rem;
+}
+
+.baby-stat-icon {
+    font-size: 3rem;
+    color: #ff9a9e;
+    margin-bottom: 1rem;
+}
+
+.baby-stat-number {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #ff6b88;
+    margin: 0;
+}
+
+.baby-stat-label {
+    color: #666;
+    font-weight: 500;
+}
+
+.baby-mini-stats {
+    margin: 1rem 0;
+}
+
+.baby-mini-stat {
+    padding: 0.5rem;
+    border-radius: 10px;
+}
+
+.baby-mini-stat.success {
+    background: var(--baby-green);
+}
+
+.baby-mini-stat.warning {
+    background: var(--baby-yellow);
+}
+
+.baby-mini-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.baby-mini-label {
+    color: #666;
+    font-weight: 500;
+}
+
+/* Progress bar */
+.baby-progress-container {
+    margin-top: 1rem;
+}
+
+.baby-progress {
+    border-radius: 50px;
+    background: #f0f0f0;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.baby-progress-bar {
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: width 1s ease-in-out;
+}
+
+.baby-progress-text {
+    color: #fff;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.baby-progress-label {
+    color: #666;
+    margin-top: 0.5rem;
+    display: block;
+    text-align: center;
+}
+
+/* Tips card */
+.baby-tips-card {
+    border: 2px solid var(--baby-pink);
+    border-radius: 15px;
+    background: #fff;
+}
+
+.baby-tips-header {
+    background: linear-gradient(135deg, var(--baby-pink), var(--baby-purple));
+    border-radius: 13px 13px 0 0 !important;
+    color: #333;
+}
+
+.baby-tips-list {
+    padding: 0;
+}
+
+.baby-tip-item {
+    padding: 0.5rem 0;
+    border-bottom: 1px dashed #f0f0f0;
+    display: flex;
+    align-items: center;
+}
+
+.baby-tip-item:last-child {
+    border-bottom: none;
+}
+
+.baby-tip-icon {
+    color: #ff9a9e;
+    margin-right: 0.5rem;
+    font-size: 0.8rem;
+}
+
+/* Animations */
+.baby-bounce {
+    animation: babyBounce 0.6s ease;
+}
+
+@keyframes babyBounce {
+    0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+    40% {transform: translateY(-10px);}
+    60% {transform: translateY(-5px);}
+}
+
+/* Floating elements */
+.baby-floating {
+    position: absolute;
+    font-size: 2rem;
+    opacity: 0.1;
+    z-index: -1;
+    animation: float 6s ease-in-out infinite;
+}
+
+.baby-float-1 {
+    top: 10%;
+    right: 5%;
+    animation-delay: 0s;
+}
+
+.baby-float-2 {
+    top: 40%;
+    right: 8%;
+    animation-delay: 2s;
+}
+
+.baby-float-3 {
+    top: 70%;
+    right: 6%;
+    animation-delay: 4s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(10deg); }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .baby-body {
+        padding: 1rem;
+    }
+    
+    .baby-stat-number {
+        font-size: 2rem;
+    }
+    
+    .baby-floating {
+        display: none;
+    }
+}
+
+/* Fun hover effects */
+.form-check-input:hover, .baby-select:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s ease;
+}
+</style>
+{% endblock %}

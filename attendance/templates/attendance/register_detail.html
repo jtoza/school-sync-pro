@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card card-primary">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <div>
+      <h3 class="card-title mb-0">
+        <i class="fas fa-clipboard-check mr-2"></i>
+        Attendance Register
+      </h3>
+      <div class="register-info mt-2">
+        <span class="badge badge-info">
+          <i class="fas fa-users mr-1"></i>
+          {{ object.student_class }}
+        </span>
+        <span class="badge badge-primary ml-2">
+          <i class="fas fa-calendar-day mr-1"></i>
+          {{ object.date }}
+        </span>
+        <span class="badge badge-secondary ml-2">
+          {{ object.term }} {{ object.session }}
+        </span>
+      </div>
+    </div>
+    <div class="btn-group">
+      <a href="{% url 'attendance:take_attendance' object.pk %}" class="btn btn-success btn-sm">
+        <i class="fas fa-edit mr-1"></i> Take Attendance
+      </a>
+      <a href="{% url 'attendance:register_edit' object.pk %}" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-cog mr-1"></i> Edit
+      </a>
+      <a href="{% url 'attendance:register_delete' object.pk %}" class="btn btn-outline-danger btn-sm">
+        <i class="fas fa-trash mr-1"></i> Delete
+      </a>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover table-striped mb-0">
+        <thead class="thead-dark">
+          <tr>
+            <th width="40%">Student</th>
+            <th width="20%">Status</th>
+            <th width="40%">Remarks</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in object.entries.all %}
+          <tr>
+            <td>
+              <i class="fas fa-user-graduate text-primary mr-2"></i>
+              <strong>{{ e.student }}</strong>
+            </td>
+            <td>
+              {% if e.status == 'P' %}
+              <span class="badge badge-success">
+                <i class="fas fa-check mr-1"></i>{{ e.get_status_display }}
+              </span>
+              {% elif e.status == 'A' %}
+              <span class="badge badge-danger">
+                <i class="fas fa-times mr-1"></i>{{ e.get_status_display }}
+              </span>
+              {% elif e.status == 'L' %}
+              <span class="badge badge-warning">
+                <i class="fas fa-clock mr-1"></i>{{ e.get_status_display }}
+              </span>
+              {% else %}
+              <span class="badge badge-secondary">{{ e.get_status_display }}</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if e.remarks %}
+              <span class="text-muted">{{ e.remarks }}</span>
+              {% else %}
+              <span class="text-muted font-italic">No remarks</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="3" class="text-center py-5">
+              <div class="empty-state">
+                <i class="fas fa-user-slash fa-3x text-muted mb-3"></i>
+                <h5>No Attendance Entries</h5>
+                <p class="text-muted">No students have been marked for attendance yet.</p>
+                <a href="{% url 'attendance:take_attendance' object.pk %}" class="btn btn-primary mt-2">
+                  <i class="fas fa-edit mr-1"></i> Take Attendance Now
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<style>
+.card-header {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+}
+
+.register-info {
+  font-size: 0.9rem;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.4em 0.6em;
+}
+
+.empty-state {
+  padding: 2rem 1rem;
+}
+
+.empty-state h5 {
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+}
+
+.btn-group .btn {
+  margin-left: 0.25rem;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(40, 167, 69, 0.05);
+}
+
+@media (max-width: 768px) {
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+  
+  .btn-group {
+    margin-top: 10px;
+    align-self: flex-end;
+  }
+  
+  .register-info {
+    margin-top: 10px;
+  }
+  
+  .table-responsive {
+    font-size: 0.85rem;
+  }
+}
+</style>
+{% endblock %}

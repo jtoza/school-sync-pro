@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}
+Classes
+{% endblock title %}
+
+{% block breadcrumb %}
+<a href="{% url 'corecode:class-create' %}" class="btn btn-primary">
+  <i class="fa fa-plus"></i>
+  Add new class
+</a>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="row">
+  <div class="col-sm-12">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Class Name</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for object in object_list %}
+        <tr>
+          <td>{{ object }}</td>
+          <td>
+            <a href="{% url 'corecode:class-update' object.id %}" class="btn btn-sm btn-warning">
+              <i class="fa fa-edit"></i> Edit
+            </a>
+            <a href="{% url 'corecode:class-delete' object.id %}" class="btn btn-sm btn-danger">
+              <i class="fa fa-trash-alt"></i> Delete
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock content %}

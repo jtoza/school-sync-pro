@@ -1,0 +1,75 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$260000$examplehash$examplehashedpassword",
+      "last_login": null,
+      "is_superuser": true,
+      "username": "admin",
+      "first_name": "",
+      "last_name": "",
+      "email": "admin@schoolapp.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2025-11-04T00:00:00Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "corecode.siteconfig",
+    "pk": 1,
+    "fields": {"key": "school_name", "value": "My School"}
+  },
+  {
+    "model": "corecode.siteconfig",
+    "pk": 2,
+    "fields": {"key": "school_slogan", "value": "A great school"}
+  },
+  {
+    "model": "corecode.siteconfig",
+    "pk": 3,
+    "fields": {"key": "school_address", "value": "Lagos, Nigeria"}
+  },
+  {
+    "model": "corecode.academicsession",
+    "pk": 1,
+    "fields": {"name": "2025/2026", "current": true}
+  },
+  {
+    "model": "corecode.academicterm",
+    "pk": 1,
+    "fields": {"name": "1st Term", "current": true}
+  },
+  {
+    "model": "corecode.academicterm",
+    "pk": 2,
+    "fields": {"name": "2nd Term", "current": false}
+  },
+  {
+    "model": "corecode.academicterm",
+    "pk": 3,
+    "fields": {"name": "3rd Term", "current": false}
+  },
+  {
+    "model": "corecode.subject",
+    "pk": 1,
+    "fields": {"name": "Mathematics"}
+  },
+  {
+    "model": "corecode.subject",
+    "pk": 2,
+    "fields": {"name": "English"}
+  },
+  {
+    "model": "corecode.studentclass",
+    "pk": 1,
+    "fields": {"name": "JSS 1"}
+  },
+  {
+    "model": "corecode.studentclass",
+    "pk": 2,
+    "fields": {"name": "JSS 2"}
+  }
+]

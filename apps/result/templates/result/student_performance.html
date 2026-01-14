@@ -1,0 +1,320 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Student Performance Trend{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <h5 class="mb-0">Student Performance Trend</h5>
+    <form method="get" class="d-flex gap-2" role="search">
+      <input type="text" name="reg" class="form-control" style="min-width:260px" placeholder="Registration Number" value="{% if reg %}{{ reg }}{% else %}{{ request.GET.reg }}{% endif %}" aria-label="Registration Number">
+      <button class="btn btn-primary" type="submit"><i class="fas fa-search me-1"></i> Load</button>
+    </form>
+  </div>
+  <div class="card-body">
+
+    {% if student %}
+    <div class="mb-3 d-flex flex-wrap align-items-center gap-2">
+      <div class="avatar avatar-sm bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width:36px;height:36px;">
+        <i class="fas fa-user-graduate"></i>
+      </div>
+      <div>
+        <div class="fw-semibold">{{ student.get_full_name|default:student }}</div>
+        <div class="text-muted small">{{ student.registration_number }} · {{ student.current_class }}</div>
+      </div>
+    </div>
+
+    <!-- Insights -->
+    <div class="row g-3 mb-3">
+      <div class="col-12 col-md-3">
+        <div class="insight-tile border rounded p-3 h-100">
+          <div class="text-muted small">Overall Average</div>
+          <div class="d-flex align-items-end gap-2">
+            <div class="display-6 fw-bold text-primary">{{ insights.overall_average|default:0 }}</div>
+            <div class="text-muted">/ 100</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-3">
+        <div class="insight-tile border rounded p-3 h-100">
+          <div class="text-muted small">Best Term</div>
+          {% if insights.best %}
+          <div class="fw-semibold">{{ insights.best.label }}</div>
+          <div class="text-success"><i class="fas fa-arrow-trend-up me-1"></i>{{ insights.best.value }}</div>
+          {% else %}
+          <div class="text-muted">—</div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-12 col-md-3">
+        <div class="insight-tile border rounded p-3 h-100">
+          <div class="text-muted small">Worst Term</div>
+          {% if insights.worst %}
+          <div class="fw-semibold">{{ insights.worst.label }}</div>
+          <div class="text-danger"><i class="fas fa-arrow-trend-down me-1"></i>{{ insights.worst.value }}</div>
+          {% else %}
+          <div class="text-muted">—</div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-12 col-md-3">
+        <div class="insight-tile border rounded p-3 h-100">
+          <div class="text-muted small">Recent Trend</div>
+          <div class="d-flex align-items-center gap-2">
+            {% if insights.trend == 'up' %}
+              <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle"><i class="fas fa-arrow-up me-1"></i>Improving</span>
+            {% elif insights.trend == 'down' %}
+              <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle"><i class="fas fa-arrow-down me-1"></i>Declining</span>
+            {% else %}
+              <span class="badge rounded-pill bg-secondary-subtle text-secondary border border-secondary-subtle"><i class="fas fa-minus me-1"></i>Flat</span>
+            {% endif %}
+            <span class="text-muted small">Streak: {{ insights.streak }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="position-relative mb-3" style="height:420px">
+      <canvas id="perfChart" aria-label="Performance Trend Chart" role="img"></canvas>
+      <div id="perfFallback" class="position-absolute top-0 start-0 w-100 h-100 d-none align-items-center justify-content-center">
+        <div class="text-center text-muted">
+          <div class="mb-2"><i class="fas fa-chart-line fa-2x"></i></div>
+          <div>Unable to render chart. Summary shown below.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary table fallback for any number of terms -->
+    <div class="table-responsive">
+      <table class="table table-sm align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Term</th>
+            <th class="text-end">CA Avg</th>
+            <th class="text-end">Exam Avg</th>
+            <th class="text-end">Total Avg</th>
+            <th class="text-end">GPA</th>
+          </tr>
+        </thead>
+        <tbody id="perfSummaryBody">
+          <!-- populated by JS for consistency -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Safe JSON payloads -->
+    {{ labels|json_script:"perf-labels" }}
+    {{ totals|json_script:"perf-totals" }}
+    {{ ca_averages|json_script:"perf-ca" }}
+    {{ exam_averages|json_script:"perf-exam" }}
+    {{ gpas|json_script:"perf-gpas" }}
+    {{ insights|json_script:"perf-insights" }}
+
+    {% else %}
+    <div class="text-center py-5">
+      <div class="display-6 text-muted mb-2"><i class="fas fa-chart-line"></i></div>
+      <p class="text-muted mb-1">Enter a student's registration number to view their performance trend.</p>
+      <p class="text-muted small">The chart will show Average Total, CA and Exam trends by term. GPA line displays when available.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<noscript>
+  <div class="alert alert-warning mt-3">JavaScript is required to view the performance chart. Enable JavaScript to see the chart visualization.</div>
+</noscript>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+(function(){
+  const labelsEl = document.getElementById('perf-labels');
+  const totalsEl = document.getElementById('perf-totals');
+  const caEl = document.getElementById('perf-ca');
+  const examEl = document.getElementById('perf-exam');
+  const gpaEl = document.getElementById('perf-gpas');
+  const fb = document.getElementById('perfFallback');
+  const tbody = document.getElementById('perfSummaryBody');
+
+  if (!labelsEl || !totalsEl) return;
+
+  let labels = [];
+  let totals = [];
+  let ca = [];
+  let exam = [];
+  let gpas = [];
+  try {
+    labels = JSON.parse(labelsEl.textContent || '[]') || [];
+    totals = JSON.parse(totalsEl.textContent || '[]') || [];
+    ca = caEl ? (JSON.parse(caEl.textContent || '[]') || []) : [];
+    exam = examEl ? (JSON.parse(examEl.textContent || '[]') || []) : [];
+    gpas = gpaEl ? (JSON.parse(gpaEl.textContent || '[]') || []) : [];
+  } catch (e) {
+    // If parsing fails, show fallback table only
+    if (fb) fb.classList.remove('d-none');
+  }
+
+  // Populate summary table regardless, so we always show something
+  (function renderSummary(){
+    if (!tbody) return;
+    const rows = [];
+    const n = labels.length;
+    for (let i = 0; i < n; i++) {
+      const tr = document.createElement('tr');
+      const td0 = document.createElement('td'); td0.textContent = labels[i] ?? '-';
+      const td1 = document.createElement('td'); td1.className = 'text-end'; td1.textContent = (ca[i] ?? 0);
+      const td2 = document.createElement('td'); td2.className = 'text-end'; td2.textContent = (exam[i] ?? 0);
+      const td3 = document.createElement('td'); td3.className = 'text-end'; td3.textContent = (totals[i] ?? 0);
+      const td4 = document.createElement('td'); td4.className = 'text-end'; td4.textContent = (gpas[i] ?? 0);
+      tr.appendChild(td0); tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); tr.appendChild(td4);
+      rows.push(tr);
+    }
+    if (rows.length === 0) {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 5; td.className = 'text-center text-muted';
+      td.textContent = 'No performance data available yet.';
+      tr.appendChild(td);
+      rows.push(tr);
+    }
+    rows.forEach(r => tbody.appendChild(r));
+  })();
+
+  // If no labels, nothing to chart; summary table already shows
+  if (!Array.isArray(labels) || labels.length === 0) {
+    if (fb) fb.classList.remove('d-none');
+    return;
+  }
+
+  // Try to render chart; on failure, reveal fallback message but keep summary table
+  try {
+    const canvas = document.getElementById('perfChart');
+    const ctx = canvas.getContext('2d');
+
+    const h = canvas.height || canvas.clientHeight || 420;
+    const gradient = ctx.createLinearGradient(0, 0, 0, h);
+    gradient.addColorStop(0, 'rgba(59, 130, 246, 0.25)');
+    gradient.addColorStop(1, 'rgba(59, 130, 246, 0.02)');
+
+    const showGpa = Array.isArray(gpas) && gpas.some(v => Number(v) > 0);
+    // Determine y-axis upper bound dynamically to show single points clearly
+    const seriesMax = Math.max(
+      0,
+      ...totals.filter(v => typeof v === 'number'),
+      ...ca.filter(v => typeof v === 'number'),
+      ...exam.filter(v => typeof v === 'number')
+    );
+    const ySuggestedMax = Math.max(50, Math.ceil((seriesMax + 5) / 10) * 10); // round to next 10
+
+    const datasets = [
+      {
+        label: 'Average Total',
+        data: totals,
+        borderColor: '#3b82f6',
+        backgroundColor: gradient,
+        borderWidth: 2.5,
+        pointRadius: 3.5,
+        pointHoverRadius: 5,
+        tension: 0.35,
+        fill: true,
+      },
+    ];
+
+    if (Array.isArray(ca) && ca.length) {
+      datasets.push({
+        label: 'Average CA',
+        data: ca,
+        borderColor: '#10b981',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        pointRadius: 2.5,
+        pointHoverRadius: 4,
+        tension: 0.25,
+        fill: false,
+      });
+    }
+    if (Array.isArray(exam) && exam.length) {
+      datasets.push({
+        label: 'Average Exam',
+        data: exam,
+        borderColor: '#f59e0b',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        pointRadius: 2.5,
+        pointHoverRadius: 4,
+        tension: 0.25,
+        fill: false,
+      });
+    }
+    if (showGpa) {
+      datasets.push({
+        label: 'GPA',
+        data: gpas,
+        borderColor: '#8b5cf6',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        pointRadius: 2.5,
+        pointHoverRadius: 4,
+        tension: 0.25,
+        fill: false,
+        borderDash: [6, 4],
+        yAxisID: 'y1'
+      });
+    }
+
+    new Chart(ctx, {
+      type: 'line',
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { position: 'top' },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                const dsLabel = ctx.dataset.label || '';
+                const val = (ctx.raw ?? ctx.parsed.y);
+                return ' ' + dsLabel + ': ' + val;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            title: { display: true, text: 'Average Total' },
+            suggestedMin: 0,
+            suggestedMax: ySuggestedMax,
+            ticks: { stepSize: Math.max(5, Math.round(ySuggestedMax / 10)) }
+          },
+          y1: {
+            display: showGpa,
+            position: 'right',
+            title: { display: true, text: 'GPA' },
+            suggestedMin: 0,
+            suggestedMax: 4,
+            grid: { drawOnChartArea: false },
+          },
+          x: { ticks: { maxRotation: 0, autoSkip: true } }
+        }
+      }
+    });
+  } catch (e) {
+    if (fb) fb.classList.remove('d-none');
+  }
+})();
+</script>
+
+<style>
+  .insight-tile { background: #fff; }
+  .bg-success-subtle { background-color: rgba(25, 135, 84, .12) !important; }
+  .bg-danger-subtle { background-color: rgba(220, 53, 69, .12) !important; }
+  .bg-secondary-subtle { background-color: rgba(108, 117, 125, .12) !important; }
+  .border-success-subtle { border-color: rgba(25, 135, 84, .35) !important; }
+  .border-danger-subtle { border-color: rgba(220, 53, 69, .35) !important; }
+  .border-secondary-subtle { border-color: rgba(108, 117, 125, .35) !important; }
+</style>
+{% endblock %}

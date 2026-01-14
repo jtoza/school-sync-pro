@@ -1,0 +1,226 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to {{ school_name|default:"School Portal" }}</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Bootstrap 4 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Source Sans Pro', sans-serif;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background-image: url("{% static 'dist/img/logo (1).png' %}");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.12;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .landing-container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .school-brand {
+            text-align: center;
+            margin-bottom: 50px;
+            color: #1b5e20;
+        }
+
+        .school-brand i {
+            font-size: 4rem;
+            color: #2e7d32;
+            margin-bottom: 15px;
+        }
+
+        .school-brand h1 {
+            font-weight: 700;
+            font-size: 2.5rem;
+            color: #1b5e20;
+        }
+
+        .school-brand .lead {
+            color: #388e3c;
+        }
+
+        .card-option {
+            border: none;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            height: 100%;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            background: white;
+        }
+
+        .card-option:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(46, 125, 50, 0.3);
+        }
+
+        .card-body {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .icon-wrapper {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .bg-staff {
+            background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+        }
+
+        .bg-parent {
+            background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+        }
+
+        .bg-student {
+            background: linear-gradient(135deg, #81c784 0%, #66bb6a 100%);
+        }
+
+        .btn-action {
+            border-radius: 25px;
+            padding: 10px 30px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .btn-staff {
+            background-color: #2e7d32;
+            border-color: #2e7d32;
+            color: white;
+        }
+
+        .btn-parent {
+            background-color: #43a047;
+            border-color: #43a047;
+            color: white;
+        }
+
+        .btn-student {
+            background-color: #66bb6a;
+            border-color: #66bb6a;
+            color: white;
+        }
+
+        .btn-staff:hover {
+            background-color: #1b5e20;
+            color: white;
+        }
+
+        .btn-parent:hover {
+            background-color: #2e7d32;
+            color: white;
+        }
+
+        .btn-student:hover {
+            background-color: #43a047;
+            color: white;
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 40px;
+            color: #388e3c;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="landing-container">
+        <div class="school-brand">
+            <i class="fas fa-graduation-cap"></i>
+            <h1>Green Bells Academy</h1>
+            <p class="lead">Excellence in Education</p>
+        </div>
+
+        <div class="row">
+            <!-- Staff Login -->
+            <div class="col-md-4 mb-4">
+                <div class="card card-option">
+                    <div class="card-body">
+                        <div class="icon-wrapper bg-staff">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <h4>Staff Portal</h4>
+                        <p class="text-muted">Login for teachers and administrators to manage school activities.</p>
+                        <a href="{% url 'corecode:login' %}" class="btn btn-action btn-staff">Login</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parent Portal -->
+            <div class="col-md-4 mb-4">
+                <div class="card card-option">
+                    <div class="card-body">
+                        <div class="icon-wrapper bg-parent">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <h4>Parent Portal</h4>
+                        <p class="text-muted">Check your child's fees, results, and academic progress.</p>
+                        <a href="/parents/access/" class="btn btn-action btn-parent">Parent Access</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Homework -->
+            <div class="col-md-4 mb-4">
+                <div class="card card-option">
+                    <div class="card-body">
+                        <div class="icon-wrapper bg-student">
+                            <i class="fas fa-book-reader"></i>
+                        </div>
+                        <h4>Student Homework</h4>
+                        <p class="text-muted">View daily homework assignments and study materials.</p>
+                        <a href="{% url 'student_homework' %}" class="btn btn-action btn-student">Check Homework</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-text">
+            <p>&copy; {% now "Y" %} Green Bells Academy. All rights reserved.</p>
+        </div>
+    </div>
+
+</body>
+
+</html>

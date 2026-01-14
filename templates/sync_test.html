@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sync Test</title>
+</head>
+<body>
+    <h1>Offline Sync Test</h1>
+    
+    <button onclick="testSync()">Test Sync API</button>
+    <button onclick="testSaveLocal()">Test Save Locally</button>
+    <button onclick="testGetAll()">Test Get All Local</button>
+    
+    <div id="results" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc;"></div>
+
+    <!-- Include the offline manager -->
+    <script src="/static/js/offline-manager.js"></script>
+    
+    <script>
+    function log(message) {
+        const results = document.getElementById('results');
+        results.innerHTML += '<div>' + new Date().toLocaleTimeString() + ' - ' + message + '</div>';
+        console.log(message);
+    }
+
+    async function testSync() {
+        log('Testing sync API...');
+        try {
+            const response = await fetch('/sync/api/sync/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    device_id: 'test_browser',
+                    changes: [],
+                    last_sync: null
+                })
+            });
+            
+            const result = await response.json();
+            log('Sync test result: ' + JSON.stringify(result));
+        } catch (error) {
+            log('Sync test failed: ' + error.message);
+        }
+    }
+
+    async function testSaveLocal() {
+        log('Testing local save...');
+        try {
+            const sampleData = {
+                teacher_sync_id: 'test_teacher_' + Date.now(),
+                date: new Date().toISOString().split('T')[0],
+                status: 'present',
+                time_in: '08:00',
+                time_out: '16:00',
+                notes: 'Test from browser ' + new Date().toLocaleTimeString()
+            };
+            
+            const syncId = await offlineManager.saveLocal('teacher_attendances', sampleData);
+            log('Saved locally with ID: ' + syncId);
+        } catch (error) {
+            log('Local save failed: ' + error.message);
+        }
+    }
+
+    async function testGetAll() {
+        log('Getting all local data...');
+        try {
+            const allData = await offlineManager.getAllLocal('teacher_attendances');
+            log('Local teacher attendances: ' + allData.length + ' records');
+            allData.forEach(item => {
+                log(' - ' + item.date + ': ' + item.status + ' (' + item.sync_id + ')');
+            });
+        } catch (error) {
+            log('Get all failed: ' + error.message);
+        }
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        log('Page loaded - Offline Manager ready');
+        log('Device ID: ' + offlineManager.deviceId);
+        log('Online: ' + navigator.onLine);
+    });
+    </script>
+</body>
+</html>

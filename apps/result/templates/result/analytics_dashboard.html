@@ -1,0 +1,458 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Analytics Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary: #16a34a;
+        --accent: #22c55e;
+        --bg: #f0fdf4;
+        --card-bg: #fff;
+    }
+
+    .analytics-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(22, 163, 74, 0.3);
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 14px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s, box-shadow 0.3s;
+        border-left: 4px solid var(--primary);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 1rem;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 900;
+        color: #1f2937;
+        margin: 0.5rem 0;
+    }
+
+    .stat-label {
+        color: #64748b;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .chart-container {
+        background: white;
+        border-radius: 14px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chart-wrapper {
+        flex: 1;
+        min-height: 300px;
+        position: relative;
+    }
+
+    .chart-title {
+        margin-bottom: 1.5rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .rank-badge {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 1.1rem;
+    }
+
+    .rank-1 {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        color: white;
+    }
+
+    .rank-2 {
+        background: linear-gradient(135deg, #94a3b8, #64748b);
+        color: white;
+    }
+
+    .rank-3 {
+        background: linear-gradient(135deg, #fb923c, #ea580c);
+        color: white;
+    }
+
+    .rank-other {
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        color: white;
+    }
+
+    .gpa-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.4rem 1rem;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+
+    .gpa-excellent {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+    }
+
+    .gpa-verygood {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: white;
+    }
+
+    .gpa-good {
+        background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        color: white;
+    }
+
+    .gpa-fair {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+    }
+
+    .gpa-needs {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+    }
+
+    .leaderboard-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        background: #f9fafb;
+        border-radius: 12px;
+        margin-bottom: 0.8rem;
+        transition: all 0.3s;
+    }
+
+    .leaderboard-item:hover {
+        background: #f0fdf4;
+        transform: translateX(5px);
+    }
+
+    .subject-bar {
+        background: #e5e7eb;
+        border-radius: 10px;
+        overflow: hidden;
+        height: 30px;
+        position: relative;
+    }
+
+    .subject-bar-fill {
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 0 0.8rem;
+        color: white;
+        font-weight: 700;
+        font-size: 0.85rem;
+        transition: width 0.5s ease;
+    }
+
+    .class-selector {
+        background: white;
+        border: 2px solid var(--primary);
+        border-radius: 10px;
+        padding: 0.6rem 1rem;
+        font-weight: 600;
+    }
+
+    /* Ensure consistent row heights */
+    .row-equal {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    .row-equal > [class*='col-'] {
+        display: flex;
+        flex-direction: column;
+    }
+</style>
+
+<!-- Analytics Header -->
+<div class="analytics-header">
+    <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+            <h1 class="mb-2"><i class="fas fa-chart-line mr-2"></i>Analytics Dashboard</h1>
+            <p class="mb-0 opacity-90">Comprehensive performance insights for {{ selected_class.name }}</p>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <form method="get" class="d-inline">
+                <select name="class" class="class-selector" onchange="this.form.submit()">
+                    <option value="">Select Class</option>
+                    {% for class in classes %}
+                    <option value="{{ class.id }}" {% if selected_class.id == class.id %}selected{% endif %}>
+                        {{ class.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </form>
+            <a href="{% url 'bulk-upload-results' %}" class="btn btn-light btn-lg ml-2">
+                <i class="fas fa-upload mr-2"></i>Bulk Upload
+            </a>
+        </div>
+    </div>
+</div>
+
+{% if selected_class %}
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                <i class="fas fa-users text-white"></i>
+            </div>
+            <div class="stat-value">{{ class_stats.total_students }}</div>
+            <div class="stat-label">Total Students</div>
+        </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+                <i class="fas fa-chart-bar text-white"></i>
+            </div>
+            <div class="stat-value">{{ class_stats.avg_class_score }}</div>
+            <div class="stat-label">Class Average</div>
+        </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                <i class="fas fa-trophy text-white"></i>
+            </div>
+            <div class="stat-value">{{ class_stats.highest_score }}</div>
+            <div class="stat-label">Highest Score</div>
+        </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                <i class="fas fa-book text-white"></i>
+            </div>
+            <div class="stat-value">{{ class_stats.total_results }}</div>
+            <div class="stat-label">Total Results</div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row row-equal">
+    <!-- Grade Distribution Chart -->
+    <div class="col-lg-6 mb-4">
+        <div class="chart-container">
+            <h4 class="chart-title"><i class="fas fa-chart-pie text-primary mr-2"></i>Grade Distribution</h4>
+            <div class="chart-wrapper">
+                <canvas id="gradeChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subject Performance Chart -->
+    <div class="col-lg-6 mb-4">
+        <div class="chart-container">
+            <h4 class="chart-title"><i class="fas fa-chart-bar text-primary mr-2"></i>Subject Averages</h4>
+            <div class="chart-wrapper">
+                <canvas id="subjectChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Leaderboard and Subject Stats -->
+<div class="row row-equal">
+    <!-- Top Students Leaderboard -->
+    <div class="col-lg-7 mb-4">
+        <div class="chart-container">
+            <h4 class="chart-title"><i class="fas fa-trophy text-warning mr-2"></i>Top Performers</h4>
+            <div class="chart-wrapper">
+                {% for student_data in top_students %}
+                <div class="leaderboard-item">
+                    <div
+                        class="rank-badge {% if student_data.position == 1 %}rank-1{% elif student_data.position == 2 %}rank-2{% elif student_data.position == 3 %}rank-3{% else %}rank-other{% endif %}">
+                        {{ student_data.position }}
+                    </div>
+                    <div class="ml-3 flex-grow-1">
+                        <div class="font-weight-bold">{{ student_data.student.get_full_name }}</div>
+                        <small class="text-muted">{{ student_data.student.registration_number }}</small>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-weight-bold" style="font-size: 1.2rem; color: var(--primary);">
+                            {{ student_data.avg_score }}%
+                        </div>
+                        <div>
+                            <span class="gpa-badge gpa-{{ student_data.gpa_class|lower|cut:' ' }}">
+                                GPA: {{ student_data.gpa }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center py-4">No results available yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Subject Statistics -->
+    <div class="col-lg-5 mb-4">
+        <div class="chart-container">
+            <h4 class="chart-title"><i class="fas fa-book-open text-primary mr-2"></i>Subject Statistics</h4>
+            <div class="chart-wrapper">
+                {% for subject in subject_stats %}
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="font-weight-bold">{{ subject.subject }}</span>
+                        <span class="badge badge-success">{{ subject.pass_rate }}% Pass</span>
+                    </div>
+                    <div class="subject-bar">
+                        <div class="subject-bar-fill" style="width: {{ subject.average }}%;">
+                            {{ subject.average }}%
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-1">
+                        <small class="text-muted">
+                            <i class="fas fa-arrow-up text-success"></i> {{ subject.highest }}
+                        </small>
+                        <small class="text-muted">
+                            <i class="fas fa-arrow-down text-danger"></i> {{ subject.lowest }}
+                        </small>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center py-4">No subject data available.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        const chartData = {{ chart_data| safe }};
+
+        // Grade Distribution Pie Chart
+        const gradeCanvas = document.getElementById('gradeChart');
+        if (gradeCanvas) {
+            const gradeCtx = gradeCanvas.getContext('2d');
+            new Chart(gradeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: chartData.grade_labels,
+                    datasets: [{
+                        data: chartData.grade_counts,
+                        backgroundColor: [
+                            '#10b981', // Exceeding
+                            '#3b82f6', // EE
+                            '#8b5cf6', // ME
+                            '#f59e0b', // AE
+                            '#ef4444', // BE
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                font: { size: 13, weight: '600' }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Subject Performance Bar Chart
+        const subjectCanvas = document.getElementById('subjectChart');
+        if (subjectCanvas) {
+            const subjectCtx = subjectCanvas.getContext('2d');
+            new Chart(subjectCtx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.subject_names,
+                    datasets: [{
+                        label: 'Average Score',
+                        data: chartData.subject_averages,
+                        backgroundColor: 'rgba(22, 163, 74, 0.8)',
+                        borderColor: '#16a34a',
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: (value) => value + '%'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+
+{% else %}
+<div class="alert alert-info">
+    <i class="fas fa-info-circle mr-2"></i>
+    Please select a class to view analytics.
+</div>
+{% endif %}
+
+{% endblock %}

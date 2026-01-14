@@ -1,0 +1,24 @@
+asgiref==3.10.0
+beautifulsoup4==4.14.2
+crispy-bootstrap4==2025.6
+dj-database-url==3.0.1
+Django==5.2.7
+django-crispy-forms==2.4
+django-widget-tweaks==1.5.0
+gunicorn==23.0.0
+packaging==25.0
+pillow==12.0.0
+python-dotenv==1.2.1
+soupsieve==2.8
+sqlparse==0.5.3
+typing_extensions==4.15.0
+tzdata==2025.2
+whitenoise==6.11.0
+playwright>=1.40.0
+weasyprint==62.3     # <-- added
+pandas
+openpyxl
+psycopg2-binary
+africastalking==1.2.6
+lipana==1.0.1
+channels==4.0.0

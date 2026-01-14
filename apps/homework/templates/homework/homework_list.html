@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content-header %}
+<div class="card-header">
+    <div class="card-tools">
+        <a href="{% url 'homework_create' %}" class="btn btn-tool">
+            <i class="fas fa-plus"></i> Post New Homework
+        </a>
+    </div>
+</div>
+{% endblock content-header %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">My Posted Homework</h3>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-striped projects">
+            <thead>
+                <tr>
+                    <th>Class</th>
+                    <th>Subject</th>
+                    <th>Title</th>
+                    <th>Due Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for homework in homework_list %}
+                <tr>
+                    <td>{{ homework.student_class }}</td>
+                    <td>{{ homework.subject }}</td>
+                    <td>
+                        <a>{{ homework.title }}</a>
+                        <br />
+                        <small>Posted {{ homework.created_at|date:"M d, Y" }}</small>
+                    </td>
+                    <td>{{ homework.due_date }}</td>
+                    <td class="project-actions text-right">
+                        <a class="btn btn-info btn-sm" href="{% url 'homework_update' homework.id %}">
+                            <i class="fas fa-pencil-alt"></i> Edit
+                        </a>
+                        <a class="btn btn-danger btn-sm" href="{% url 'homework_delete' homework.id %}">
+                            <i class="fas fa-trash"></i> Delete
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No homework posted yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock content %}
