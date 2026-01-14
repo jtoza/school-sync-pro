@@ -19,17 +19,12 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-this-in-production'
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 # Allowed hosts - FIXED
-<<<<<<< HEAD
 allowed_hosts_str = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,127.0.1.1,.onrender.com')
 ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',') if host.strip()]
 # Ensure common localhost aliases are present
 for host in ('127.0.0.1', 'localhost'):
     if host not in ALLOWED_HOSTS:
         ALLOWED_HOSTS.append(host)
-=======
-allowed_hosts_str = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,.onrender.com')
-ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',') if host.strip()]
->>>>>>> b00086b8e144822c2ac905dccb242c0f0965c7ec
 
 # Render external hostname support
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
