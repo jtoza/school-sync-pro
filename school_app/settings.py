@@ -59,6 +59,8 @@ INSTALLED_APPS = [
     'apps.homework',
     'chatroom',
     'channels',
+    'apps.books',
+    'apps.transport',
 ]
 
 MIDDLEWARE = [

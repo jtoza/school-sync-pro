@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Vehicles</h3>
+<a class="btn btn-primary btn-sm" href="{% url 'transport:vehicle-create' %}">Add Vehicle</a>
+<table class="table table-striped mt-2">
+  <thead><tr><th>Plate</th><th>Model</th><th>Capacity</th><th>Driver</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+    {% for v in object_list %}
+    <tr>
+      <td><a href="{% url 'transport:vehicle-detail' v.pk %}">{{ v.plate_number }}</a></td>
+      <td>{{ v.model }}</td>
+      <td>{{ v.capacity }}</td>
+      <td>{{ v.driver_name }}</td>
+      <td>{{ v.get_status_display }}</td>
+      <td>
+        <a href="{% url 'transport:vehicle-update' v.pk %}" class="btn btn-sm btn-secondary">Edit</a>
+        <a href="{% url 'transport:vehicle-delete' v.pk %}" class="btn btn-sm btn-danger">Delete</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6">No vehicles yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

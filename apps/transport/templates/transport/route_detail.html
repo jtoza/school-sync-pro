@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Route {{ object.name }}</h3>
+<p>Start: {{ object.start_point }}</p>
+<p>End: {{ object.end_point }}</p>
+<p>Fare: {{ object.fare }}</p>
+<a href="{% url 'transport:route-update' object.pk %}" class="btn btn-secondary btn-sm">Edit</a>
+<a href="{% url 'transport:route-delete' object.pk %}" class="btn btn-danger btn-sm">Delete</a>
+{% endblock %}

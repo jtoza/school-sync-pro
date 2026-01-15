@@ -11,6 +11,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.http import JsonResponse, HttpResponse
 from django.db.models import Q
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 from .forms import (
     AcademicSessionForm,
@@ -19,6 +20,8 @@ from .forms import (
     SiteConfigForm,
     StudentClassForm,
     SubjectForm,
+    ProfileForm,
+    AccountForm,
 )
 from .models import (
     AcademicSession,
@@ -26,7 +29,40 @@ from .models import (
     SiteConfig,
     StudentClass,
     Subject,
+    Profile,
 )
+
+
+class ProfileView(LoginRequiredMixin, TemplateView):
+    template_name = 'account/profile.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['profile'] = getattr(self.request.user, 'profile', None)
+        return ctx
+
+
+class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    model = Profile
+    form_class = ProfileForm
+    template_name = 'account/profile_form.html'
+    success_url = reverse_lazy('corecode:profile')
+    success_message = 'Profile updated successfully.'
+
+    def get_object(self, queryset=None):
+        profile, _ = Profile.objects.get_or_create(user=self.request.user)
+        return profile
+
+
+class AccountUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    model = User
+    form_class = AccountForm
+    template_name = 'account/account_form.html'
+    success_url = reverse_lazy('corecode:profile-settings')
+    success_message = 'Account updated successfully.'
+
+    def get_object(self, queryset=None):
+        return self.request.user
 
 
 class IndexView(LoginRequiredMixin, TemplateView):

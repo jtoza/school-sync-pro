@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>{{ object.title }}</h3>
+<p>Author: {{ object.author }}</p>
+<p>ISBN: {{ object.isbn }}</p>
+<p>Category: {{ object.category }}</p>
+<p>Available: {{ object.available_copies }}/{{ object.total_copies }}</p>
+<p>Status: {{ object.get_status_display }}</p>
+<a href="{% url 'books:book-update' object.pk %}" class="btn btn-secondary btn-sm">Edit</a>
+<a href="{% url 'books:book-delete' object.pk %}" class="btn btn-danger btn-sm">Delete</a>
+{% endblock %}

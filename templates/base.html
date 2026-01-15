@@ -727,10 +727,10 @@
               <i class="fas fa-user-circle mr-2"></i>Welcome, {{ user.username }}
             </span>
             <div class="dropdown-divider"></div>
-            <a href="#" class="dropdown-item">
+            <a href="{% url 'corecode:profile' %}" class="dropdown-item">
               <i class="fas fa-user mr-2"></i> Profile
             </a>
-            <a href="#" class="dropdown-item">
+            <a href="{% url 'corecode:profile-settings' %}" class="dropdown-item">
               <i class="fas fa-cog mr-2"></i> Settings
             </a>
             <div class="dropdown-divider"></div>
@@ -981,6 +981,64 @@
                   <a href="{% url 'corecode:classes' %}" class="nav-link">
                     <i class="nav-icon fas fa-chalkboard"></i>
                     <p>Classes</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <!-- Library Section -->
+            <li class="nav-header">Library</li>
+            <li class="nav-item has-treeview">
+              <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-book"></i>
+                <p>
+                  Library
+                  <i class="fas fa-angle-left right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="{% url 'books:book-list' %}" class="nav-link">
+                    <i class="nav-icon fas fa-book-open"></i>
+                    <p>Books</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'books:borrow-list' %}" class="nav-link">
+                    <i class="nav-icon fas fa-exchange-alt"></i>
+                    <p>Borrow Records</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <!-- Transport Section -->
+            <li class="nav-header">Transport</li>
+            <li class="nav-item has-treeview">
+              <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-bus"></i>
+                <p>
+                  Transport
+                  <i class="fas fa-angle-left right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="{% url 'transport:vehicle-list' %}" class="nav-link">
+                    <i class="nav-icon fas fa-shuttle-van"></i>
+                    <p>Vehicles</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'transport:route-list' %}" class="nav-link">
+                    <i class="nav-icon fas fa-route"></i>
+                    <p>Routes</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'transport:assignment-list' %}" class="nav-link">
+                    <i class="nav-icon fas fa-user-tag"></i>
+                    <p>Assignments</p>
                   </a>
                 </li>
               </ul>

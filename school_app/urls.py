@@ -53,6 +53,8 @@ urlpatterns = [
     path('service-worker.js', service_worker_view, name='service_worker'),
     path('offline/', TemplateView.as_view(template_name='offline.html'), name='offline'),
     path('idcards/', include('apps.idcards.urls', namespace='idcards')),  # ADDED NAMESPACE
+    path('books/', include('apps.books.urls', namespace='books')),
+    path('transport/', include('apps.transport.urls', namespace='transport')),
 
     path('sync/', include('apps.sync.urls')),
     path('sync/test/', TemplateView.as_view(template_name='sync_test.html'), name='sync_test'),

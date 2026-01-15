@@ -26,6 +26,9 @@ from .views import (
     signup_view,
     login_view,
     logout_view,
+    ProfileView,
+    ProfileUpdateView,
+    AccountUpdateView,
 )
 
 urlpatterns = [
@@ -70,6 +73,11 @@ urlpatterns = [
     path("signup/", signup_view, name="signup"),
     path("login/", login_view, name="login"),
     path("logout/", logout_view, name="logout"),
+
+    # Profile & Account
+    path('account/profile/', ProfileView.as_view(), name='profile'),
+    path('account/profile/edit/', ProfileUpdateView.as_view(), name='profile-edit'),
+    path('account/settings/', AccountUpdateView.as_view(), name='profile-settings'),
     
     # Class Management URLs
     path('teacher/classes/', teacher_class_list, name='teacher-class-list'),

@@ -59,7 +59,7 @@ class StaffUpdateView(SuccessMessageMixin, UpdateView):
 
 class StaffDeleteView(DeleteView):
     model = Staff
-    success_url = reverse_lazy("staff-list")
+    success_url = reverse_lazy("staffs:staff-list")
     template_name = "staffs/staff_confirm_delete.html"
 
 

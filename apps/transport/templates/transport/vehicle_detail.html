@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Vehicle {{ object.plate_number }}</h3>
+<p>Model: {{ object.model }}</p>
+<p>Capacity: {{ object.capacity }}</p>
+<p>Driver: {{ object.driver_name }} ({{ object.driver_phone }})</p>
+<p>Status: {{ object.get_status_display }}</p>
+<a href="{% url 'transport:vehicle-update' object.pk %}" class="btn btn-secondary btn-sm">Edit</a>
+<a href="{% url 'transport:vehicle-delete' object.pk %}" class="btn btn-danger btn-sm">Delete</a>
+{% endblock %}

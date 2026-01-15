@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import ModelForm, modelformset_factory
+from django.contrib.auth.models import User
 
 from .models import (
     AcademicSession,
@@ -7,6 +8,7 @@ from .models import (
     SiteConfig,
     StudentClass,
     Subject,
+    Profile,
 )
 
 SiteConfigForm = modelformset_factory(
@@ -49,6 +51,18 @@ class StudentClassForm(ModelForm):
     class Meta:
         model = StudentClass
         fields = ["name"]
+
+
+class ProfileForm(ModelForm):
+    class Meta:
+        model = Profile
+        fields = ["avatar", "phone", "bio"]
+
+
+class AccountForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ["username", "email"]
 
 
 class CurrentSessionForm(forms.Form):

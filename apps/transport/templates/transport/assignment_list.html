@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Transport Assignments</h3>
+<a class="btn btn-primary btn-sm" href="{% url 'transport:assignment-create' %}">Add Assignment</a>
+<table class="table table-striped mt-2">
+  <thead><tr><th>Entity</th><th>Route</th><th>Vehicle</th><th>Start</th><th>End</th><th>Active</th><th></th></tr></thead>
+  <tbody>
+    {% for a in object_list %}
+    <tr>
+      <td>{{ a.entity }}</td>
+      <td>{{ a.route }}</td>
+      <td>{{ a.vehicle|default:'-' }}</td>
+      <td>{{ a.start_date }}</td>
+      <td>{{ a.end_date|default:'-' }}</td>
+      <td>{{ a.is_active }}</td>
+      <td>
+        <a href="{% url 'transport:assignment-update' a.pk %}" class="btn btn-sm btn-secondary">Edit</a>
+        <a href="{% url 'transport:assignment-delete' a.pk %}" class="btn btn-sm btn-danger">Delete</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="7">No assignments yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

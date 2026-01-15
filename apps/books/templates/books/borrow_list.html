@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Borrow Records</h3>
+<a class="btn btn-primary btn-sm" href="{% url 'books:borrow-create' %}">New Borrow</a>
+<table class="table table-striped mt-2">
+  <thead><tr><th>Book</th><th>Borrower</th><th>Borrowed On</th><th>Due On</th><th>Returned On</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+    {% for r in object_list %}
+    <tr>
+      <td>{{ r.book }}</td>
+      <td>{{ r.borrower }}</td>
+      <td>{{ r.borrowed_on }}</td>
+      <td>{{ r.due_on }}</td>
+      <td>{{ r.returned_on|default:'-' }}</td>
+      <td>{{ r.get_status_display }}</td>
+      <td>
+        <a href="{% url 'books:borrow-update' r.pk %}" class="btn btn-sm btn-secondary">Edit</a>
+        <a href="{% url 'books:borrow-delete' r.pk %}" class="btn btn-sm btn-danger">Delete</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="7">No borrow records yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

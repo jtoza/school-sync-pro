@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Books</h3>
+<a class="btn btn-primary btn-sm" href="{% url 'books:book-create' %}">Add Book</a>
+<table class="table table-striped mt-2">
+  <thead><tr><th>Title</th><th>Author</th><th>ISBN</th><th>Available</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+    {% for b in object_list %}
+    <tr>
+      <td><a href="{% url 'books:book-detail' b.pk %}">{{ b.title }}</a></td>
+      <td>{{ b.author }}</td>
+      <td>{{ b.isbn }}</td>
+      <td>{{ b.available_copies }}/{{ b.total_copies }}</td>
+      <td>{{ b.get_status_display }}</td>
+      <td>
+        <a href="{% url 'books:book-update' b.pk %}" class="btn btn-sm btn-secondary">Edit</a>
+        <a href="{% url 'books:book-delete' b.pk %}" class="btn btn-sm btn-danger">Delete</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6">No books yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
