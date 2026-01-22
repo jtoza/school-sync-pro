@@ -63,6 +63,7 @@ urlpatterns = [
     path('homework/', include('apps.homework.urls')),
     path('chat/', include('chatroom.urls', namespace='chatroom')),
     path('test-db/', test_database, name='test_db'),
+    path('lesson-plans/', include('lessonplans.urls')),
 
 ]
 

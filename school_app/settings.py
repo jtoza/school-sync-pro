@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'channels',
     'apps.books',
     'apps.transport',
+    'lessonplans.apps.LessonplansConfig',
 ]
 
 MIDDLEWARE = [
