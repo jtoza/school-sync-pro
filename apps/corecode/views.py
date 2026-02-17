@@ -1,8 +1,24 @@
+# Manual 503 trigger for testing
+from django.http import HttpResponse
+def trigger_503(request):
+    from django.core.handlers.exception import response_for_exception
+    from django.http import HttpRequest
+    # Simulate a 503 error
+    response = service_unavailable(request)
+    response.status_code = 503
+    return response
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect, render
+
+# 503 Service Unavailable view
+def service_unavailable(request, exception=None):
+    from django.utils import timezone
+    return render(request, '503_django.html', {
+        'now': timezone.now(),
+    }, status=503)
 from django.urls import reverse_lazy
 from django.views.generic import ListView, TemplateView, View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView

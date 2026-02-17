@@ -1,7 +1,7 @@
 from django.urls import path
 from django.views.generic import TemplateView
 from .views_class_management import teacher_class_list, class_detail
-from .views import global_search, notifications_feed, send_notice
+from .views import global_search, notifications_feed, send_notice, trigger_503
 
 from .views import (
     ClassCreateView,
@@ -94,4 +94,5 @@ urlpatterns = [
     # Utility APIs
     path('search/', global_search, name='global-search'),
     path('notifications/', notifications_feed, name='notifications-feed'),
+    path('test-503/', trigger_503, name='test_503'),
 ]

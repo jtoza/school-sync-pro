@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Connection Lost - School Sync Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0b1120;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background grid */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* Floating orbs */
+        .orb {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.05));
+            filter: blur(60px);
+            animation: float 20s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        .orb-1 {
+            top: -150px;
+            right: -100px;
+            background: radial-gradient(circle at 30% 30%, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.1));
+        }
+
+        .orb-2 {
+            bottom: -150px;
+            left: -100px;
+            background: radial-gradient(circle at 70% 70%, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.1));
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        .error-card {
+            max-width: 680px;
+            width: 100%;
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 32px;
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+            animation: cardAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            z-index: 10;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        @keyframes cardAppear {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .error-header {
+            background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 100%);
+            padding: 48px 40px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .error-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .error-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            display: inline-block;
+            animation: floatIcon 3s ease-in-out infinite;
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.1); }
+        }
+
+        .error-header h1 {
+            font-size: 36px;
+            margin-bottom: 12px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(to right, #fff, #e0e7ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            z-index: 2;
+        }
+
+        .error-header p {
+            font-size: 18px;
+            opacity: 0.9;
+            font-weight: 400;
+            position: relative;
+            z-index: 2;
+            color: #cbd5e1;
+        }
+
+        .error-body {
+            padding: 40px;
+        }
+
+        .warning-badge {
+            background: rgba(251, 191, 36, 0.1);
+            color: #fbbf24;
+            padding: 16px 20px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-weight: 500;
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            backdrop-filter: blur(5px);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { border-color: rgba(251, 191, 36, 0.2); }
+            50% { border-color: rgba(251, 191, 36, 0.4); }
+        }
+
+        .warning-badge span {
+            font-size: 28px;
+            filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.3));
+        }
+
+        .database-card {
+            background: rgba(31, 41, 55, 0.5);
+            backdrop-filter: blur(5px);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .database-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+        }
+
+        .database-card h3 {
+            color: #f3f4f6;
+            font-size: 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .connection-details {
+            background: rgba(17, 24, 39, 0.7);
+            border-radius: 16px;
+            padding: 20px;
+            font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+            font-size: 13px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .connection-details div {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+        }
+
+        .connection-details div:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .connection-details div:first-child {
+            padding-top: 0;
+        }
+
+        .connection-details .label {
+            color: #9ca3af;
+            width: 100px;
+            font-weight: 500;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .connection-details .value {
+            color: #e5e7eb;
+            font-weight: 400;
+            word-break: break-all;
+        }
+
+        .error-status {
+            color: #f87171;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .error-status::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            display: inline-block;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .trial-ended {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+            color: #fca5a5;
+            padding: 20px;
+            border-radius: 16px;
+            margin: 30px 0;
+            text-align: center;
+            font-weight: 600;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            backdrop-filter: blur(5px);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .trial-ended span {
+            font-size: 24px;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin: 30px 0;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 18px 28px;
+            border-radius: 16px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(75, 85, 99, 0.5);
+            backdrop-filter: blur(5px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(107, 114, 128, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #d1d5db;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-outline:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.02);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .quick-tips {
+            background: rgba(31, 41, 55, 0.3);
+            backdrop-filter: blur(5px);
+            border-radius: 20px;
+            padding: 24px;
+            margin: 30px 0;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .quick-tips h4 {
+            color: #e5e7eb;
+            margin-bottom: 16px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .quick-tips ul {
+            list-style: none;
+        }
+
+        .quick-tips li {
+            color: #9ca3af;
+            font-size: 14px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            border-radius: 12px;
+            transition: background 0.2s ease;
+        }
+
+        .quick-tips li:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .quick-tips li span {
+            font-size: 18px;
+            min-width: 32px;
+        }
+
+        .quick-tips a {
+            color: #818cf8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .quick-tips a:hover {
+            color: #a5b4fc;
+            text-decoration: underline;
+        }
+
+        .refresh-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .refresh-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 12px 28px;
+            border-radius: 40px;
+            color: #e5e7eb;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        .countdown {
+            color: #6b7280;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .countdown .timer {
+            color: #fbbf24;
+            font-weight: 600;
+            font-family: 'SF Mono', monospace;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #4b5563;
+            font-size: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 24px;
+        }
+
+        .footer p {
+            margin-bottom: 6px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 12px;
+        }
+
+        .footer-links a {
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 12px;
+            transition: color 0.2s ease;
+            padding: 4px 8px;
+            border-radius: 20px;
+        }
+
+        .footer-links a:hover {
+            color: #e5e7eb;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .error-timestamp {
+            font-family: 'SF Mono', monospace;
+            color: #4b5563;
+            margin-top: 8px;
+            font-size: 11px;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 16px;
+            }
+
+            .error-header {
+                padding: 32px 24px;
+            }
+
+            .error-header h1 {
+                font-size: 28px;
+            }
+
+            .error-body {
+                padding: 24px;
+            }
+
+            .connection-details div {
+                flex-direction: column;
+            }
+
+            .connection-details .label {
+                width: 100%;
+                margin-bottom: 4px;
+            }
+
+            .refresh-section {
+                flex-direction: column;
+            }
+
+            .countdown {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    
+    <div class="error-card">
+        <div class="error-header">
+            <div class="error-icon">⚠️</div>
+            <h1>Database Connection Lost</h1>
+            <p>Your Railway database service needs attention</p>
+        </div>
+        
+        <div class="error-body">
+            <div class="warning-badge">
+                <span>🔔</span>
+                <div>
+                    <strong>Action Required:</strong> Database service inactive - trial period ended
+                </div>
+            </div>
+            
+            <div class="database-card">
+                <h3>📊 Connection Details</h3>
+                <div class="connection-details">
+                    <div>
+                        <span class="label">Host</span>
+                        <span class="value">shortline.proxy.rlwy.net</span>
+                    </div>
+                    <div>
+                        <span class="label">IP Address</span>
+                        <span class="value">66.33.22.244</span>
+                    </div>
+                    <div>
+                        <span class="label">Port</span>
+                        <span class="value">48274</span>
+                    </div>
+                    <div>
+                        <span class="label">Status</span>
+                        <span class="value error-status">Connection Failed</span>
+                    </div>
+                    <div>
+                        <span class="label">Error</span>
+                        <span class="value">server closed connection unexpectedly</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="trial-ended">
+                <span>🚂</span> Railway PostgreSQL Trial Expired - Payment Required
+            </div>
+
+            <div class="action-buttons">
+                <a href="https://railway.app/dashboard" target="_blank" class="btn btn-primary">
+                    <span>🚂</span> Go to Railway Dashboard
+                </a>
+                <a href="https://railway.app/pricing" target="_blank" class="btn btn-secondary">
+                    <span>💰</span> View Pricing Plans
+                </a>
+                <a href="mailto:support@railway.app" class="btn btn-outline">
+                    <span>📧</span> Contact Railway Support
+                </a>
+            </div>
+
+            <div class="quick-tips">
+                <h4>📋 Quick Resolution Steps</h4>
+                <ul>
+                    <li><span>1️⃣</span> Log into <a href="https://railway.app/dashboard" target="_blank">Railway Dashboard</a></li>
+                    <li><span>2️⃣</span> Select your PostgreSQL database project</li>
+                    <li><span>3️⃣</span> Click "Upgrade" or "Add Payment Method"</li>
+                    <li><span>4️⃣</span> Choose a plan (Hobby: $5/month)</li>
+                    <li><span>5️⃣</span> Wait 2 minutes and refresh</li>
+                </ul>
+            </div>
+
+            <div class="refresh-section">
+                <button onclick="window.location.reload()" class="refresh-btn">
+                    <span>🔄</span> Check Connection
+                </button>
+                <div class="countdown">
+                    <span>⏱️</span>
+                    <span>Auto-refresh in <span class="timer" id="timer">30</span>s</span>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p>School Sync Pro - Database Maintenance Mode</p>
+                <div class="error-timestamp">
+                    Error: OperationalError at / • Tue, 17 Feb 2026 14:15:58 GMT
+                </div>
+                <div class="footer-links">
+                    <a href="/">Try Homepage</a>
+                    <a href="/admin">Admin Login</a>
+                    <a href="#">Status Page</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Smooth countdown timer
+        let timeLeft = 30;
+        const timerElement = document.getElementById('timer');
+        
+        function updateTimer() {
+            timerElement.textContent = timeLeft;
+            if (timeLeft <= 0) {
+                window.location.reload();
+            }
+        }
+
+        // Update every second
+        setInterval(() => {
+            timeLeft--;
+            updateTimer();
+        }, 1000);
+
+        // Initial call
+        updateTimer();
+
+        // Add smooth hover effects for buttons
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('mouseenter', function(e) {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            btn.addEventListener('mouseleave', function(e) {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>

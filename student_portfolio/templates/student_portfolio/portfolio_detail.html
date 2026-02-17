@@ -7,134 +7,388 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'student_portfolio/css/portfolio.css' %}">
 <style>
-.portfolio-gallery {
+:root {
+    --ai-primary: #667eea;
+    --ai-secondary: #764ba2;
+    --ai-accent: #f093fb;
+    --ai-success: #4ecdc4;
+    --ai-warning: #ffd166;
+    --ai-danger: #ff6b6b;
+    --ai-dark: #2d3748;
+    --ai-light: #f8f9fa;
+}
+
+.ai-neural-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 90% 40%, rgba(118, 75, 162, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 80%, rgba(240, 147, 251, 0.1) 0%, transparent 50%);
+    z-index: 1;
+}
+
+.ai-header-gradient {
+    background: linear-gradient(135deg, var(--ai-primary) 0%, var(--ai-secondary) 100%);
     position: relative;
     overflow: hidden;
-    border-radius: 16px;
+    padding: 4rem 0;
+    margin-bottom: 3rem;
 }
 
-.portfolio-gallery img {
-    transition: transform 0.5s ease;
+.ai-floating {
+    animation: ai-float 3s ease-in-out infinite;
 }
 
-.portfolio-gallery:hover img {
-    transform: scale(1.05);
+@keyframes ai-float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
 }
 
-.metadata-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin: 1.5rem 0;
+.ai-glass-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.9) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
 }
 
-.meta-item {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    padding: 1rem;
-    border-radius: 12px;
-    text-align: center;
-    transition: all 0.3s ease;
+.ai-glass-card::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(135deg, 
+        var(--ai-primary) 0%, 
+        var(--ai-secondary) 50%, 
+        var(--ai-accent) 100%);
+    z-index: -1;
+    border-radius: 26px;
+    opacity: 0.1;
 }
 
-.meta-item:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+.ai-grid-pattern {
+    background-image: 
+        linear-gradient(rgba(102, 126, 234, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(102, 126, 234, 0.1) 1px, transparent 1px);
+    background-size: 30px 30px;
 }
 
-.meta-icon {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-    display: block;
+.ai-data-stream {
+    position: relative;
+    overflow: hidden;
 }
 
-.skills-cloud {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
+.ai-data-stream::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--ai-primary), transparent);
+    animation: ai-stream 3s linear infinite;
 }
 
-.skill-tag {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+@keyframes ai-stream {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.ai-pulse-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--ai-success);
+    border-radius: 50%;
+    position: relative;
+}
+
+.ai-pulse-dot::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    border-radius: inherit;
+    animation: ai-pulse 2s ease-out infinite;
+}
+
+@keyframes ai-pulse {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(3); opacity: 0; }
+}
+
+.ai-skill-tag {
+    background: linear-gradient(135deg, var(--ai-primary) 0%, var(--ai-secondary) 100%);
     color: white;
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
     font-size: 0.85rem;
     font-weight: 500;
-}
-
-.action-btn-group {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
-
-.download-btn {
-    background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
-    border: none;
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 50px;
-    font-weight: 600;
+    position: relative;
+    overflow: hidden;
     transition: all 0.3s ease;
 }
 
-.download-btn:hover {
+.ai-skill-tag::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.ai-skill-tag:hover::before {
+    left: 100%;
+}
+
+.ai-skill-tag:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.ai-metabox {
+    background: linear-gradient(135deg, rgba(248, 249, 250, 0.8) 0%, rgba(233, 236, 239, 0.8) 100%);
+    padding: 1.5rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.ai-metabox::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--ai-primary), var(--ai-secondary));
+}
+
+.ai-metabox:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+.ai-neuron-line {
+    position: relative;
+}
+
+.ai-neuron-line::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 1.5rem;
+    width: 2px;
+    background: linear-gradient(to bottom, transparent, var(--ai-primary), transparent);
+}
+
+.ai-timeline-node {
+    width: 12px;
+    height: 12px;
+    background: white;
+    border: 3px solid var(--ai-primary);
+    border-radius: 50%;
+    position: absolute;
+    left: 1rem;
+    top: 0;
+    z-index: 2;
+}
+
+.ai-btn-neural {
+    background: linear-gradient(135deg, var(--ai-primary) 0%, var(--ai-secondary) 100%);
+    border: none;
     color: white;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.ai-btn-neural::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.ai-btn-neural:hover::before {
+    left: 100%;
+}
+
+.ai-btn-neural:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.ai-share-hologram {
+    background: linear-gradient(135deg, 
+        rgba(255, 209, 102, 0.1) 0%, 
+        rgba(255, 209, 102, 0.2) 100%);
+    border: 2px solid rgba(255, 209, 102, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.ai-binary-bg {
+    background-image: 
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(102, 126, 234, 0.05) 2px, rgba(102, 126, 234, 0.05) 4px);
 }
 
 .file-preview-container {
-    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-    border-radius: 20px;
-    padding: 3rem 2rem;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    border-radius: 24px;
+    padding: 3rem;
     text-align: center;
     margin-bottom: 2rem;
-    border: 2px dashed #667eea30;
+    border: 2px dashed rgba(102, 126, 234, 0.2);
+    position: relative;
+    overflow: hidden;
 }
 
-.icon-container {
-    flex-shrink: 0;
+.file-preview-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, 
+        var(--ai-primary), 
+        var(--ai-secondary), 
+        var(--ai-accent));
+}
+
+.portfolio-gallery {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    transform-style: preserve-3d;
+}
+
+.portfolio-gallery img {
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.portfolio-gallery:hover img {
+    transform: scale(1.08) rotateY(5deg);
+}
+
+.ai-icon-container {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--ai-primary) 0%, var(--ai-secondary) 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Enhanced Header -->
-<div class="portfolio-header">
-    <div class="container">
-        <nav aria-label="breadcrumb" class="mb-3">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'student_portfolio:portfolio_list' %}" class="text-white-50">Portfolio</a></li>
-                <li class="breadcrumb-item active text-white">{{ item.title|truncatewords:4 }}</li>
+<!-- Neural Network Inspired Header -->
+<div class="ai-header-gradient">
+    <div class="ai-neural-bg"></div>
+    <div class="ai-data-stream"></div>
+    
+    <div class="container position-relative z-2">
+        <!-- Neural Breadcrumbs -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb ai-breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{% url 'student_portfolio:portfolio_list' %}" class="text-white-50">
+                        <i class="fas fa-network-wired me-2"></i>Portfolio Network
+                    </a>
+                </li>
+                <li class="breadcrumb-item active text-white">
+                    <i class="fas fa-microchip me-2"></i>{{ item.title|truncatewords:4 }}
+                </li>
             </ol>
         </nav>
         
+        <!-- Main Header -->
         <div class="row align-items-center">
             <div class="col-lg-8">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="avatar me-3 floating">
-                        {{ item.student.user|get_first_chars }}
+                <div class="d-flex align-items-center mb-4">
+                    <!-- Neural Avatar -->
+                    <div class="ai-avatar me-4 ai-floating">
+                        <div class="ai-avatar-inner">
+                            {{ item.student.user|get_first_chars }}
+                        </div>
+                        <div class="ai-avatar-ring"></div>
                     </div>
-                    <div>
-                        <h1 class="display-6 fw-bold text-white mb-1">{{ item.title }}</h1>
-                        <p class="lead text-white-50 mb-0">
-                            <i class="fas fa-user-graduate me-1"></i>
-                            by {{ item.student.user.get_full_name }}
-                        </p>
+                    
+                    <div class="ai-header-content">
+                        <div class="ai-tags mb-2">
+                            <span class="ai-tag ai-pulse">
+                                <i class="fas fa-satellite-dish me-1"></i>Live Data
+                            </span>
+                            <span class="ai-tag">
+                                <i class="fas fa-bolt me-1"></i>Optimized
+                            </span>
+                        </div>
+                        
+                        <h1 class="display-5 fw-bold text-white mb-2 ai-text-glow">
+                            {{ item.title }}
+                        </h1>
+                        
+                        <div class="d-flex align-items-center text-white-50">
+                            <div class="ai-pulse-dot me-2"></div>
+                            <p class="mb-0">
+                                <i class="fas fa-user-astronaut me-1"></i>
+                                by {{ item.student.user.get_full_name }}
+                                <span class="ai-badge ms-2">@{{ item.student.user.username }}</span>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4 text-lg-end">
+            
+            <div class="col-lg-4">
+                <!-- Neural Action Panel -->
                 {% if user.student == item.student %}
-                <div class="action-btn-group justify-content-lg-end">
-                    <a href="{% url 'student_portfolio:portfolio_update' item.pk %}" class="btn btn-light btn-portfolio">
-                        <i class="fas fa-edit me-2"></i>Edit
-                    </a>
-                    <a href="{% url 'student_portfolio:portfolio_delete' item.pk %}" class="btn btn-outline-light">
-                        <i class="fas fa-trash me-2"></i>Delete
-                    </a>
+                <div class="ai-action-panel">
+                    <div class="ai-panel-header">
+                        <i class="fas fa-terminal me-2"></i>
+                        <span>Neural Controls</span>
+                    </div>
+                    <div class="ai-btn-grid">
+                        <a href="{% url 'student_portfolio:portfolio_update' item.pk %}" 
+                           class="ai-btn-neural ai-btn-edit">
+                            <i class="fas fa-code me-2"></i>
+                            <span>Edit Source</span>
+                            <div class="ai-btn-glow"></div>
+                        </a>
+                        <a href="{% url 'student_portfolio:portfolio_delete' item.pk %}" 
+                           class="ai-btn-neural ai-btn-delete">
+                            <i class="fas fa-trash-alt me-2"></i>
+                            <span>Delete Node</span>
+                            <div class="ai-btn-glow"></div>
+                        </a>
+                    </div>
                 </div>
                 {% endif %}
             </div>
@@ -144,68 +398,101 @@
 
 <div class="container mt-5">
     <div class="row">
-        <!-- Main Content -->
+        <!-- Main Neural Content -->
         <div class="col-lg-8">
-            <div class="card portfolio-card mb-4 glass-card">
-                <div class="card-body p-4">
-                    <!-- Enhanced File Preview -->
+            <div class="ai-glass-card mb-4 ai-grid-pattern">
+                <div class="card-body p-5">
+                    <!-- AI Enhanced File Preview -->
                     <div class="file-preview-container">
                         {% if item.image_file %}
                         <div class="portfolio-gallery mb-4">
-                            <img src="{{ item.image_file.url }}" alt="{{ item.title }}" class="img-fluid rounded-3 shadow-lg" style="max-height: 500px; width: 100%; object-fit: cover;">
+                            <img src="{{ item.image_file.url }}" alt="{{ item.title }}" 
+                                 class="img-fluid rounded-3 ai-img-hover"
+                                 style="max-height: 500px; width: 100%; object-fit: cover;">
+                            <div class="ai-img-overlay"></div>
                         </div>
                         {% elif item.document_file %}
-                        <div class="text-center">
-                            <i class="fas fa-file-pdf file-type-document fa-7x mb-4 floating"></i>
-                            <h3 class="text-gradient mb-3">Document Preview</h3>
-                            <p class="text-muted mb-4">{{ item.document_file.name }}</p>
-                            <a href="{{ item.document_file.url }}" class="download-btn" target="_blank" download>
-                                <i class="fas fa-download me-2"></i>Download Document
+                        <div class="text-center ai-floating">
+                            <div class="ai-file-icon document">
+                                <i class="fas fa-file-pdf"></i>
+                                <div class="ai-file-glow"></div>
+                            </div>
+                            <h3 class="text-gradient mb-3 ai-text-glow">Quantum Document</h3>
+                            <p class="text-muted mb-4 ai-file-info">{{ item.document_file.name }}</p>
+                            <a href="{{ item.document_file.url }}" 
+                               class="ai-btn-neural ai-btn-download" 
+                               target="_blank" download>
+                                <i class="fas fa-download me-2"></i>
+                                <span>Download Matrix</span>
                             </a>
                         </div>
                         {% elif item.code_file %}
-                        <div class="text-center">
-                            <i class="fas fa-code file-type-code fa-7x mb-4 floating"></i>
-                            <h3 class="text-gradient mb-3">Code File</h3>
-                            <p class="text-muted mb-4">{{ item.code_file.name }}</p>
-                            <a href="{{ item.code_file.url }}" class="download-btn" target="_blank" download>
-                                <i class="fas fa-download me-2"></i>Download Source Code
+                        <div class="text-center ai-floating">
+                            <div class="ai-file-icon code">
+                                <i class="fas fa-code"></i>
+                                <div class="ai-file-glow"></div>
+                            </div>
+                            <h3 class="text-gradient mb-3 ai-text-glow">Source Code Matrix</h3>
+                            <p class="text-muted mb-4 ai-file-info">{{ item.code_file.name }}</p>
+                            <a href="{{ item.code_file.url }}" 
+                               class="ai-btn-neural ai-btn-download" 
+                               target="_blank" download>
+                                <i class="fas fa-download me-2"></i>
+                                <span>Download Source</span>
                             </a>
                         </div>
                         {% else %}
-                        <div class="text-center">
-                            <i class="fas fa-file file-type-other fa-7x mb-4 floating"></i>
-                            <h3 class="text-gradient mb-3">Portfolio Item</h3>
-                            <p class="text-muted">External resource or general item</p>
+                        <div class="text-center ai-floating">
+                            <div class="ai-file-icon other">
+                                <i class="fas fa-infinity"></i>
+                                <div class="ai-file-glow"></div>
+                            </div>
+                            <h3 class="text-gradient mb-3 ai-text-glow">Neural Artifact</h3>
+                            <p class="text-muted">External quantum resource</p>
                         </div>
                         {% endif %}
                     </div>
 
-                    <!-- Description Section -->
-                    <div class="mb-5">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="icon-container bg-primary rounded-circle p-3 me-3">
-                                <i class="fas fa-align-left text-white fa-lg"></i>
+                    <!-- Neural Description -->
+                    <div class="mb-5 ai-neuron-line">
+                        <div class="d-flex align-items-center mb-4 position-relative">
+                            <div class="ai-timeline-node"></div>
+                            <div class="ai-icon-container me-3">
+                                <i class="fas fa-brain"></i>
                             </div>
-                            <h3 class="text-gradient mb-0">Project Description</h3>
+                            <div>
+                                <h3 class="text-gradient mb-0 ai-text-glow">Neural Description</h3>
+                                <small class="text-muted">AI-processed project analysis</small>
+                            </div>
                         </div>
                         <div class="ps-5">
-                            <p class="lead text-dark lh-lg">{{ item.description|linebreaks }}</p>
+                            <div class="ai-description-box">
+                                <p class="lead text-dark lh-lg ai-text-typing">
+                                    {{ item.description|linebreaks }}
+                                </p>
+                                <div class="ai-data-lines"></div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- External URL Section -->
+                    <!-- Quantum Links -->
                     {% if item.external_url %}
                     <div class="mb-4">
                         <div class="d-flex align-items-center mb-3">
-                            <div class="icon-container bg-success rounded-circle p-3 me-3">
-                                <i class="fas fa-external-link-alt text-white fa-lg"></i>
+                            <div class="ai-icon-container me-3">
+                                <i class="fas fa-wormhole"></i>
                             </div>
-                            <h3 class="text-gradient mb-0">External Resources</h3>
+                            <div>
+                                <h3 class="text-gradient mb-0 ai-text-glow">Quantum Links</h3>
+                                <small class="text-muted">Hyperdimensional resources</small>
+                            </div>
                         </div>
                         <div class="ps-5">
-                            <a href="{{ item.external_url }}" target="_blank" class="btn btn-outline-primary btn-lg">
-                                <i class="fas fa-external-link-alt me-2"></i>View External Resource
+                            <a href="{{ item.external_url }}" target="_blank" 
+                               class="ai-btn-neural ai-btn-external">
+                                <i class="fas fa-external-link-alt me-2"></i>
+                                <span>Access Wormhole</span>
+                                <div class="ai-link-trail"></div>
                             </a>
                         </div>
                     </div>
@@ -214,94 +501,119 @@
             </div>
         </div>
 
-        <!-- Enhanced Sidebar -->
+        <!-- Neural Sidebar -->
         <div class="col-lg-4">
-            <!-- Student Info Card -->
-            <div class="card portfolio-card mb-4 glass-card">
-                <div class="card-header gradient-primary text-white py-3">
-                    <h5 class="mb-0 d-flex align-items-center">
-                        <i class="fas fa-user-graduate me-2"></i>Student Profile
-                    </h5>
+            <!-- Quantum Profile -->
+            <div class="ai-glass-card mb-4">
+                <div class="card-header ai-gradient-primary text-white py-3 position-relative">
+                    <div class="ai-particles-small"></div>
+                    <div class="position-relative z-2">
+                        <h5 class="mb-0 d-flex align-items-center">
+                            <i class="fas fa-user-astronaut me-2"></i>
+                            <span>Quantum Profile</span>
+                        </h5>
+                    </div>
                 </div>
                 <div class="card-body text-center p-4">
-                    <div class="avatar mx-auto mb-3 floating">
-                        {{ item.student.user|get_first_chars }}
+                    <!-- Neural Avatar -->
+                    <div class="ai-avatar-large mx-auto mb-3 ai-floating">
+                        <div class="ai-avatar-inner">
+                            {{ item.student.user|get_first_chars }}
+                        </div>
+                        <div class="ai-avatar-ring-large"></div>
                     </div>
-                    <h5 class="text-gradient">{{ item.student.user.get_full_name }}</h5>
-                    <p class="text-muted mb-3">@{{ item.student.user.username }}</p>
                     
-                    <div class="student-meta">
+                    <h5 class="text-gradient ai-text-glow">{{ item.student.user.get_full_name }}</h5>
+                    <p class="text-muted mb-3 ai-username">@{{ item.student.user.username }}</p>
+                    
+                    <!-- Quantum Stats -->
+                    <div class="ai-quantum-stats">
                         {% if item.student.current_class %}
-                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                            <span class="text-muted"><i class="fas fa-graduation-cap me-2"></i>Class:</span>
-                            <strong>{{ item.student.current_class }}</strong>
+                        <div class="ai-stat-item">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span class="ai-stat-label">Class</span>
+                            <span class="ai-stat-value">{{ item.student.current_class }}</span>
                         </div>
                         {% endif %}
                         
                         {% if item.student.department %}
-                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                            <span class="text-muted"><i class="fas fa-building me-2"></i>Department:</span>
-                            <strong>{{ item.student.department }}</strong>
+                        <div class="ai-stat-item">
+                            <i class="fas fa-atom"></i>
+                            <span class="ai-stat-label">Department</span>
+                            <span class="ai-stat-value">{{ item.student.department }}</span>
                         </div>
                         {% endif %}
                         
-                        <div class="d-flex justify-content-between align-items-center py-2">
-                            <span class="text-muted"><i class="fas fa-calendar me-2"></i>Member Since:</span>
-                            <strong>{{ item.student.user.date_joined|date:"M Y" }}</strong>
+                        <div class="ai-stat-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span class="ai-stat-label">Neural Join</span>
+                            <span class="ai-stat-value">{{ item.student.user.date_joined|date:"M Y" }}</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Project Details Card -->
-            <div class="card portfolio-card mb-4 glass-card">
-                <div class="card-header gradient-success text-white py-3">
+            <!-- Project Matrix -->
+            <div class="ai-glass-card mb-4 ai-binary-bg">
+                <div class="card-header ai-gradient-success text-white py-3">
                     <h5 class="mb-0 d-flex align-items-center">
-                        <i class="fas fa-chart-bar me-2"></i>Project Analytics
+                        <i class="fas fa-chart-network me-2"></i>
+                        <span>Project Matrix</span>
                     </h5>
                 </div>
                 <div class="card-body p-4">
-                    <div class="metadata-grid">
-                        <div class="meta-item">
-                            <i class="fas fa-folder meta-icon text-primary"></i>
-                            <strong>Category</strong>
-                            <div class="mt-1">
-                                {% if item.category %}
-                                <span class="badge gradient-primary">{{ item.category.name }}</span>
-                                {% else %}
-                                <span class="text-muted small">Uncategorized</span>
-                                {% endif %}
+                    <!-- Neural Metadata -->
+                    <div class="ai-metadata-grid">
+                        <div class="ai-metabox">
+                            <i class="fas fa-sitemap ai-meta-icon"></i>
+                            <div class="ai-meta-content">
+                                <strong>Category</strong>
+                                <div class="mt-2">
+                                    {% if item.category %}
+                                    <span class="ai-neural-tag">{{ item.category.name }}</span>
+                                    {% else %}
+                                    <span class="ai-meta-null">Uncategorized</span>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="meta-item">
-                            <i class="fas fa-file meta-icon text-info"></i>
-                            <strong>File Type</strong>
-                            <div class="mt-1">
-                                <span class="badge bg-info text-white text-capitalize">{{ item.file_type }}</span>
+                        <div class="ai-metabox">
+                            <i class="fas fa-file-code ai-meta-icon"></i>
+                            <div class="ai-meta-content">
+                                <strong>File Type</strong>
+                                <div class="mt-2">
+                                    <span class="ai-file-type-tag">{{ item.file_type }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Quantum Skills -->
                     {% if item.skills_used %}
                     <div class="mt-4">
-                        <h6 class="text-gradient mb-2"><i class="fas fa-tools me-2"></i>Skills Demonstrated</h6>
-                        <div class="skills-cloud">
+                        <h6 class="text-gradient mb-3 ai-text-glow">
+                            <i class="fas fa-cogs me-2"></i>Quantum Skills
+                        </h6>
+                        <div class="ai-skills-matrix">
                             {% for skill in item.skills_used|split %}
-                            <span class="skill-tag">{{ skill }}</span>
+                            <span class="ai-skill-tag">{{ skill }}</span>
                             {% endfor %}
                         </div>
                     </div>
                     {% endif %}
 
-                    <div class="timeline mt-4">
-                        <div class="timeline-item">
+                    <!-- Time Matrix -->
+                    <div class="ai-time-matrix mt-4">
+                        <div class="ai-time-node">
+                            <div class="ai-time-dot"></div>
                             <small class="text-muted">Created</small>
                             <div class="fw-bold">{{ item.created_at|date:"F d, Y" }}</div>
                         </div>
                         {% if item.updated_at != item.created_at %}
-                        <div class="timeline-item">
-                            <small class="text-muted">Last Updated</small>
+                        <div class="ai-time-node">
+                            <div class="ai-time-dot updated"></div>
+                            <small class="text-muted">Last Sync</small>
                             <div class="fw-bold">{{ item.updated_at|date:"F d, Y" }}</div>
                         </div>
                         {% endif %}
@@ -309,37 +621,42 @@
                 </div>
             </div>
 
-            <!-- Sharing Card -->
-            <div class="card portfolio-card glass-card">
-                <div class="card-header gradient-warning text-white py-3">
+            <!-- Neural Sharing -->
+            <div class="ai-glass-card ai-share-hologram">
+                <div class="card-header ai-gradient-warning text-white py-3">
                     <h5 class="mb-0 d-flex align-items-center">
-                        <i class="fas fa-share-alt me-2"></i>Share Project
+                        <i class="fas fa-share-alt me-2"></i>
+                        <span>Neural Broadcast</span>
                     </h5>
                 </div>
                 <div class="card-body p-4">
-                    <p class="small text-muted mb-3">
-                        Share this portfolio item with teachers, colleges, or potential employers:
+                    <p class="small text-muted mb-3 ai-broadcast-text">
+                        Transmit this quantum artifact across the network:
                     </p>
                     
-                    <div class="d-grid gap-2">
+                    <div class="ai-share-grid">
                         <a href="{% url 'student_portfolio:portfolio_public' item.pk %}" 
-                           class="btn btn-success btn-portfolio" 
+                           class="ai-btn-neural ai-btn-share" 
                            target="_blank">
-                            <i class="fas fa-link me-2"></i>Public View Link
+                            <i class="fas fa-broadcast-tower me-2"></i>
+                            <span>Public View</span>
                         </a>
-                        <button class="btn btn-outline-secondary" 
+                        <button class="ai-btn-neural ai-btn-copy" 
                                 onclick="copyToClipboard('{{ request.scheme }}://{{ request.get_host }}{% url 'student_portfolio:portfolio_public' item.pk %}')">
-                            <i class="fas fa-copy me-2"></i>Copy Link
+                            <i class="fas fa-copy me-2"></i>
+                            <span>Copy Signal</span>
                         </button>
                     </div>
 
-                    <div class="mt-3 p-3 bg-light rounded">
-                        <small class="text-muted d-block mb-1">
-                            <i class="fas fa-info-circle me-1"></i>This link provides public access without login
-                        </small>
-                        <small class="text-muted">
-                            <i class="fas fa-eye me-1"></i>Perfect for resumes and applications
-                        </small>
+                    <div class="ai-broadcast-info mt-3">
+                        <div class="ai-info-item">
+                            <i class="fas fa-satellite"></i>
+                            <small>Public access without authentication</small>
+                        </div>
+                        <div class="ai-info-item">
+                            <i class="fas fa-rocket"></i>
+                            <small>Perfect for quantum resumes</small>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -352,43 +669,65 @@
 <script>
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(function() {
-        showNotification('Link copied to clipboard!', 'success');
+        showNeuralNotification('Signal copied to clipboard!', 'success');
     }).catch(function(err) {
-        // Fallback for older browsers
         var textArea = document.createElement("textarea");
         textArea.value = text;
         document.body.appendChild(textArea);
         textArea.select();
         document.execCommand("copy");
         document.body.removeChild(textArea);
-        showNotification('Link copied to clipboard!', 'success');
+        showNeuralNotification('Signal copied to clipboard!', 'success');
     });
 }
 
-function showNotification(message, type) {
-    // Create toast element
-    const toast = document.createElement('div');
-    toast.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
-    toast.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px;';
-    toast.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+function showNeuralNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `ai-notification ai-notification-${type}`;
+    notification.innerHTML = `
+        <div class="ai-notification-content">
+            <div class="ai-notification-icon">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            </div>
+            <div class="ai-notification-text">${message}</div>
+        </div>
+        <div class="ai-notification-progress"></div>
     `;
     
-    document.body.appendChild(toast);
+    document.body.appendChild(notification);
     
-    // Auto remove after 3 seconds
     setTimeout(() => {
-        toast.remove();
+        notification.classList.add('ai-notification-show');
+    }, 10);
+    
+    setTimeout(() => {
+        notification.classList.remove('ai-notification-show');
+        setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
 
-// Add floating animation to elements
+// Enhanced floating animation
 document.addEventListener('DOMContentLoaded', function() {
-    const floatingElements = document.querySelectorAll('.floating');
-    floatingElements.forEach(el => {
-        el.style.animation = 'floating 3s ease-in-out infinite';
+    const elements = document.querySelectorAll('.ai-floating');
+    elements.forEach((el, index) => {
+        el.style.animationDelay = `${index * 0.2}s`;
     });
+    
+    // Add typing effect to description
+    const description = document.querySelector('.ai-text-typing');
+    if (description) {
+        const text = description.textContent;
+        description.textContent = '';
+        let i = 0;
+        const typeWriter = () => {
+            if (i < text.length) {
+                description.textContent += text.charAt(i);
+                i++;
+                setTimeout(typeWriter, 10);
+            }
+        };
+        setTimeout(typeWriter, 1000);
+    }
 });
 </script>
 {% endblock %}

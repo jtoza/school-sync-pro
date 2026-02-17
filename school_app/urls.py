@@ -1,3 +1,6 @@
+
+# Custom error handler for 503
+handler503 = 'apps.corecode.views.service_unavailable'
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings

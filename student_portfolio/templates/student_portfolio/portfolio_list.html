@@ -2,506 +2,686 @@
 {% load static %}
 {% load portfolio_filters %}
 
-{% block title %}My Portfolio - Student Showcase{% endblock %}
+{% block title %}My Portfolio - Quantum Neural Network{% endblock %}
 
 {% block extra_css %}
 <style>
-/* Base Styles */
+/* Quantum Design System */
 :root {
-    --primary-color: #667eea;
-    --secondary-color: #764ba2;
-    --accent-color: #f093fb;
-    --text-dark: #2d3748;
-    --text-light: #718096;
-    --bg-light: #f8f9fa;
-    --white: #ffffff;
-    --shadow: 0 10px 30px rgba(0,0,0,0.1);
-    --shadow-hover: 0 20px 50px rgba(0,0,0,0.15);
-    --radius: 16px;
+    --quantum-primary: #667eea;
+    --quantum-secondary: #764ba2;
+    --quantum-accent: #f093fb;
+    --quantum-success: #4ecdc4;
+    --quantum-warning: #ffd166;
+    --quantum-danger: #ff6b6b;
+    --quantum-dark: #0f0f23;
+    --quantum-light: #f8f9fa;
+    --quantum-glass: rgba(255, 255, 255, 0.1);
+    --quantum-glow: rgba(102, 126, 234, 0.5);
 }
 
 body {
-    background-color: #f5f7fa;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: var(--text-dark);
-    line-height: 1.6;
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+    color: #e0e0ff;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
 }
 
-/* Header Section */
-.portfolio-header {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    padding: 4rem 0;
-    margin-bottom: 2rem;
+/* Quantum Header */
+.quantum-header {
+    background: linear-gradient(135deg, 
+        rgba(102, 126, 234, 0.2) 0%, 
+        rgba(118, 75, 162, 0.2) 50%, 
+        rgba(240, 147, 251, 0.2) 100%);
     position: relative;
     overflow: hidden;
+    padding: 5rem 0;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.portfolio-header::before {
+.quantum-header::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(102, 126, 234, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 90% 40%, rgba(118, 75, 162, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 50% 80%, rgba(240, 147, 251, 0.3) 0%, transparent 50%),
+        repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,0.05) 2px, rgba(255,255,255,0.05) 4px);
+    animation: quantum-bg-float 20s linear infinite;
 }
 
-.floating {
-    animation: float 3s ease-in-out infinite;
+@keyframes quantum-bg-float {
+    0% { background-position: 0 0, 0 0, 0 0, 0 0; }
+    100% { background-position: 100px 100px, -100px -100px, 50px 50px, 0 4px; }
 }
 
-@keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-    100% { transform: translateY(0px); }
+.quantum-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.1;
 }
 
-.btn-portfolio {
-    border-radius: 50px;
+.quantum-text-glow {
+    text-shadow: 0 0 20px var(--quantum-glow),
+                 0 0 40px var(--quantum-glow),
+                 0 0 60px rgba(102, 126, 234, 0.3);
+}
+
+.quantum-btn {
+    background: linear-gradient(135deg, 
+        rgba(102, 126, 234, 0.2) 0%, 
+        rgba(118, 75, 162, 0.2) 100%);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    color: #e0e0ff;
     padding: 0.75rem 1.5rem;
+    border-radius: 12px;
     font-weight: 600;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-.btn-portfolio:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-}
-
-/* Stats Grid */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1.5rem;
-    margin: 2.5rem 0;
-}
-
-.stat-item {
-    background: var(--white);
-    padding: 2rem 1.5rem;
-    border-radius: var(--radius);
-    text-align: center;
-    box-shadow: var(--shadow);
-    transition: all 0.3s ease;
-    border: 1px solid rgba(255,255,255,0.2);
     position: relative;
     overflow: hidden;
+    transition: all 0.3s ease;
 }
 
-.stat-item::before {
+.quantum-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255,255,255,0.2), 
+        transparent);
+    transition: left 0.5s ease;
+}
+
+.quantum-btn:hover::before {
+    left: 100%;
+}
+
+.quantum-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3),
+                inset 0 0 0 1px rgba(255,255,255,0.1);
+}
+
+/* Quantum Stats */
+.quantum-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin: 3rem 0;
+}
+
+.quantum-stat-card {
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.05) 0%, 
+        rgba(255, 255, 255, 0.1) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.quantum-stat-card::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 4px;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, 
+        var(--quantum-primary), 
+        var(--quantum-secondary), 
+        var(--quantum-accent));
 }
 
-.stat-item:hover {
+.quantum-stat-card:hover {
     transform: translateY(-5px);
-    box-shadow: var(--shadow-hover);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255,255,255,0.1);
 }
 
-.stat-number {
-    font-size: 2.5rem;
-    font-weight: bold;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+.quantum-stat-number {
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, 
+        var(--quantum-primary) 0%, 
+        var(--quantum-secondary) 50%, 
+        var(--quantum-accent) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    display: block;
     line-height: 1;
     margin-bottom: 0.5rem;
 }
 
-/* Portfolio Grid */
-.portfolio-grid {
+/* Quantum Portfolio Grid */
+.quantum-portfolio-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 2rem;
     margin-top: 2rem;
 }
 
-.portfolio-item-card {
-    background: var(--white);
-    border-radius: var(--radius);
+.quantum-artifact-card {
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.05) 0%, 
+        rgba(255, 255, 255, 0.1) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
     overflow: hidden;
-    box-shadow: var(--shadow);
+    position: relative;
     transition: all 0.3s ease;
-    border: 1px solid rgba(255,255,255,0.2);
-    backdrop-filter: blur(10px);
-    height: 100%;
-    display: flex;
-    flex-direction: column;
 }
 
-.portfolio-item-card:hover {
+.quantum-artifact-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, 
+        var(--quantum-primary), 
+        var(--quantum-secondary), 
+        var(--quantum-accent));
+    z-index: 1;
+}
+
+.quantum-artifact-card:hover {
     transform: translateY(-10px) scale(1.02);
-    box-shadow: var(--shadow-hover);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255,255,255,0.1);
 }
 
-.card-media {
+.quantum-card-media {
     height: 200px;
     overflow: hidden;
     position: relative;
 }
 
-.card-media img {
+.quantum-card-media img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.portfolio-item-card:hover .card-media img {
-    transform: scale(1.1);
+.quantum-artifact-card:hover .quantum-card-media img {
+    transform: scale(1.2) rotate(2deg);
 }
 
-.card-media-placeholder {
+.quantum-card-media-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, 
+        transparent 0%, 
+        rgba(0,0,0,0.7) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.quantum-artifact-card:hover .quantum-card-media-overlay {
+    opacity: 1;
+}
+
+.quantum-card-media-placeholder {
     height: 200px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    background: linear-gradient(135deg, 
+        var(--quantum-primary) 0%, 
+        var(--quantum-secondary) 100%);
+    position: relative;
+    overflow: hidden;
 }
 
-.card-body {
+.quantum-card-body {
     padding: 1.5rem;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
+    position: relative;
+    z-index: 2;
 }
 
-.card-title {
+.quantum-card-title {
     font-weight: 700;
-    color: var(--text-dark);
+    color: #ffffff;
     margin-bottom: 0.75rem;
+    font-size: 1.25rem;
 }
 
-.card-text {
-    color: var(--text-light);
-    flex-grow: 1;
+.quantum-card-text {
+    color: rgba(224, 224, 255, 0.7);
     margin-bottom: 1.5rem;
+    line-height: 1.6;
 }
 
-.card-footer {
+.quantum-card-footer {
     padding: 1rem 1.5rem;
-    background-color: rgba(0,0,0,0.02);
-    border-top: 1px solid rgba(0,0,0,0.05);
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Badges and Tags */
-.badge {
+/* Quantum Badges */
+.quantum-badge {
+    background: linear-gradient(135deg, 
+        rgba(102, 126, 234, 0.2) 0%, 
+        rgba(118, 75, 162, 0.2) 100%);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    color: #e0e0ff;
     padding: 0.5rem 1rem;
-    font-weight: 600;
     border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    backdrop-filter: blur(10px);
 }
 
-.gradient-primary {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    color: white;
-}
-
-.skills-cloud {
+/* Quantum Skills */
+.quantum-skills-cloud {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
     margin: 1rem 0;
 }
 
-.skill-tag {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+.quantum-skill-tag {
+    background: linear-gradient(135deg, 
+        var(--quantum-primary) 0%, 
+        var(--quantum-secondary) 100%);
     color: white;
     padding: 0.3rem 0.8rem;
     border-radius: 20px;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     font-weight: 500;
+    position: relative;
+    overflow: hidden;
 }
 
-/* Action Buttons */
-.action-btn-group {
-    display: flex;
+.quantum-skill-tag::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255,255,255,0.3), 
+        transparent);
+    transition: left 0.5s ease;
+}
+
+.quantum-skill-tag:hover::before {
+    left: 100%;
+}
+
+/* Quantum Actions */
+.quantum-action-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.5rem;
-    flex-wrap: wrap;
-    margin-top: auto;
+    margin-top: 1rem;
 }
 
-.btn {
+.quantum-action-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(224, 224, 255, 0.7);
+    padding: 0.5rem;
     border-radius: 8px;
-    font-weight: 500;
-    transition: all 0.2s ease;
+    font-size: 0.8rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: block;
 }
 
-.btn-sm {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.875rem;
+.quantum-action-btn:hover {
+    background: rgba(102, 126, 234, 0.2);
+    color: #ffffff;
+    border-color: rgba(102, 126, 234, 0.5);
+    transform: translateY(-2px);
 }
 
-.btn-outline-primary {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-}
-
-.btn-outline-primary:hover {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-}
-
-.btn-outline-secondary {
-    border-color: var(--text-light);
-    color: var(--text-light);
-}
-
-.btn-outline-secondary:hover {
-    background-color: var(--text-light);
-    border-color: var(--text-light);
-    color: white;
-}
-
-.btn-outline-success {
-    border-color: #10b981;
-    color: #10b981;
-}
-
-.btn-outline-success:hover {
-    background-color: #10b981;
-    border-color: #10b981;
-    color: white;
-}
-
-/* Empty State */
-.empty-state {
+/* Quantum Empty State */
+.quantum-empty-state {
     text-align: center;
     padding: 5rem 2rem;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-radius: var(--radius);
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.05) 0%, 
+        rgba(255, 255, 255, 0.1) 100%);
+    border-radius: 24px;
+    border: 2px dashed rgba(255, 255, 255, 0.1);
     margin: 2rem 0;
+    backdrop-filter: blur(20px);
 }
 
-.empty-icon {
+.quantum-empty-icon {
     font-size: 5rem;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    background: linear-gradient(135deg, 
+        var(--quantum-primary) 0%, 
+        var(--quantum-secondary) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 1.5rem;
+    filter: drop-shadow(0 0 20px var(--quantum-glow));
 }
 
-.text-gradient {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-weight: 700;
-}
-
-/* Alerts */
-.alert-portfolio {
-    border-radius: var(--radius);
-    border: none;
-    box-shadow: var(--shadow);
+/* Quantum Messages */
+.quantum-message {
+    background: linear-gradient(135deg, 
+        rgba(13, 202, 240, 0.1) 0%, 
+        rgba(0, 123, 255, 0.1) 100%);
+    border: 1px solid rgba(13, 202, 240, 0.3);
+    border-radius: 16px;
     padding: 1rem 1.5rem;
+    backdrop-filter: blur(10px);
+    margin-bottom: 1.5rem;
 }
 
-.alert-success {
-    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-    color: #065f46;
+/* Quantum Animation */
+@keyframes quantum-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
 }
 
-.alert-warning {
-    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-    color: #92400e;
+.quantum-pulse {
+    animation: quantum-pulse 2s ease-in-out infinite;
 }
 
-.alert-danger {
-    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-    color: #991b1b;
+/* Quantum Scan Lines */
+.quantum-scanlines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background: linear-gradient(
+        to bottom,
+        transparent 50%,
+        rgba(0, 0, 0, 0.1) 50%
+    );
+    background-size: 100% 4px;
+    z-index: 9999;
+    opacity: 0.3;
 }
 
-/* Responsive Adjustments */
+/* Responsive */
 @media (max-width: 768px) {
-    .portfolio-grid {
+    .quantum-portfolio-grid {
         grid-template-columns: 1fr;
     }
     
-    .stats-grid {
+    .quantum-stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
     
-    .portfolio-header {
-        padding: 2.5rem 0;
-    }
-    
-    .display-4 {
-        font-size: 2rem;
+    .quantum-action-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (max-width: 576px) {
-    .stats-grid {
+    .quantum-stats-grid {
         grid-template-columns: 1fr;
     }
     
-    .action-btn-group {
-        justify-content: center;
+    .quantum-action-grid {
+        grid-template-columns: 1fr;
     }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Enhanced Header Section -->
-<div class="portfolio-header">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <h1 class="display-4 fw-bold text-white mb-3">
-                    <i class="fas fa-folder-open me-3 floating"></i>My Portfolio
+<!-- Quantum Interface -->
+<div class="quantum-scanlines"></div>
+
+<!-- Quantum Header -->
+<div class="quantum-header">
+    <div class="quantum-grid"></div>
+    <div class="container position-relative">
+        <!-- Quantum Navigation -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="display-4 fw-bold text-white mb-3 quantum-text-glow">
+                    <i class="fas fa-network-wired me-3 quantum-pulse"></i>
+                    Quantum Portfolio
                 </h1>
                 <p class="lead text-white-50 mb-0">
-                    Showcase your best work, achievements, and projects in one beautiful collection
+                    Neural network of academic achievements and quantum projects
                 </p>
             </div>
-            <div class="col-lg-4 text-lg-end">
+            <div class="quantum-controls">
                 {% if user.student %}
-                <a href="{% url 'student_portfolio:portfolio_create' %}" class="btn btn-light btn-lg btn-portfolio">
-                    <i class="fas fa-plus-circle me-2"></i>Add New Item
+                <a href="{% url 'student_portfolio:portfolio_create' %}" 
+                   class="quantum-btn">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    <span>Create Quantum Artifact</span>
                 </a>
                 {% endif %}
+            </div>
+        </div>
+
+        <!-- Quantum Stats Dashboard -->
+        <div class="quantum-stats-grid">
+            <div class="quantum-stat-card">
+                <div class="quantum-stat-number">{{ portfolio_items.count }}</div>
+                <div class="text-white-50 fw-bold">Quantum Artifacts</div>
+                <small class="text-muted">Active neural nodes</small>
+            </div>
+            <div class="quantum-stat-card">
+                <div class="quantum-stat-number">{{ portfolio_items|length }}</div>
+                <div class="text-white-50 fw-bold">Online Broadcast</div>
+                <small class="text-muted">Public quantum streams</small>
+            </div>
+            <div class="quantum-stat-card">
+                <div class="quantum-stat-number">
+                    {{ portfolio_items|dictsort:"category"|length }}
+                </div>
+                <div class="text-white-50 fw-bold">Quantum Categories</div>
+                <small class="text-muted">Neural classifications</small>
+            </div>
+            <div class="quantum-stat-card">
+                <div class="quantum-stat-number">{% now "Y" %}</div>
+                <div class="text-white-50 fw-bold">Temporal Cycle</div>
+                <small class="text-muted">Academic quantum year</small>
             </div>
         </div>
     </div>
 </div>
 
 <div class="container py-5">
-    <!-- Enhanced Stats Cards -->
-    <div class="stats-grid">
-        <div class="stat-item">
-            <div class="stat-number">{{ portfolio_items.count }}</div>
-            <div class="text-muted fw-bold">Total Items</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-number">{{ portfolio_items|length }}</div>
-            <div class="text-muted fw-bold">Published</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-number">
-                {{ portfolio_items|dictsort:"category"|length }}
-            </div>
-            <div class="text-muted fw-bold">Categories</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-number">{% now "Y" %}</div>
-            <div class="text-muted fw-bold">Academic Year</div>
-        </div>
-    </div>
-
-    <!-- Messages -->
+    <!-- Quantum Messages -->
     {% if messages %}
     <div class="row mb-4">
         <div class="col-12">
             {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show alert-portfolio" role="alert">
-                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-triangle{% endif %} me-2"></i>
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="quantum-message">
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        <i class="fas fa-{% if message.tags == 'success' %}check-circle text-success{% else %}exclamation-triangle text-warning{% endif %} fa-lg"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        {{ message }}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             </div>
             {% endfor %}
         </div>
     </div>
     {% endif %}
 
-    <!-- Portfolio Grid -->
+    <!-- Quantum Artifacts Grid -->
     {% if portfolio_items %}
-    <div class="portfolio-grid">
+    <div class="quantum-portfolio-grid">
         {% for item in portfolio_items %}
-        <div class="portfolio-item-card">
-            <!-- Card Media -->
+        <div class="quantum-artifact-card">
+            <!-- Quantum Media -->
             {% if item.image_file %}
-            <div class="card-media">
+            <div class="quantum-card-media">
                 <img src="{{ item.image_file.url }}" alt="{{ item.title }}">
+                <div class="quantum-card-media-overlay"></div>
+                <div class="quantum-media-badge">
+                    <i class="fas fa-image"></i>
+                </div>
             </div>
             {% else %}
-            <div class="card-media-placeholder">
-                <i class="fas fa-{% if item.file_type == 'document' %}file-pdf{% elif item.file_type == 'image' %}image{% elif item.file_type == 'code' %}code{% else %}file{% endif %} text-white fa-4x"></i>
+            <div class="quantum-card-media-placeholder">
+                <i class="fas fa-{% if item.file_type == 'document' %}file-pdf{% elif item.file_type == 'image' %}image{% elif item.file_type == 'code' %}code{% else %}file{% endif %} text-white fa-3x quantum-pulse"></i>
+                <div class="quantum-placeholder-glow"></div>
             </div>
             {% endif %}
             
-            <div class="card-body">
-                <!-- Category Badge -->
+            <div class="quantum-card-body">
+                <!-- Quantum Category -->
                 {% if item.category %}
                 <div class="mb-3">
-                    <span class="badge gradient-primary">{{ item.category.name }}</span>
+                    <span class="quantum-badge">
+                        <i class="fas fa-tag me-1"></i>{{ item.category.name }}
+                    </span>
                 </div>
                 {% endif %}
 
-                <!-- Title -->
-                <h5 class="card-title">{{ item.title }}</h5>
+                <!-- Quantum Title -->
+                <h5 class="quantum-card-title">{{ item.title }}</h5>
                 
-                <!-- Description -->
-                <p class="card-text">{{ item.description|truncatewords:25 }}</p>
+                <!-- Quantum Description -->
+                <p class="quantum-card-text">{{ item.description|truncatewords:25 }}</p>
                 
-                <!-- Skills -->
+                <!-- Quantum Skills -->
                 {% if item.skills_used %}
-                <div>
-                    <div class="skills-cloud">
-                        {% for skill in item.skills_used|split|slice:":3" %}
-                        <span class="skill-tag">{{ skill }}</span>
-                        {% endfor %}
-                        {% with skills_list=item.skills_used|split %}
-                        {% if skills_list|length > 3 %}
-                        <span class="badge bg-light text-dark border">+{{ skills_list|length|add:"-3" }} more</span>
-                        {% endif %}
-                        {% endwith %}
-                    </div>
+                <div class="quantum-skills-cloud">
+                    {% for skill in item.skills_used|split|slice:":3" %}
+                    <span class="quantum-skill-tag">{{ skill }}</span>
+                    {% endfor %}
+                    {% with skills_list=item.skills_used|split %}
+                    {% if skills_list|length > 3 %}
+                    <span class="quantum-badge">+{{ skills_list|length|add:"-3" }} quantum</span>
+                    {% endif %}
+                    {% endwith %}
                 </div>
                 {% endif %}
                 
-                <!-- Action Buttons -->
-                <div class="action-btn-group mt-3">
-                    <a href="{% url 'student_portfolio:portfolio_detail' item.pk %}" class="btn btn-outline-primary btn-sm">
-                        <i class="fas fa-eye me-1"></i>View
+                <!-- Quantum Actions -->
+                <div class="quantum-action-grid">
+                    <a href="{% url 'student_portfolio:portfolio_detail' item.pk %}" 
+                       class="quantum-action-btn">
+                        <i class="fas fa-eye me-1"></i>Quantum View
                     </a>
                     {% if user.student == item.student %}
-                    <a href="{% url 'student_portfolio:portfolio_update' item.pk %}" class="btn btn-outline-secondary btn-sm">
-                        <i class="fas fa-edit me-1"></i>Edit
+                    <a href="{% url 'student_portfolio:portfolio_update' item.pk %}" 
+                       class="quantum-action-btn">
+                        <i class="fas fa-edit me-1"></i>Edit Matrix
                     </a>
                     {% endif %}
-                    <a href="{% url 'student_portfolio:portfolio_public' item.pk %}" class="btn btn-outline-success btn-sm" target="_blank">
-                        <i class="fas fa-share-alt me-1"></i>Share
+                    <a href="{% url 'student_portfolio:portfolio_public' item.pk %}" 
+                       class="quantum-action-btn" 
+                       target="_blank">
+                        <i class="fas fa-share-alt me-1"></i>Broadcast
                     </a>
                 </div>
             </div>
             
-            <!-- Card Footer -->
-            <div class="card-footer">
-                <div class="d-flex justify-content-between align-items-center text-muted small">
+            <!-- Quantum Footer -->
+            <div class="quantum-card-footer">
+                <div class="d-flex justify-content-between align-items-center text-white-50 small">
                     <span>
-                        <i class="fas fa-calendar me-1"></i>{{ item.created_at|date:"M d, Y" }}
+                        <i class="fas fa-calendar me-1"></i>
+                        <span class="quantum-date">{{ item.created_at|date:"M d, Y" }}</span>
                     </span>
                     <span class="text-capitalize">
-                        <i class="fas fa-{{ item.file_type }} me-1"></i>{{ item.file_type }}
+                        <i class="fas fa-{{ item.file_type }} me-1"></i>
+                        <span class="quantum-type">{{ item.file_type }}</span>
                     </span>
                 </div>
             </div>
+            
+            <!-- Quantum Glow Effect -->
+            <div class="quantum-artifact-glow"></div>
         </div>
         {% endfor %}
     </div>
     {% else %}
-    <!-- Empty State -->
-    <div class="empty-state">
-        <div class="empty-icon">
-            <i class="fas fa-folder-open"></i>
+    <!-- Quantum Empty State -->
+    <div class="quantum-empty-state">
+        <div class="quantum-empty-icon">
+            <i class="fas fa-network-wired"></i>
         </div>
-        <h3 class="text-gradient mb-3">Your Portfolio is Empty</h3>
-        <p class="text-muted mb-4 lead">
-            Start building your professional portfolio by showcasing your best work and achievements.
+        <h3 class="text-white mb-3 quantum-text-glow">Quantum Network Empty</h3>
+        <p class="text-white-50 mb-4 lead">
+            No neural artifacts detected. Initiate quantum creation sequence.
         </p>
         {% if user.student %}
-        <a href="{% url 'student_portfolio:portfolio_create' %}" class="btn btn-primary btn-lg btn-portfolio">
-            <i class="fas fa-plus-circle me-2"></i>Create Your First Item
+        <a href="{% url 'student_portfolio:portfolio_create' %}" 
+           class="quantum-btn btn-lg">
+            <i class="fas fa-plus-circle me-2"></i>
+            Initialize First Artifact
         </a>
         {% endif %}
     </div>
     {% endif %}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add quantum effects to cards
+    const cards = document.querySelectorAll('.quantum-artifact-card');
+    cards.forEach((card, index) => {
+        // Random delay for animations
+        card.style.animationDelay = `${index * 0.1}s`;
+        
+        // Add hover effect for data stream
+        card.addEventListener('mouseenter', function() {
+            this.classList.add('quantum-active');
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.classList.remove('quantum-active');
+        });
+    });
+    
+    // Add scanlines effect
+    const scanlines = document.querySelector('.quantum-scanlines');
+    let position = 0;
+    setInterval(() => {
+        position = (position + 1) % 4;
+        scanlines.style.backgroundPosition = `0px ${position}px`;
+    }, 100);
+    
+    // Quantum pulse effect for stats
+    const stats = document.querySelectorAll('.quantum-stat-card');
+    stats.forEach((stat, index) => {
+        setInterval(() => {
+            stat.classList.add('quantum-stat-pulse');
+            setTimeout(() => {
+                stat.classList.remove('quantum-stat-pulse');
+            }, 1000);
+        }, 3000 + (index * 1000));
+    });
+});
+</script>
 {% endblock %}

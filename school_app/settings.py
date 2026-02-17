@@ -1,3 +1,5 @@
+# Custom error handlers
+HANDLER503 = 'apps.corecode.views.service_unavailable'
 """
 Django settings for school_app project.
 Optimized for Railway PostgreSQL + Render hosting.
@@ -17,6 +19,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Security
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-this-in-production')
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+
+# ============================================
+# LOCAL DEVELOPMENT FIX - Force DEBUG for runserver
+# ============================================
+if 'runserver' in sys.argv:
+    DEBUG = True
+    print("🔧 Local development detected - DEBUG mode forced to True")
 
 # Allowed hosts - FIXED
 allowed_hosts_str = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,127.0.1.1,.onrender.com')
@@ -175,6 +184,40 @@ CSRF_TRUSTED_ORIGINS = list(set(CSRF_TRUSTED_ORIGINS))
 print(f"🔒 CSRF Trusted Origins: {CSRF_TRUSTED_ORIGINS}")
 
 # ============================================
+# SECURITY OVERRIDE FOR LOCAL DEVELOPMENT
+# ============================================
+def is_production():
+    """Check if we're running in production environment"""
+    # Check for production environment variables
+    is_render = bool(os.getenv('RENDER', False))
+    is_railway = bool(os.getenv('RAILWAY_ENVIRONMENT', False))
+    is_prod_env = os.getenv('ENVIRONMENT', '').lower() == 'production'
+    is_prod_host = any('.onrender.com' in host for host in ALLOWED_HOSTS) or \
+                   any('.railway.app' in host for host in ALLOWED_HOSTS)
+    
+    return is_render or is_railway or is_prod_env or is_prod_host
+
+# Check environment
+if is_production() and not DEBUG:
+    print("🚀 Production environment detected - enabling security settings")
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    
+    # Render/Railway proxy support
+    USE_X_FORWARDED_HOST = True
+    USE_X_FORWARDED_PORT = True
+else:
+    print("💻 Development/Local environment - HTTPS security disabled")
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+
+# ============================================
 # REST OF YOUR SETTINGS...
 # ============================================
 
@@ -211,20 +254,6 @@ LOGOUT_REDIRECT_URL = "/"
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 10800
-
-# Security settings for production
-if not DEBUG:
-    SECURE_SSL_REDIRECT = True
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    
-    # Render proxy support
-    USE_X_FORWARDED_HOST = True
-    USE_X_FORWARDED_PORT = True
 
 # Channels configuration (WebSockets)
 REDIS_URL = os.getenv('REDIS_URL')
@@ -299,5 +328,4 @@ LOGGING = {
 # Data upload limits
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 
-# Remove the database test that causes the warning
-print(f"🚀 Django configured. DEBUG={DEBUG}")
+print(f"🚀 Django configured. DEBUG={DEBUG}, SECURE_SSL_REDIRECT={SECURE_SSL_REDIRECT}")

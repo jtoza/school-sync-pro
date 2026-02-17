@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}503 Service Unavailable - {{ school_name|default:"School Sync Pro" }}{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-9">
+            <div class="card border-0 shadow-lg error-503-card">
+                <div class="card-body p-5 text-center">
+                    <div class="error-503-icon mb-4">
+                        <span>⚠️</span>
+                    </div>
+                    <h1 class="display-4 mb-2 font-weight-bold text-gradient">Service Unavailable</h1>
+                    <p class="lead mb-4 text-muted">Database Connection Lost — Your Railway database trial has ended.</p>
+                    <div class="alert alert-warning d-flex align-items-center justify-content-center mb-4 error-503-badge" role="alert">
+                        <span class="mr-2" style="font-size: 1.7rem;">🔔</span>
+                        <div><strong>Action Required:</strong> Your Railway database service needs to be reactivated</div>
+                    </div>
+                    <div class="error-503-details mb-4">
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                <div class="bg-white rounded p-3 h-100 shadow-sm">
+                                    <h6 class="mb-2 text-primary font-weight-bold">📊 Connection Details</h6>
+                                    <div class="mb-1"><span class="text-secondary font-weight-bold">Host:</span> shortline.proxy.rlwy.net (66.33.22.244)</div>
+                                    <div class="mb-1"><span class="text-secondary font-weight-bold">Port:</span> 48274</div>
+                                    <div class="mb-1"><span class="text-secondary font-weight-bold">Status:</span> <span class="text-danger font-weight-bold">❌ Connection Failed</span></div>
+                                    <div><span class="text-secondary font-weight-bold">Error:</span> server closed connection unexpectedly</div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="bg-danger bg-opacity-10 rounded p-3 h-100 shadow-sm border border-danger">
+                                    <h6 class="mb-2 text-danger font-weight-bold">🚂 Trial Ended</h6>
+                                    <div class="text-danger font-weight-bold">Your Railway PostgreSQL trial has expired or requires payment</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column flex-md-row justify-content-center align-items-stretch mb-4 gap-2 error-503-actions">
+                        <a href="https://railway.app/dashboard" target="_blank" class="btn btn-primary mb-2 mb-md-0 mr-md-2 px-4 py-2"><span>🚂</span> Railway Dashboard</a>
+                        <a href="https://railway.app/pricing" target="_blank" class="btn btn-secondary mb-2 mb-md-0 mr-md-2 px-4 py-2"><span>💰</span> Pricing Plans</a>
+                        <a href="mailto:support@railway.app" class="btn btn-outline-secondary px-4 py-2"><span>📧</span> Contact Support</a>
+                    </div>
+                    <div class="bg-light rounded p-4 mb-4 text-left error-503-steps">
+                        <h6 class="mb-2">📋 Quick Steps to Fix:</h6>
+                        <ol class="pl-3 mb-0">
+                            <li>Log into <a href="https://railway.app/dashboard" style="color: #667eea;">Railway Dashboard</a></li>
+                            <li>Select your PostgreSQL database</li>
+                            <li>Click on "Upgrade" or "Add Payment Method"</li>
+                            <li>Choose a plan (Hobby starts at $5/month)</li>
+                            <li>Wait 1-2 minutes and refresh this page</li>
+                        </ol>
+                    </div>
+                    <div class="mt-3 mb-2">
+                        <button onclick="window.location.reload()" class="btn btn-outline-info mr-2 px-4 py-2"><span>🔄</span> Check Connection Again</button>
+                        <span class="text-muted small">Page will auto-refresh every 30 seconds</span>
+                    </div>
+                    <div class="mt-4 text-muted small">
+                        <p>School Sync Pro - Database Maintenance Mode</p>
+                        <p>Error: OperationalError at /<br>Server time: {{ now|default:request|date:'D, d M Y H:i:s T' }}</p>
+                        <p>
+                            <a href="/" class="text-secondary">Try Homepage</a> &bull;
+                            <a href="/admin" class="text-secondary">Admin Login</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+.error-503-card {
+    background: linear-gradient(135deg, #f8fafc 60%, #e0e7ff 100%);
+    border-radius: 1.5rem;
+}
+.error-503-icon span {
+    font-size: 4.5rem;
+    animation: bounce 2s infinite;
+    display: inline-block;
+    filter: drop-shadow(0 2px 8px #a5b4fc);
+}
+.text-gradient {
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+}
+.error-503-badge {
+    font-size: 1.1rem;
+    border-left: 5px solid #f59e0b;
+    background: #fef3c7;
+    color: #92400e;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.07);
+}
+.error-503-details .bg-white {
+    border: 1px solid #e2e8f0;
+}
+.error-503-details .bg-danger {
+    background: #fee2e2 !important;
+    border: 1px solid #fecaca !important;
+}
+.error-503-actions .btn {
+    min-width: 180px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+.error-503-steps ol {
+    margin-bottom: 0;
+    padding-left: 1.2rem;
+}
+@media (max-width: 767.98px) {
+    .error-503-card { padding: 0.5rem; }
+    .error-503-details .col-md-6 { margin-bottom: 1rem; }
+    .error-503-actions .btn { min-width: 100%; margin-bottom: 0.5rem; }
+}
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+</style>
+<script>
+// Auto-refresh every 30 seconds to check if database is back
+setTimeout(function() {
+    window.location.reload();
+}, 30000);
+</script>
+{% endblock %}

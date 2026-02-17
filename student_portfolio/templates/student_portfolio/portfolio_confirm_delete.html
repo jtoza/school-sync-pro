@@ -6,36 +6,293 @@
 <div class="container mt-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'student_portfolio:portfolio_list' %}">Portfolio</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'student_portfolio:portfolio_detail' object.pk %}">{{ object.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'student_portfolio:portfolio_list' %}" class="text-gradient">Portfolio</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'student_portfolio:portfolio_detail' object.pk %}" class="text-gradient">{{ object.title }}</a></li>
             <li class="breadcrumb-item active">Delete</li>
         </ol>
     </nav>
 
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card border-danger">
-                <div class="card-header bg-danger text-white">
-                    <h4 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Confirm Deletion</h4>
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 ai-card-delete">
+                <div class="card-header ai-gradient-danger text-white position-relative overflow-hidden">
+                    <div class="ai-particles"></div>
+                    <div class="position-relative z-2">
+                        <div class="d-flex align-items-center">
+                            <div class="ai-icon-container me-3">
+                                <i class="fas fa-exclamation-triangle fa-2x"></i>
+                            </div>
+                            <div>
+                                <h4 class="mb-0">Neural Network Alert</h4>
+                                <small class="opacity-75">Critical deletion request detected</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <p>Are you sure you want to delete the portfolio item <strong>"{{ object.title }}"</strong>?</p>
-                    <p class="text-danger">This action cannot be undone.</p>
+                
+                <div class="card-body p-5">
+                    <!-- Animated Warning -->
+                    <div class="text-center mb-4">
+                        <div class="ai-pulse-ring">
+                            <div class="ai-pulse-ring-inner">
+                                <i class="fas fa-trash-alt fa-3x text-danger"></i>
+                            </div>
+                        </div>
+                    </div>
                     
-                    <form method="post">
+                    <!-- Warning Message -->
+                    <div class="ai-alert-card mb-4">
+                        <div class="ai-alert-header">
+                            <i class="fas fa-brain me-2"></i>
+                            <span class="ai-alert-title">Irreversible Action Detected</span>
+                        </div>
+                        <p class="mb-0 mt-2">
+                            Neural analysis confirms deletion of portfolio item 
+                            <strong class="ai-highlight">"{{ object.title }}"</strong> 
+                            will permanently remove all associated data.
+                        </p>
+                    </div>
+                    
+                    <!-- Data Loss Visualization -->
+                    <div class="ai-data-loss-visual mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Data integrity: 100%</small>
+                            <small class="text-danger">0% after deletion</small>
+                        </div>
+                        <div class="progress ai-progress-loss" style="height: 6px;">
+                            <div class="progress-bar bg-success" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Confirmation Form -->
+                    <form method="post" class="ai-delete-form">
                         {% csrf_token %}
-                        <div class="mt-4">
-                            <button type="submit" class="btn btn-danger">
-                                <i class="fas fa-trash"></i> Yes, Delete
-                            </button>
-                            <a href="{% url 'student_portfolio:portfolio_detail' object.pk %}" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> Cancel
+                        <div class="ai-form-grid mt-4 pt-4 border-top">
+                            <!-- Cancel Button -->
+                            <a href="{% url 'student_portfolio:portfolio_detail' object.pk %}" 
+                               class="btn btn-lg btn-ai-secondary ai-hover-glow">
+                                <div class="ai-btn-content">
+                                    <i class="fas fa-shield-alt me-2"></i>
+                                    <span>Abort Process</span>
+                                </div>
+                                <div class="ai-btn-hover">
+                                    <i class="fas fa-undo-alt"></i>
+                                </div>
                             </a>
+                            
+                            <!-- Delete Button -->
+                            <button type="submit" class="btn btn-lg btn-ai-danger ai-hover-glow">
+                                <div class="ai-btn-content">
+                                    <i class="fas fa-bolt me-2"></i>
+                                    <span>Execute Deletion</span>
+                                </div>
+                                <div class="ai-btn-hover">
+                                    <i class="fas fa-skull-crossbones"></i>
+                                </div>
+                            </button>
                         </div>
                     </form>
+                    
+                    <!-- Security Check -->
+                    <div class="ai-security-check mt-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="confirmDelete" required>
+                            <label class="form-check-label small text-muted" for="confirmDelete">
+                                <i class="fas fa-fingerprint me-1"></i>
+                                I understand this action is irreversible and permanent
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-footer ai-footer-note text-center py-3">
+                    <small class="text-muted">
+                        <i class="fas fa-robot me-1"></i>
+                        AI Safety Protocol: Deleted items cannot be recovered by neural networks
+                    </small>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.ai-card-delete {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(220, 53, 69, 0.2),
+                0 0 0 1px rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(248,249,250,0.9) 100%);
+}
+
+.ai-gradient-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #ff6b6b 100%);
+    position: relative;
+}
+
+.ai-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 20% 50%, rgba(255,255,255,0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.2) 0%, transparent 50%);
+    animation: ai-particle-float 8s ease-in-out infinite;
+}
+
+@keyframes ai-particle-float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+.ai-pulse-ring {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+}
+
+.ai-pulse-ring::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 3px solid rgba(220, 53, 69, 0.3);
+    border-radius: 50%;
+    animation: ai-pulse 2s ease-out infinite;
+}
+
+.ai-pulse-ring-inner {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(220,53,69,0.1) 0%, rgba(255,107,107,0.1) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@keyframes ai-pulse {
+    0% { transform: scale(0.8); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+
+.ai-alert-card {
+    background: linear-gradient(135deg, rgba(255,243,205,0.3) 0%, rgba(255,229,153,0.3) 100%);
+    border-left: 4px solid #ffc107;
+    border-radius: 12px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.ai-alert-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #ffc107, transparent);
+}
+
+.ai-alert-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.ai-alert-title {
+    font-weight: 600;
+    color: #856404;
+}
+
+.ai-highlight {
+    background: linear-gradient(120deg, rgba(220,53,69,0.1) 0%, rgba(220,53,69,0.2) 100%);
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    border-left: 3px solid #dc3545;
+}
+
+.ai-data-loss-visual {
+    background: rgba(0,0,0,0.02);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px dashed rgba(0,0,0,0.1);
+}
+
+.ai-progress-loss {
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(220,53,69,0.1);
+}
+
+.ai-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .ai-form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.btn-ai-secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #868e96 100%);
+    border: none;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.btn-ai-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #ff6b6b 100%);
+    border: none;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.ai-hover-glow:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(220, 53, 69, 0.3);
+}
+
+.ai-btn-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+}
+
+.ai-btn-hover {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.ai-hover-glow:hover .ai-btn-hover {
+    top: 0;
+}
+
+.ai-footer-note {
+    background: linear-gradient(135deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.05) 100%);
+    border-top: 1px solid rgba(0,0,0,0.05);
+}
+</style>
 {% endblock %}
