@@ -1,0 +1,125 @@
+{% extends 'lessonplans/base.html' %}
+
+{% block title %}All Lesson Plans{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1>Lesson Plans</h1>
+        <p class="text-muted">Browse and filter lesson plans</p>
+    </div>
+    <div class="col-auto">
+        <a href="{% url 'lessonplans:create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Create New Plan
+        </a>
+    </div>
+</div>
+
+<!-- Filter Form -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                {{ filter_form.subject.label_tag }}
+                {{ filter_form.subject }}
+            </div>
+            <div class="col-md-2">
+                {{ filter_form.class_level.label_tag }}
+                {{ filter_form.class_level }}
+            </div>
+            <div class="col-md-2">
+                {{ filter_form.status.label_tag }}
+                {{ filter_form.status }}
+            </div>
+            <div class="col-md-2">
+                {{ filter_form.visibility.label_tag }}
+                {{ filter_form.visibility }}
+            </div>
+            <div class="col-md-3">
+                <label>&nbsp;</label>
+                <div class="input-group">
+                    {{ filter_form.search }}
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                    <a href="{% url 'lessonplans:list' %}" class="btn btn-secondary">Clear</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Lesson Plans Grid -->
+<div class="row">
+    {% for plan in lessonplans %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 lessonplan-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title">{{ plan.title }}</h5>
+                        <span class="badge bg-{% if plan.status == 'published' %}success{% elif plan.status == 'draft' %}secondary{% else %}warning{% endif %} status-badge">
+                            {{ plan.get_status_display }}
+                        </span>
+                    </div>
+                    <p class="card-text text-muted small">
+                        <strong>Teacher:</strong> {{ plan.teacher.username }}<br>
+                        {% if plan.subject %}
+                            <strong>Subject:</strong> {{ plan.subject.name }}<br>
+                        {% endif %}
+                        {% if plan.class_level %}
+                            <strong>Class:</strong> {{ plan.class_level.name }}<br>
+                        {% endif %}
+                        <strong>Duration:</strong> {{ plan.duration_minutes }} minutes
+                    </p>
+                    <p class="card-text">{{ plan.objectives|truncatechars:150 }}</p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">{{ plan.created_at|date:"M d, Y" }}</small>
+                        <a href="{% url 'lessonplans:detail' plan.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                No lesson plans found. <a href="{% url 'lessonplans:create' %}">Create your first one!</a>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if is_paginated %}
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">First</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Previous</a>
+            </li>
+        {% endif %}
+        
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+        
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Last</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}
